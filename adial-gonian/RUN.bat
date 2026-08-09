@@ -32,11 +32,13 @@ if errorlevel 1 (
     powershell -Command "[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; Invoke-WebRequest -Uri 'https://nodejs.org/dist/v20.16.0/node-v20.16.0-x64.msi' -OutFile '%TEMP%\node_install.msi'"
     msiexec /i "%TEMP%\node_install.msi" /qn
     del "%TEMP%\node_install.msi" >nul 2>&1
-    set "PATH=%PATH%;C:\Program Files\nodejs"
-    echo     Node.js installed!
+    echo     Node.js installed! Please restart terminal after this run.
 ) else (
     for /f "tokens=*" %%i in ('node --version 2^>^&1') do echo     Found: %%i
 )
+
+REM Refresh PATH
+set "PATH=%PATH%;C:\Program Files\nodejs;%LOCALAPPDATA%\Volta\tools\image\node\20\bin"
 
 echo [3/6] Installing Python packages...
 if not exist "backend\.pip_done" (
@@ -48,13 +50,18 @@ if not exist "backend\.pip_done" (
 )
 
 echo [4/6] Installing Node.js packages...
-if not exist "frontend\node_modules" (
-    cd frontend
-    call npm install
-    cd /d "%BASEDIR%"
-    echo     Done!
+where npm >nul 2>&1
+if not errorlevel 1 (
+    if not exist "frontend\node_modules" (
+        cd frontend
+        call npm install
+        cd /d "%BASEDIR%"
+        echo     Done!
+    ) else (
+        echo     Already installed
+    )
 ) else (
-    echo     Already installed
+    echo     SKIPPED - npm not found. Backend will still work.
 )
 
 echo [5/6] Configuring settings...
@@ -67,7 +74,6 @@ echo [6/6] Starting Adial Gonian...
 echo.
 echo ============================================
 echo   Adial Gonian is starting!
-echo   Say "Adial Gonian" to activate!
 echo   Backend:  http://localhost:8765
 echo   API Docs: http://localhost:8765/docs
 echo ============================================
@@ -77,10 +83,29 @@ start "Adial Gonian Backend" /min cmd /c "cd /d "%BASEDIR%backend" && python mai
 
 timeout /t 4 /nobreak >nul
 
-cd frontend
-call npx vite --host 0.0.0.0
-cd /d "%BASEDIR%"
+where npx >nul 2>&1
+if not errorlevel 1 (
+    if exist "frontend\node_modules" (
+        cd frontend
+        call npx vite --host 0.0.0.0
+        cd /d "%BASEDIR%"
+    ) else (
+        echo   Backend running at http://localhost:8765
+        echo   Open http://localhost:8765/docs in your browser
+        echo.
+        echo   Press Ctrl+C to stop
+        pause
+    )
+) else (
+    echo   Backend running at http://localhost:8765
+    echo   Open http://localhost:8765/docs in your browser
+    echo.
+    echo   To install HUD later: install Node.js from https://nodejs.org
+    echo   Then restart this script.
+    echo.
+    echo   Press Ctrl+C to stop
+    pause
+)
 
 echo.
 echo Adial Gonian shut down.
-pause

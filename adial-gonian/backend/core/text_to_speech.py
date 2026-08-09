@@ -108,21 +108,9 @@ class TextToSpeech:
                 pass
 
     async def _play_audio(self, file_path: str):
-        """Play audio file using sounddevice (MP3 -> WAV conversion via pygame or ffmpeg)."""
+        """Play audio file using available system tools."""
+        # Try ffplay (ffmpeg) first
         try:
-            # Try using pygame for playback (supports MP3 directly)
-            import pygame
-            pygame.mixer.init()
-            pygame.mixer.music.load(file_path)
-            pygame.mixer.music.play()
-            while pygame.mixer.music.get_busy():
-                await asyncio.sleep(0.1)
-            pygame.mixer.quit()
-        except ImportError:
-            pass
-        
-        try:
-            # Fallback: use ffplay (ffmpeg)
             import subprocess
             process = subprocess.Popen(
                 ["ffplay", "-nodisp", "-autoexit", "-loglevel", "quiet", file_path],
@@ -131,8 +119,49 @@ class TextToSpeech:
             )
             while process.poll() is None:
                 await asyncio.sleep(0.1)
+            return
         except FileNotFoundError:
-            logger.warning("Neither pygame nor ffplay available for audio playback")
+            pass
+
+        # Try pygame-ce (newer pygame)
+        try:
+            import pygame
+            pygame.mixer.init()
+            pygame.mixer.music.load(file_path)
+            pygame.mixer.music.play()
+            while pygame.mixer.music.get_busy():
+                await asyncio.sleep(0.1)
+            pygame.mixer.quit()
+            return
+        except Exception:
+            pass
+
+        # Windows: try PowerShell audio playback
+        try:
+            import subprocess
+            # Use Windows Media Player via PowerShell
+            ps_cmd = f'''
+            Add-Type -AssemblyName presentationCore
+            $media = New-Object System.Windows.Media.MediaPlayer
+            $media.Open("{file_path}")
+            while ($media.NaturalDuration.TimeSpan -eq $null) {{ Start-Sleep -Milliseconds 100 }}
+            $duration = $media.NaturalDuration.TimeSpan.TotalSeconds
+            $media.Play()
+            Start-Sleep -Seconds ($duration + 0.5)
+            $media.Close()
+            '''
+            process = subprocess.Popen(
+                ["powershell", "-Command", ps_cmd],
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL,
+            )
+            while process.poll() is None:
+                await asyncio.sleep(0.1)
+            return
+        except Exception:
+            pass
+
+        logger.warning("No audio playback method available. Audio saved to file.")
 
     async def speak_async(self, text: str, rate: str = "+0%"):
         """
