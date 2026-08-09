@@ -16,9 +16,13 @@ node_modules/
 dist-electron/
 .vite/
 
-# Environment
+# Environment (contains API keys!)
 .env
 .env.local
+
+# Install markers
+backend/.pip_done
+backend/.installed
 
 # Models (large files)
 backend/models/
