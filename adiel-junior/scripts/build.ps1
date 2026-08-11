@@ -8,7 +8,9 @@
 #  תיקונים אוטומטיים מובנים (autofix):
 #   * core.longpaths=true ל-git (קבצים עם נתיבים ארוכים ב-llama.cpp)
 #   * זיהוי אוטומטי של Visual Studio 2022 (17) או 2026 (18) ובחירת ה-Generator
+#   * ניקוי אוטומטי של קאש build ישן עם Generator שונה
 #   * אם הורדת התלויות נכשלת - שכפול מקומי ל-third_party וניסיון חוזר
+#   * תיקיית third_party פגומה/חלקית - השלמה או שכפול מחדש
 #   * אם מחולל האייקון נכשל - שימוש באייקון הקיים במאגר
 # =============================================================================
 param(
@@ -57,18 +59,36 @@ $gen = "Visual Studio 17 2022"
 if ($major -eq "18") { $gen = "Visual Studio 18 2026" }
 Write-Step "Visual Studio: $vsPath (גרסה $vsVer) -> Generator: $gen"
 
-# ---- 3. מחולל אייקון (פרויקט עצמאי - בלי למשוך llama.cpp) ----
-Write-Step "מחולל אייקון..."
-try {
-    cmd /c "cmake -S tools\gen_icon -B build\icon -G `"$gen`" -A x64 -DCMAKE_BUILD_TYPE=Release >nul 2>&1"
-    cmd /c "cmake --build build\icon --config Release >nul 2>&1"
-    $iconExe = Get-ChildItem build\icon -Recurse -Filter gen_icon.exe -ErrorAction SilentlyContinue | Select-Object -First 1
-    if ($iconExe) { & $iconExe.FullName } else { Write-Fail "האייקון לא נוצר - משתמש בקיים" }
-} catch {
-    Write-Fail "מחולל האייקון נכשל - משתמש באייקון הקיים במאגר (assets/adieljunior.ico)"
+# ---- 3. AUTOFIX: ניקוי קאש build ישן עם Generator שונה ----
+$cacheFile = Join-Path $Root "build\CMakeCache.txt"
+if (Test-Path $cacheFile) {
+    $cachedGen = Select-String -Path $cacheFile -Pattern '^CMAKE_GENERATOR:INTERNAL=(.+)$' |
+        ForEach-Object { $_.Matches[0].Groups[1].Value } | Select-Object -First 1
+    if ($cachedGen -and $cachedGen -ne $gen) {
+        Write-Step "ה-build הקיים נבנה עם '$cachedGen' - מוחק ומתחיל מחדש עם '$gen'"
+        Remove-Item (Join-Path $Root "build") -Recurse -Force -ErrorAction SilentlyContinue
+    }
+}
+$iconCache = Join-Path $Root "build\icon\CMakeCache.txt"
+if (Test-Path $iconCache) {
+    Remove-Item (Join-Path $Root "build\icon") -Recurse -Force -ErrorAction SilentlyContinue
 }
 
-# ---- 4. קונפיגורציה (עם נפילה ל-Generator השני) ----
+# ---- 4. מחולל אייקון (פרויקט עצמאי - בלי למשוך llama.cpp) ----
+Write-Step "מחולל אייקון..."
+$iconArgs = @("-S", "tools\gen_icon", "-B", "build\icon", "-G", $gen, "-A", "x64", "-DCMAKE_BUILD_TYPE=Release")
+& $cmake @iconArgs 2>&1 | Out-Null
+if ($LASTEXITCODE -eq 0) {
+    & $cmake --build build\icon --config Release 2>&1 | Out-Null
+    if ($LASTEXITCODE -eq 0) {
+        $iconExe = Get-ChildItem build\icon -Recurse -Filter gen_icon.exe -ErrorAction SilentlyContinue |
+            Select-Object -First 1
+        if ($iconExe) { & $iconExe.FullName; Write-Ok "הלוגו נוצר" }
+        else { Write-Fail "האייקון לא נוצר - משתמש בקיים" }
+    } else { Write-Fail "בניית האייקון נכשלה - משתמש בקיים" }
+} else { Write-Fail "קונפיגורציית האייקון נכשלה - משתמש בקיים" }
+
+# ---- 5. קונפיגורציה (עם נפילה ל-Generator השני) ----
 $baseArgs = @(
     "-DCMAKE_BUILD_TYPE=$Config",
     "-DADIEL_USE_LLAMA=ON",
@@ -84,7 +104,7 @@ if ($NoGpu) { $baseArgs += "-DGGML_CUDA=OFF"; $baseArgs += "-DGGML_DML=OFF" }
 
 function Invoke-Configure([string]$g, [string[]]$extra) {
     $a = @("-S", ".", "-B", "build", "-G", $g, "-A", "x64") + $baseArgs + $extra
-    & $cmake @a | Out-Null
+    & $cmake @a 2>&1 | Out-Null
     return $LASTEXITCODE
 }
 
@@ -104,14 +124,24 @@ if ($code -ne 0) {
     New-Item -ItemType Directory -Force -Path third_party | Out-Null
 
     $pinned = @(
-        @{ name = "llama.cpp";   url = "https://github.com/ggml-org/llama.cpp.git";   sha = "030ebb558a5820b444a8f836ed5cdd46c9b4bd7a" },
-        @{ name = "whisper.cpp"; url = "https://github.com/ggml-org/whisper.cpp.git"; sha = "592feef04a1802b18cbeffd0fd0eb5d02570c2ec" },
-        @{ name = "porcupine";   url = "https://github.com/Picovoice/porcupine.git";  sha = "c23ab023ae410766cb835446765537b25013b166" }
+        @{ name = "llama.cpp";   url = "https://github.com/ggml-org/llama.cpp.git";   sha = "030ebb558a5820b444a8f836ed5cdd46c9b4bd7a"; marker = "CMakeLists.txt" },
+        @{ name = "whisper.cpp"; url = "https://github.com/ggml-org/whisper.cpp.git"; sha = "592feef04a1802b18cbeffd0fd0eb5d02570c2ec"; marker = "CMakeLists.txt" },
+        @{ name = "porcupine";   url = "https://github.com/Picovoice/porcupine.git";  sha = "c23ab023ae410766cb835446765537b25013b166"; marker = "include\pv_porcupine.h" }
     )
 
     foreach ($p in $pinned) {
         $dir = Join-Path "third_party" $p.name
-        if (-not (Test-Path $dir)) {
+        $markerPath = Join-Path $dir $p.marker
+        if (Test-Path $dir -and -not (Test-Path $markerPath)) {
+            Write-Fail "$($p.name) פגום - משכפל מחדש"
+            Remove-Item $dir -Recurse -Force -ErrorAction SilentlyContinue
+        }
+        if (Test-Path $dir) {
+            # השלמת checkout אם נכשל קודם (קבצים עם נתיבים ארוכים)
+            cmd /c "git -C `"$dir`" config core.longpaths true >nul 2>&1"
+            cmd /c "git -C `"$dir`" checkout . >nul 2>&1"
+            Write-Ok "$($p.name) קיים ותקין"
+        } else {
             Write-Step "משכפל $($p.name) ..."
             cmd /c "git -c core.longpaths=true clone --depth 1 $($p.url) `"$dir`" >nul 2>&1"
             if ($LASTEXITCODE -eq 0) {
@@ -139,9 +169,9 @@ if ($code -ne 0) {
     if ($code -ne 0) { Write-Fail "הקונפיגורציה נכשלה שוב. בדקו את ההודעות למעלה."; exit 1 }
 }
 
-# ---- 5. בנייה ----
+# ---- 6. בנייה ----
 Write-Step "בנייה..."
-& $cmake --build build --config $Config --target AdielJunior -m
+& $cmake --build build --config $Config --target AdielJunior --parallel
 if ($LASTEXITCODE -ne 0) {
     Write-Fail "הבנייה נכשלה. טיפים:"
     Write-Fail "  1. GPU: נסו -NoGpu לבניית CPU"
@@ -149,7 +179,7 @@ if ($LASTEXITCODE -ne 0) {
     exit 1
 }
 
-# ---- 6. אריזה ----
+# ---- 7. אריזה ----
 Write-Step "אריזה..."
 & powershell -ExecutionPolicy Bypass -File scripts\deploy.ps1 -Config $Config
 if ($LASTEXITCODE -ne 0) { Write-Fail "האריזה נכשלה"; exit 1 }
