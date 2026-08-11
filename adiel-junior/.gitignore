@@ -1,13 +1,14 @@
 # ===== Adiel Junior (native C++ engine) =====
-adiel-junior/build*/
-adiel-junior/out/
-adiel-junior/dist/
-adiel-junior/third_party/*
-!adiel-junior/third_party/README.md
-adiel-junior/models/
-adiel-junior/logs/
-adiel-junior/data/history.json
-adiel-junior/data/raw/
+# הערה: דפוסים בקובץ .gitignore מקונן הם יחסיים לתיקייה שלו
+build*/
+out/
+dist/
+third_party/*
+!third_party/README.md
+models/
+logs/
+data/history.json
+data/raw/
 *.gguf
 *.bin
 *.onnx
