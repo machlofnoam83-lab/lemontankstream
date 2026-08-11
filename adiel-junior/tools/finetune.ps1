@@ -1,30 +1,30 @@
 ﻿# =============================================================================
 #  Adiel Junior - Fine-Tuning Pipeline (100% Native C++, ללא Python)
 #
-#  משתמש בכלי llama.cpp: llama-finetune (כוונון עדין) + llama-quantize (קוונטיזציה)
-#  מתאים למודל 3B (Qwen2.5-3B / Llama-3.2-3B) על נתוני עברית.
+#  מאמן את המודל שלנו: llama-finetune (כוונון עדין) + llama-quantize (קוונטיזציה)
+#  על נתוני העברית שלנו (data\hebrew_corpus.txt - נבנה ע"י tools\build_corpus).
 #
 #  שימוש:
 #    powershell -ExecutionPolicy Bypass -File tools\finetune.ps1 `
-#        -BaseModel models\Qwen2.5-3B-Instruct-Q4_K_M.gguf `
-#        -Data data\hebrew_instruct.txt `
+#        -BaseModel models\AdielJunior-3B-Base.gguf `
+#        -Data data\hebrew_corpus.txt `
 #        -OutModel models\AdielJunior-3B-Q4_K_M.gguf
 #
 #  הערה: לאימון CPU - בנו llama.cpp ללא CUDA/DirectML (בנייה נקייה).
 # =============================================================================
 param(
-    [string]$BaseModel = "models\Qwen2.5-3B-Instruct-Q4_K_M.gguf",  # מודל בסיס (GGUF)
-    [string]$Data      = "data\hebrew_instruct.txt",               # טקסט אימון בעברית
-    [string]$OutModel  = "models\AdielJunior-3B-Q4_K_M.gguf",      # התוצר הסופי
+    [string]$BaseModel = "models\AdielJunior-3B-Base.gguf",   # מודל הבסיס שלנו (אימון קודם)
+    [string]$Data      = "data\hebrew_corpus.txt",            # קורפוס האימון שלנו (עברית)
+    [string]$OutModel  = "models\AdielJunior-3B-Q4_K_M.gguf", # התוצר הסופי שלנו
     [int]$Ctx          = 512,
     [int]$Batch        = 16,
     [int]$GpuLayers    = -1,     # -1 = הכל (GPU); 0 = CPU
     [double]$Lr        = 1e-4,
     [int]$Epochs       = 2,
-    [string]$LlamaDir  = "third_party\llama.cpp"                    # clone מקומי
+    [string]$LlamaDir  = "third_party\llama.cpp"               # clone מקומי
 )
 
-$ErrorActionPreference = "Stop"
+$ErrorActionPreference = "Continue"
 try { [Console]::OutputEncoding = [System.Text.Encoding]::UTF8 } catch { }
 $Root = Split-Path -Parent $PSScriptRoot
 Set-Location $Root
@@ -38,7 +38,7 @@ if (-not (Test-Path $finetune)) { Write-Error "llama-finetune לא נמצא. ב�
 
 $f32 = "models\finetuned-f32.gguf"
 
-Write-Host "=== שלב 1: כוונון עדין (llama-finetune) ===" -ForegroundColor Cyan
+Write-Host "=== שלב 1: אימון המודל שלנו (llama-finetune) ===" -ForegroundColor Cyan
 & $finetune `
     --file $Data `
     --model $BaseModel `
@@ -54,5 +54,5 @@ if ($LASTEXITCODE -ne 0) { Write-Error "קוונטיזציה נכשלה"; exit 1
 
 Remove-Item $f32 -ErrorAction SilentlyContinue
 Write-Host ""
-Write-Host "המודל המעודכן מוכן: $OutModel" -ForegroundColor Green
+Write-Host "המודל שלנו מוכן: $OutModel" -ForegroundColor Green
 Write-Host "הגדירו אותו בקונפיג: ai.model_path = `"$OutModel`"" -ForegroundColor Green

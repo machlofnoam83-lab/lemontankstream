@@ -118,7 +118,7 @@ void Config::writeDefault(const std::string& path) {
     root["language"] = json::Value("he");
 
     json::Value ai;
-    ai["model_path"] = json::Value("models/Qwen2.5-3B-Instruct-Q4_K_M.gguf");
+    ai["model_path"] = json::Value("models/AdielJunior-3B-Q4_K_M.gguf");
     ai["engine"]     = json::Value("llama");
     ai["gpu_layers"] = json::Value(-1);
     ai["n_ctx"]      = json::Value(4096);

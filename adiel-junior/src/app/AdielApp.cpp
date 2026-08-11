@@ -407,9 +407,12 @@ void AdielApp::runAiWorker() {
             // סטרימינג קולי: משפט שלם → דיבור מיד (בלי לחכות לסוף התשובה)
             m_sentenceBuf += piece;
             const char last = m_sentenceBuf.empty() ? '\0' : m_sentenceBuf.back();
+            // סוף משפט: נקודה/קריאה/סימן שאלה, או הבית האחרון של "…" (UTF-8: E2 80 A6)
+            const bool endOfSentence =
+                last == '.' || last == '!' || last == '?' ||
+                (static_cast<unsigned char>(last) == 0xA6);
             const size_t minLen = 24;
-            if ((last == '.' || last == '!' || last == '?' || last == '…') &&
-                m_sentenceBuf.size() >= minLen) {
+            if (endOfSentence && m_sentenceBuf.size() >= minLen) {
                 std::string sentence = m_sentenceBuf;
                 m_sentenceBuf.clear();
                 setState(AssistantState::Speaking);

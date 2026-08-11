@@ -4,7 +4,7 @@
 # =============================================================================
 param([string]$Config = "Release")
 
-$ErrorActionPreference = "Stop"
+$ErrorActionPreference = "Continue"
 try { [Console]::OutputEncoding = [System.Text.Encoding]::UTF8 } catch { }
 $Root = Split-Path -Parent $PSScriptRoot
 Set-Location $Root
@@ -12,21 +12,29 @@ Set-Location $Root
 $dist = Join-Path $Root "dist\AdielJunior"
 New-Item -ItemType Directory -Force -Path $dist | Out-Null
 
-# ה-exe (מחפש בשני מיקומים אפשריים)
+# ה-exe (מחפש בכמה מיקומים אפשריים)
 $exeCandidates = @(
     (Join-Path $Root "build\bin\$Config\AdielJunior.exe"),
-    (Join-Path $Root "build\$Config\AdielJunior.exe")
+    (Join-Path $Root "build\$Config\AdielJunior.exe"),
+    (Join-Path $Root "build\AdielJunior.exe")
 )
 $exe = $exeCandidates | Where-Object { Test-Path $_ } | Select-Object -First 1
 if (-not $exe) { Write-Error "AdielJunior.exe לא נמצא - הריצו קודם build"; exit 1 }
 Copy-Item $exe $dist -Force
 
-# קונפיג (יוצר ברירת מחדל אם חסר)
+# קונפיג - העתקה מהמאגר, או יצירה מקומית אם חסר (ללא הרצת ה-exe)
 $cfgDir = Join-Path $Root "config"
 New-Item -ItemType Directory -Force -Path $cfgDir | Out-Null
 $cfg = Join-Path $cfgDir "adieljunior.json"
 if (-not (Test-Path $cfg)) {
-    & (Join-Path $dist "AdielJunior.exe") --config $cfg 2>$null | Out-Null
+    $obj = [ordered]@{
+        language = "he"
+        ai = [ordered]@{ engine = "llama"; model_path = "models/AdielJunior-3B-Q4_K_M.gguf"; gpu_layers = -1 }
+        wake_word = [ordered]@{ keyword = "אדיאל ג'וניור" }
+        hud = [ordered]@{ enabled = $true }
+    }
+    $json = $obj | ConvertTo-Json -Depth 5
+    [System.IO.File]::WriteAllText($cfg, $json, (New-Object System.Text.UTF8Encoding($false)))
 }
 if (Test-Path $cfg) { Copy-Item $cfg $dist -Force }
 
@@ -48,10 +56,10 @@ echo ============================================
 echo   Adiel Junior - עוזר אישי חכם (Native C++)
 echo ============================================
 echo.
-if exist "models\Qwen2.5-3B-Instruct-Q4_K_M.gguf" (
+if exist "models\AdielJunior-3B-Q4_K_M.gguf" (
     AdielJunior.exe
 ) else (
-    echo מודל ה-AI לא נמצא - מריצים במצב הדגמה...
+    echo מודל ה-AI שלנו לא נמצא - מריצים במצב הדגמה...
     AdielJunior.exe --demo
 )
 pause

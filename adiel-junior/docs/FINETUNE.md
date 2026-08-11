@@ -6,7 +6,7 @@
 ## סקירה
 
 ```
-data/hebrew_instruct.txt ──▶ llama-finetune ──▶ finetuned-f32.gguf
+data/hebrew_corpus.txt ──▶ llama-finetune ──▶ finetuned-f32.gguf
                                                        │
                                             llama-quantize Q4_K_M
                                                        │
@@ -38,8 +38,8 @@ cmake --build build --config Release --target llama-finetune llama-quantize -m
 
 ```powershell
 powershell -ExecutionPolicy Bypass -File tools\finetune.ps1 `
-    -BaseModel models\Qwen2.5-3B-Instruct-Q4_K_M.gguf `
-    -Data data\hebrew_instruct.txt `
+    -BaseModel models\AdielJunior-3B-Base.gguf `
+    -Data data\hebrew_corpus.txt `
     -OutModel models\AdielJunior-3B-Q4_K_M.gguf
 ```
 

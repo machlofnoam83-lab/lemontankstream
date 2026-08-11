@@ -240,7 +240,16 @@ std::string Value::dump(bool pretty, int indent) const {
 
 // --------------------------------------------------------------- פונקציות ---
 Value parse(const std::string& text) {
-    Parser p(text);
+    // דילוג על BOM של UTF-8 אם קיים (קבצים שנכתבו ע"י כלים אחרים)
+    size_t start = 0;
+    if (text.size() >= 3 && static_cast<unsigned char>(text[0]) == 0xEF &&
+        static_cast<unsigned char>(text[1]) == 0xBB &&
+        static_cast<unsigned char>(text[2]) == 0xBF) {
+        start = 3;
+    }
+    // העתקה מקומית — חיונית! Parser שומר הפניה למחרוזת
+    const std::string body = (start == 0) ? text : text.substr(start);
+    Parser p(body);
     return p.parse();
 }
 

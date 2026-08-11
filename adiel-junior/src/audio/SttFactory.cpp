@@ -13,6 +13,7 @@
 namespace aj {
 
 IStt* createSttEngine(const Config& cfg) {
+    (void)cfg;
 #ifdef ADIEL_HAVE_WHISPER
     if (cfg.sttEngine == "whisper") {
         auto* stt = new WhisperStt();

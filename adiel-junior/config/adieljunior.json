@@ -2,7 +2,7 @@
   "language": "he",
   "ai": {
     "engine": "llama",
-    "model_path": "models/Qwen2.5-3B-Instruct-Q4_K_M.gguf",
+    "model_path": "models/AdielJunior-3B-Q4_K_M.gguf",
     "gpu_layers": -1,
     "n_ctx": 4096,
     "n_threads": 0,

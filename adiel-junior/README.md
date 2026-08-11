@@ -37,7 +37,7 @@
 
 | תכונה | טכנולוגיה | סטטוס |
 |-------|-----------|-------|
-| 🧠 מודל שפה מקומי 3B (Qwen2.5-3B / Llama-3.2-3B) | llama.cpp C API, קישור סטטי, GGUF Q4_K_M/Q8_0, טעינה מלאה ל-VRAM (`gpu_layers=-1`) | ✅ ממומש |
+| 🧠 מודל שפה מקומי 3B — **המודל שלנו** (מאומן על הנתונים שלנו) | llama.cpp C API, קישור סטטי, GGUF Q4_K_M/Q8_0, טעינה מלאה ל-VRAM (`gpu_layers=-1`) | ✅ ממומש |
 | 👁️ תפיסת מסך 30–60 FPS | DXGI Desktop Duplication (Zero-Copy) + GDI fallback | ✅ ממומש |
 | 🔍 זיהוי שינויים דינמי | FrameDiffer (רשת 64×36, רק שינוי משמעותי → ניתוח) | ✅ ממומש |
 | 📖 "ראייה" בעברית | Windows.Media.Ocr (WinRT) — קורא טקסט מהמסך ל-AI | ✅ ממומש |
@@ -48,7 +48,7 @@
 | 🎛️ מצבי תצוגה | מרכז / צד (Docked) / מוסתר — בקול ("שים בצד", "חזור לאמצע", "הסתר") או בלחיצה | ✅ ממומש |
 | 🌊 גל קול תגובתי + טבעות אנרגיה | FFT משלנו (radix-2) על שמע המיקרופון | ✅ ממומש |
 | ⌨️ מקשי קיצור | Ctrl+Alt+L/D/C/H/Q/S (האזנה/צד/מרכז/הסתר/יציאה/מסך) | ✅ ממומש |
-| 🔧 כוונון עדין בעברית | llama-finetune + llama-quantize (C++ טהור, ללא Python) | ✅ צינור מוכן |
+| 🔧 בניית המודל שלנו מאפס | קורפוס משלנו (`build_corpus`) → אימון (`llama-finetune`) → קוונטיזציה — C++ טהור, ללא Python | ✅ צינור מוכן |
 | 🧪 בדיקות עצמיות | `AdielJunior.exe --selftest` — 26 בדיקות ליבה | ✅ עוברות |
 
 ## 🚀 התחלה מהירה (Windows 10/11 x64)
@@ -72,15 +72,25 @@ AdielJunior.exe --selftest  :: בדיקות עצמיות
 AdielJunior.exe             :: מצב מלא (אחרי הורדת מודלים)
 ```
 
-## 📦 הורדת מודלים (פעם אחת, ואז הכל אופליין)
+## 🧠 המודל הוא שלנו — איך אנחנו בונים אותו
 
-| מודל | מיקום צפוי | הורדה |
-|------|-----------|-------|
-| LLM 3B (Q4_K_M) | `models/Qwen2.5-3B-Instruct-Q4_K_M.gguf` | [Hugging Face — Qwen2.5-3B-Instruct-GGUF](https://huggingface.co/Qwen/Qwen2.5-3B-Instruct-GGUF) |
-| Whisper עברית | `models/whisper/ggml-small-he.bin` | [Hugging Face — whisper-small-he](https://huggingface.co/openai/whisper-small) (המרה עם כלי whisper.cpp) |
-| Porcupine params | `models/porcupine/porcupine_params.pv` | [Picovoice GitHub](https://github.com/Picovoice/porcupine/tree/master/lib/common) |
-| מילת הפעלה `.ppn` | `models/porcupine/אדיאל-ג'וניור_windows_v3_0_0.ppn` | [Picovoice Console](https://console.picovoice.ai) (חינם — אימון "אדיאל ג'וניור") |
-| קול עברי (TTS) | `models/sherpa/vits-hebrew.onnx` | [k2-fsa sherpa-onnx models](https://github.com/k2-fsa/sherpa-onnx/releases) (חיפוש Hebrew VITS) |
+| שלב | הכלי שלנו | תיאור |
+|-----|-----------|-------|
+| 1. נתונים | `tools/build_corpus.cpp` | קבצי השיחות שלנו (עברית) → קורפוס אימון בפורמט ChatML + סטטיסטיקות |
+| 2. אימון | `tools/finetune.ps1` + `llama-finetune` | אימון המודל על הנתונים שלנו (GPU/CPU) |
+| 3. קוונטיזציה | `llama-quantize` | Q4_K_M → `models/AdielJunior-3B-Q4_K_M.gguf` |
+| 4. הרצה | `AdielJunior.exe` | טוען את המודל שלנו — הכל מקומי |
+
+**המנוע לא תלוי באף מודל מסחרי**: כל GGUF שמאומן על ידינו עובד.
+תיעוד מלא: [docs/TRAIN_FROM_SCRATCH.md](docs/TRAIN_FROM_SCRATCH.md).
+
+### קבצי עזר (לבדיקות/פיתוח בלבד — לא חלק מהמוצר)
+| רכיב | הערה |
+|------|------|
+| Whisper עברית | `models/whisper/ggml-small-he.bin` — [whisper.cpp](https://github.com/ggml-org/whisper.cpp) |
+| Porcupine params | `models/porcupine/porcupine_params.pv` — [Picovoice](https://github.com/Picovoice/porcupine) |
+| מילת הפעלה `.ppn` | אומן אצלנו ב-[Picovoice Console](https://console.picovoice.ai) (חינם) — "אדיאל ג'וניור" |
+| קול עברי (TTS) | `models/sherpa/vits-hebrew.onnx` — [sherpa-onnx](https://github.com/k2-fsa/sherpa-onnx) |
 
 ## 📁 מבנה הפרויקט
 
@@ -110,6 +120,7 @@ adiel-junior/
 - [ארכיטקטורה מלאה](docs/ARCHITECTURE.md)
 - [בנייה ב-Windows](docs/BUILD_WINDOWS.md)
 - [קונפיגורציה](docs/CONFIG.md)
+- [בניית המודל שלנו מאפס](docs/TRAIN_FROM_SCRATCH.md)
 - [כוונון עדין](docs/FINETUNE.md)
 
 ## 🧪 סטטוס בדיקות

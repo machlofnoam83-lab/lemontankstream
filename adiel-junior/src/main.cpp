@@ -26,17 +26,17 @@ namespace aj { int runSelfTests(); }
 namespace {
 
 void printUsage() {
-    std::printf(
-        "Adiel Junior v1.0 — עוזר אישי חכם, Native C++20, 100% מקומי\n"
+    std::fputs(
+        "Adiel Junior v1.0 - עוזר אישי חכם, Native C++20, 100% מקומי\n"
         "-------------------------------------------------------------\n"
         "שימוש:\n"
         "  AdielJunior.exe                    הרצה רגילה\n"
         "  AdielJunior.exe --config FILE      קובץ קונפיגורציה מותאם\n"
-        "  AdielJunior.exe --demo             מצב הדגמה (ללא מודלים — בדיקת כל הצינור)\n"
+        "  AdielJunior.exe --demo             מצב הדגמה (ללא מודלים - בדיקת כל הצינור)\n"
         "  AdielJunior.exe --headless         ללא חלון HUD (יומן בלבד)\n"
         "  AdielJunior.exe --selftest         בדיקות עצמיות של הליבה\n"
         "  AdielJunior.exe --version          גרסה\n"
-        "  AdielJunior.exe --help             עזרה זו\n");
+        "  AdielJunior.exe --help             עזרה זו\n", stdout);
 }
 
 } // namespace

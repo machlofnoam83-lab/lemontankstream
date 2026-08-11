@@ -240,7 +240,7 @@ endif()
 # ---------------------------------------------------------------------------
 #  Tool: מחולל הלוגו ההולוגרפי (C++ טהור, ללא תלות חיצונית)
 # ---------------------------------------------------------------------------
-add_executable(gen_icon tools/gen_icon.cpp)
+add_executable(gen_icon tools/gen_icon/gen_icon.cpp)
 target_compile_definitions(gen_icon PRIVATE NOMINMAX WIN32_LEAN_AND_MEAN)
 
 # ---------------------------------------------------------------------------
@@ -251,6 +251,14 @@ set_target_properties(AdielJunior PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
 )
 set_target_properties(gen_icon PROPERTIES
+    RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
+)
+
+# ---------------------------------------------------------------------------
+#  Tool: build_corpus - בניית קורפוס האימון שלנו (C++ טהור)
+# ---------------------------------------------------------------------------
+add_executable(build_corpus tools/build_corpus.cpp)
+set_target_properties(build_corpus PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
 )
 

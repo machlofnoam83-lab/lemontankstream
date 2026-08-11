@@ -26,7 +26,7 @@ struct Config {
     std::string language = "he";
 
     // ---- AI Core (llama.cpp)
-    std::string modelPath = "models/Qwen2.5-3B-Instruct-Q4_K_M.gguf";
+    std::string modelPath = "models/AdielJunior-3B-Q4_K_M.gguf"; // המודל שלנו
     int  gpuLayers        = -1;        // -1 = כל השכבות ב-VRAM
     int  nCtx             = 4096;
     int  nThreads         = 0;         // 0 = אוטומטי

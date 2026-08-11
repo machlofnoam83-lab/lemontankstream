@@ -7,7 +7,7 @@
 | מפתח | ברירת מחדל | תיאור |
 |------|-----------|-------|
 | `engine` | `"llama"` | `"llama"` (llama.cpp) או `"stub"` (הדגמה) |
-| `model_path` | `models/Qwen2.5-3B-Instruct-Q4_K_M.gguf` | נתיב מודל GGUF |
+| `model_path` | `models/AdielJunior-3B-Q4_K_M.gguf` | נתיב המודל שלנו (GGUF) |
 | `gpu_layers` | `-1` | מספר שכבות ב-VRAM; **שלילי = הכל** |
 | `n_ctx` | `4096` | אורך הקשר (טוקנים) |
 | `n_threads` | `0` | 0 = אוטומטי |
