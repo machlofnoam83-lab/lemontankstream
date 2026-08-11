@@ -1,0 +1,36 @@
+// =============================================================================
+//  Adiel Junior — משאבי גרסה ואייקון
+// =============================================================================
+#include <windows.h>
+#include "version.h"
+
+// האייקון נוצר ע"י tools/gen_icon.exe → assets/adieljunior.ico
+IDI_ICON1 ICON "assets/adieljunior.ico"
+
+VS_VERSION_INFO VERSIONINFO
+ FILEVERSION     ADIEL_VERSION_MAJOR,ADIEL_VERSION_MINOR,ADIEL_VERSION_PATCH,0
+ PRODUCTVERSION  ADIEL_VERSION_MAJOR,ADIEL_VERSION_MINOR,ADIEL_VERSION_PATCH,0
+ FILEFLAGSMASK   0x3fL
+ FILEFLAGS       0x0L
+ FILEOS          VOS_NT_WINDOWS32
+ FILETYPE        VFT_APP
+ FILESUBTYPE     0x0L
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "040904b0" // עברית (ישראל), UTF-16
+        BEGIN
+            VALUE "CompanyName",      "Adiel Junior Systems"
+            VALUE "FileDescription",  "אדיאל ג'וניור — עוזר אישי חכם (Native C++20, 100% מקומי)"
+            VALUE "FileVersion",      "1.0.0"
+            VALUE "InternalName",     "AdielJunior"
+            VALUE "OriginalFilename", "AdielJunior.exe"
+            VALUE "ProductName",      "אדיאל ג'וניור"
+            VALUE "ProductVersion",   "1.0.0"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x409, 1200
+    END
+END

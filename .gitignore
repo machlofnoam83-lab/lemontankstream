@@ -1,0 +1,22 @@
+# ===== Adiel Junior (native C++ engine) =====
+adiel-junior/build*/
+adiel-junior/out/
+adiel-junior/dist/
+adiel-junior/third_party/*
+!adiel-junior/third_party/README.md
+adiel-junior/models/
+adiel-junior/logs/
+*.gguf
+*.bin
+*.onnx
+*.ppn
+*.pv
+*.wav
+
+# ===== Legacy prototype (adial-gonian) =====
+adial-gonian/node_modules/
+adial-gonian/frontend/dist/
+adial-gonian/.env
+adial-gonian/__pycache__/
+adial-gonian/**/__pycache__/
+adial-gonian/backend/**/*.pyc

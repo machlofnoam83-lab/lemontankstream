@@ -1,0 +1,78 @@
+{
+  "language": "he",
+  "ai": {
+    "engine": "llama",
+    "model_path": "models/Qwen2.5-3B-Instruct-Q4_K_M.gguf",
+    "gpu_layers": -1,
+    "n_ctx": 4096,
+    "n_threads": 0,
+    "max_tokens": 512,
+    "temperature": 0.7,
+    "top_p": 0.9,
+    "min_p": 0.05,
+    "history_limit": 10,
+    "use_mmap": true,
+    "use_mlock": false
+  },
+  "vision": {
+    "enabled": true,
+    "fps": 30,
+    "change_threshold": 0.02,
+    "ocr": true,
+    "gdi_fallback": true
+  },
+  "wake_word": {
+    "engine": "porcupine",
+    "keyword": "אדיאל ג'וניור",
+    "porcupine_params": "models/porcupine/porcupine_params.pv",
+    "porcupine_keyword_model": "models/porcupine/אדיאל-ג'וניור_windows_v3_0_0.ppn",
+    "sensitivity": 0.6,
+    "sherpa_model_dir": "models/sherpa/kws",
+    "mic_device_id": ""
+  },
+  "stt": {
+    "engine": "whisper",
+    "whisper_model": "models/whisper/ggml-small-he.bin",
+    "whisper_threads": 4,
+    "whisper_use_gpu": true,
+    "silence_timeout_ms": 900.0
+  },
+  "tts": {
+    "engine": "sherpa",
+    "sherpa_vits_model": "models/sherpa/vits-hebrew.onnx",
+    "sherpa_vits_tokens": "models/sherpa/tokens.txt",
+    "sherpa_vits_lexicon": "",
+    "sherpa_vits_data_dir": "models/sherpa/espeak-ng-data",
+    "sherpa_vits_speaker": 0,
+    "sherpa_vits_speed": 1.0,
+    "piper_voice_model": "models/piper/he_IL-haim-medium.onnx",
+    "piper_voice_config": "models/piper/he_IL-haim-medium.onnx.json",
+    "piper_espeak_data": "models/piper/espeak-ng-data",
+    "volume": 1.0
+  },
+  "hud": {
+    "enabled": true,
+    "mode": "center",
+    "opacity": 0.92,
+    "width": 620,
+    "height": 400,
+    "click_through": true,
+    "font": "Segoe UI"
+  },
+  "general": {
+    "hotkeys": true,
+    "log_to_file": true,
+    "log_file": "logs/adieljunior.log",
+    "start_minimized": false
+  },
+  "hotkeys": {
+    "listen": 76,
+    "dock": 68,
+    "center": 67,
+    "hide": 72,
+    "quit": 81,
+    "screen": 83,
+    "mod_ctrl": true,
+    "mod_alt": true
+  }
+}
