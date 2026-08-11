@@ -1,16 +1,16 @@
-# =============================================================================
-#  Adiel Junior — Fine-Tuning Pipeline (100% Native C++, ללא Python)
+﻿# =============================================================================
+#  Adiel Junior - Fine-Tuning Pipeline (100% Native C++, ללא Python)
 #
-#  משתמש בכלי llama.cpp: llama-finetune (LoRA/כוונון מלא) + llama-quantize
+#  משתמש בכלי llama.cpp: llama-finetune (כוונון עדין) + llama-quantize (קוונטיזציה)
 #  מתאים למודל 3B (Qwen2.5-3B / Llama-3.2-3B) על נתוני עברית.
 #
 #  שימוש:
 #    powershell -ExecutionPolicy Bypass -File tools\finetune.ps1 `
 #        -BaseModel models\Qwen2.5-3B-Instruct-Q4_K_M.gguf `
 #        -Data data\hebrew_instruct.txt `
-#        -OutModel models\Qwen2.5-3B-Instruct-Q4_K_M.gguf
+#        -OutModel models\AdielJunior-3B-Q4_K_M.gguf
 #
-#  הערה: לאימון CPU — בנו llama.cpp ללא CUDA/DirectML (בנייה נקייה).
+#  הערה: לאימון CPU - בנו llama.cpp ללא CUDA/DirectML (בנייה נקייה).
 # =============================================================================
 param(
     [string]$BaseModel = "models\Qwen2.5-3B-Instruct-Q4_K_M.gguf",  # מודל בסיס (GGUF)
@@ -25,6 +25,7 @@ param(
 )
 
 $ErrorActionPreference = "Stop"
+try { [Console]::OutputEncoding = [System.Text.Encoding]::UTF8 } catch { }
 $Root = Split-Path -Parent $PSScriptRoot
 Set-Location $Root
 
@@ -36,7 +37,6 @@ $quantize = Join-Path $LlamaDir "build\bin\Release\llama-quantize.exe"
 if (-not (Test-Path $finetune)) { Write-Error "llama-finetune לא נמצא. בנו את llama.cpp: cmake --build third_party\llama.cpp\build --config Release --target llama-finetune llama-quantize"; exit 1 }
 
 $f32 = "models\finetuned-f32.gguf"
-$tmp = "models\finetuned-f16.gguf"
 
 Write-Host "=== שלב 1: כוונון עדין (llama-finetune) ===" -ForegroundColor Cyan
 & $finetune `
@@ -45,7 +45,7 @@ Write-Host "=== שלב 1: כוונון עדין (llama-finetune) ===" -Foregroun
     -c $Ctx -b $Batch -ub $Batch `
     -ngl $GpuLayers `
     -lr $Lr --epochs $Epochs `
-    --out-file $f32
+    --output $f32
 if ($LASTEXITCODE -ne 0) { Write-Error "אימון נכשל"; exit 1 }
 
 Write-Host "=== שלב 2: קוונטיזציה ל-Q4_K_M ===" -ForegroundColor Cyan

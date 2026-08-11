@@ -1,5 +1,7 @@
 #include "core/Config.h"
 
+#include <filesystem>
+
 #include "core/Logger.h"
 
 namespace aj {
@@ -196,6 +198,14 @@ void Config::writeDefault(const std::string& path) {
     hotkeys["mod_ctrl"]= json::Value(true);
     hotkeys["mod_alt"] = json::Value(true);
     root["hotkeys"] = hotkeys;
+
+    // יצירת תיקיית ההורה אם חסרה (autofix)
+    try {
+        std::filesystem::path p(path);
+        if (p.has_parent_path()) {
+            std::filesystem::create_directories(p.parent_path());
+        }
+    } catch (...) {}
 
     json::writeFile(path, root, true);
     logInfo("Config: נכתב קובץ ברירת מחדל %s", path.c_str());

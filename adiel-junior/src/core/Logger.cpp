@@ -1,6 +1,7 @@
 #include "core/Logger.h"
 
 #include <ctime>
+#include <filesystem>
 
 #ifdef _WIN32
 #include <windows.h>
@@ -28,6 +29,13 @@ void Logger::setFile(const std::string& path) {
     m_filePath = path;
     if (m_file) { std::fclose(m_file); m_file = nullptr; }
     if (!m_filePath.empty()) {
+        // יצירת תיקיית ההורה אם חסרה (autofix)
+        try {
+            std::filesystem::path p(path);
+            if (p.has_parent_path()) {
+                std::filesystem::create_directories(p.parent_path());
+            }
+        } catch (...) {}
         m_file = std::fopen(m_filePath.c_str(), "a");
         m_fileEnabled = (m_file != nullptr);
     }
