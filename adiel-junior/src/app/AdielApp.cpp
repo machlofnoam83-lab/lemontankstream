@@ -19,8 +19,11 @@
 
 #ifdef _WIN32
 #include <windows.h>
+#include <shellapi.h>
 #include "audio/WasapiMicCapture.h"
 #endif
+
+#include <filesystem>
 
 namespace aj {
 
@@ -100,6 +103,7 @@ bool AdielApp::initModules() {
 
     if (m_llm) m_hud->setEngineName(m_llm->name());
     m_hud->setStatus("אדיאל ג'וניור מוכן. אמור \"" + m_cfg.wakeKeyword + "\".");
+    loadMemory();
     return true;
 }
 
@@ -111,9 +115,20 @@ void AdielApp::initHotkeys() {
     HINSTANCE hInst = GetModuleHandle(nullptr);
     WNDCLASS wc{};
     wc.lpfnWndProc = [](HWND h, UINT m, WPARAM w, LPARAM l) -> LRESULT {
+        AdielApp* app = reinterpret_cast<AdielApp*>(GetWindowLongPtr(h, GWLP_USERDATA));
+        if (!app) return DefWindowProc(h, m, w, l);
         if (m == WM_HOTKEY) {
-            AdielApp* app = reinterpret_cast<AdielApp*>(GetWindowLongPtr(h, GWLP_USERDATA));
-            if (app) app->onHotkey(static_cast<int>(w));
+            app->onHotkey(static_cast<int>(w));
+            return 0;
+        }
+        if (m == WM_APP) { // אירוע מגש
+            if (l == WM_RBUTTONUP || l == WM_CONTEXTMENU || l == WM_LBUTTONUP) {
+                app->trayCommand(0); // תפריט
+            }
+            return 0;
+        }
+        if (m == WM_COMMAND) {
+            app->trayCommand(static_cast<int>(LOWORD(w)));
             return 0;
         }
         return DefWindowProc(h, m, w, l);
@@ -126,6 +141,9 @@ void AdielApp::initHotkeys() {
     if (!hwnd) return;
     SetWindowLongPtr(hwnd, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(this));
     m_hotkeyHwnd = hwnd;
+
+    // מגש מערכת (tray)
+    if (m_cfg.trayEnabled) initTray(hwnd);
 
     const auto& hk = m_cfg.hotkeys;
     const UINT mod = (hk.modifierCtrl ? MOD_CONTROL : 0) | (hk.modifierAlt ? MOD_ALT : 0);
@@ -447,6 +465,10 @@ void AdielApp::runAiWorker() {
         m_hud->setStatus("מוכן. אמור \"" + m_cfg.wakeKeyword + "\".");
         m_hud->setTokens(reply);
         if (!spokenAny) setState(AssistantState::Idle);
+
+        // זיכרון מתמשך + איסוף נתונים לקורפוס
+        saveMemory();
+        collectData(job->userText, reply);
     }
 }
 
@@ -540,5 +562,120 @@ void AdielApp::speak(const std::string& text) {
         }
     });
 }
+
+// ---------------------------------------------------------------------------
+//  זיכרון מתמשך
+// ---------------------------------------------------------------------------
+void AdielApp::loadMemory() {
+    std::string path = m_cfg.historyFile.empty() ? "data/history.json" : m_cfg.historyFile;
+    json::Value root = json::parseFile(path);
+    const json::Value* arr = root.getArray("messages");
+    if (!arr) return;
+    std::lock_guard<std::mutex> lock(m_historyMtx);
+    for (const auto& m : arr->array()) {
+        ChatMessage msg;
+        msg.role = m.getString("role");
+        msg.content = m.getString("content");
+        if (!msg.role.empty() && !msg.content.empty()) m_history.push_back(std::move(msg));
+    }
+    if (!m_history.empty()) {
+        logInfo("זיכרון: נטענו %zu הודעות מהשיחה הקודמת", m_history.size());
+    }
+}
+
+void AdielApp::saveMemory() {
+    std::vector<ChatMessage> hist;
+    {
+        std::lock_guard<std::mutex> lock(m_historyMtx);
+        hist = m_history;
+    }
+    json::Value root;
+    json::Value arr;
+    for (const auto& m : hist) {
+        json::Value jm;
+        jm["role"] = json::Value(m.role);
+        jm["content"] = json::Value(m.content);
+        arr.push(jm);
+    }
+    root["messages"] = arr;
+    try {
+        std::filesystem::path p(m_cfg.historyFile.empty() ? "data/history.json" : m_cfg.historyFile);
+        if (p.has_parent_path()) std::filesystem::create_directories(p.parent_path());
+    } catch (...) {}
+    json::writeFile(m_cfg.historyFile.empty() ? "data/history.json" : m_cfg.historyFile, root, true);
+}
+
+// איסוף שיחות אמיתיות → קורפוס האימון שלנו (U:/A: — מזין את build_corpus)
+void AdielApp::collectData(const std::string& user, const std::string& assistant) {
+    if (!m_cfg.dataCollection || user.empty() || assistant.empty()) return;
+    try {
+        std::filesystem::path dir(m_cfg.rawDataDir.empty() ? "data/raw" : m_cfg.rawDataDir);
+        std::filesystem::create_directories(dir);
+        std::FILE* f = std::fopen((dir / "conversations.txt").string().c_str(), "ab");
+        if (!f) return;
+        std::fprintf(f, "U: %s\nA: %s\n\n", user.c_str(), assistant.c_str());
+        std::fclose(f);
+    } catch (...) {}
+}
+
+// ---------------------------------------------------------------------------
+//  מגש מערכת (Windows)
+// ---------------------------------------------------------------------------
+#ifdef _WIN32
+namespace {
+constexpr UINT kTrayMsg = WM_APP + 1;
+constexpr UINT kTrayId = 1;
+// מזההי פקודות תפריט
+constexpr int kCmdListen = 1001;
+constexpr int kCmdDock   = 1002;
+constexpr int kCmdCenter = 1003;
+constexpr int kCmdHide   = 1004;
+constexpr int kCmdExit   = 1005;
+}
+
+void AdielApp::initTray(HWND hwnd) {
+    NOTIFYICONDATAW nid{};
+    nid.cbSize = sizeof(nid);
+    nid.hWnd = hwnd;
+    nid.uID = kTrayId;
+    nid.uFlags = NIF_ICON | NIF_MESSAGE | NIF_TIP;
+    nid.uCallbackMessage = kTrayMsg;
+    nid.hIcon = LoadIconW(GetModuleHandleW(nullptr), MAKEINTRESOURCEW(1));
+    if (!nid.hIcon) nid.hIcon = LoadIconW(nullptr, IDI_APPLICATION);
+    wcscpy_s(nid.szTip, L"אדיאל ג'וניור — עוזר אישי חכם");
+    m_trayAdded = Shell_NotifyIconW(NIM_ADD, &nid) == TRUE;
+    logInfo("Tray: %s", m_trayAdded ? "איקון נוסף למגש" : "כשל בהוספת איקון למגש");
+}
+
+void AdielApp::trayCommand(int id) {
+    if (id == 0) {
+        // תפריט הקשר
+        HMENU menu = CreatePopupMenu();
+        AppendMenuW(menu, MF_STRING, kCmdListen, L"האזנה (מילת הפעלה)");
+        AppendMenuW(menu, MF_SEPARATOR, 0, nullptr);
+        AppendMenuW(menu, MF_STRING, kCmdDock, L"שים בצד");
+        AppendMenuW(menu, MF_STRING, kCmdCenter, L"חזור לאמצע");
+        AppendMenuW(menu, MF_STRING, kCmdHide, L"הסתר");
+        AppendMenuW(menu, MF_SEPARATOR, 0, nullptr);
+        AppendMenuW(menu, MF_STRING, kCmdExit, L"יציאה");
+        POINT pt{};
+        GetCursorPos(&pt);
+        SetForegroundWindow(static_cast<HWND>(m_hotkeyHwnd));
+        const UINT cmd = static_cast<UINT>(TrackPopupMenu(
+            menu, TPM_RIGHTBUTTON | TPM_RETURNCMD, pt.x, pt.y, 0,
+            static_cast<HWND>(m_hotkeyHwnd), nullptr));
+        DestroyMenu(menu);
+        if (cmd != 0) trayCommand(static_cast<int>(cmd));
+        return;
+    }
+    switch (id) {
+        case kCmdListen: onWakeWord(); break;
+        case kCmdDock:   m_hud->setMode("docked"); break;
+        case kCmdCenter: m_hud->setMode("center"); break;
+        case kCmdHide:   m_hud->setMode("hidden"); break;
+        case kCmdExit:   requestExit(); break;
+    }
+}
+#endif // _WIN32
 
 } // namespace aj

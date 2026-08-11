@@ -51,6 +51,8 @@ endif()
 if(MSVC)
     add_compile_options(/W4 /permissive- /utf-8 /EHsc /Zc:__cplusplus)
     add_compile_definitions(_CRT_SECURE_NO_WARNINGS NOMINMAX WIN32_LEAN_AND_MEAN)
+    # WNDCLASS/CreateWindow/AvSetMmThread וכו' — גרסאות רחבות (W)
+    add_compile_definitions(UNICODE _UNICODE)
     if(ADIEL_STATIC_RT)
         foreach(flag CMAKE_CXX_FLAGS CMAKE_CXX_FLAGS_RELEASE CMAKE_CXX_FLAGS_DEBUG)
             string(REPLACE "/MD" "/MT" ${flag} "${${flag}}")
@@ -96,6 +98,7 @@ set(AJ_HUD_SOURCES
 )
 set(AJ_APP_SOURCES
     src/app/CommandRouter.cpp
+    src/app/ConsoleChat.cpp
     src/app/AdielApp.cpp
     src/main.cpp
 )

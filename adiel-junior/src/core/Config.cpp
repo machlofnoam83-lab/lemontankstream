@@ -96,6 +96,10 @@ Config Config::load(const std::string& path, std::string* errMsg) {
         cfg.logToFile      = v->getBool("log_to_file", cfg.logToFile);
         cfg.logFile        = v->getString("log_file", cfg.logFile);
         cfg.startMinimized = v->getBool("start_minimized", cfg.startMinimized);
+        cfg.trayEnabled    = v->getBool("tray", cfg.trayEnabled);
+        cfg.historyFile    = v->getString("history_file", cfg.historyFile);
+        cfg.rawDataDir     = v->getString("raw_data_dir", cfg.rawDataDir);
+        cfg.dataCollection = v->getBool("data_collection", cfg.dataCollection);
     }
 
     if (const json::Value* h = root.getObject("hotkeys")) {
@@ -182,10 +186,14 @@ void Config::writeDefault(const std::string& path) {
     root["hud"] = hud;
 
     json::Value general;
-    general["hotkeys"]        = json::Value(true);
-    general["log_to_file"]    = json::Value(true);
-    general["log_file"]       = json::Value("logs/adieljunior.log");
-    general["start_minimized"]= json::Value(false);
+    general["hotkeys"]         = json::Value(true);
+    general["log_to_file"]     = json::Value(true);
+    general["log_file"]        = json::Value("logs/adieljunior.log");
+    general["start_minimized"] = json::Value(false);
+    general["tray"]            = json::Value(true);
+    general["history_file"]    = json::Value("data/history.json");
+    general["raw_data_dir"]    = json::Value("data/raw");
+    general["data_collection"] = json::Value(true);
     root["general"] = general;
 
     json::Value hotkeys;

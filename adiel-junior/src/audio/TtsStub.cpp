@@ -1,5 +1,6 @@
 #include "audio/TtsStub.h"
 
+#include <algorithm>
 #include <cmath>
 
 #include "core/Logger.h"

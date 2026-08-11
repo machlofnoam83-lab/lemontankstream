@@ -77,9 +77,9 @@ if (Test-Path $iconCache) {
 # ---- 4. מחולל אייקון (פרויקט עצמאי - בלי למשוך llama.cpp) ----
 Write-Step "מחולל אייקון..."
 $iconArgs = @("-S", "tools\gen_icon", "-B", "build\icon", "-G", $gen, "-A", "x64", "-DCMAKE_BUILD_TYPE=Release")
-& $cmake @iconArgs 2>&1 | Out-Null
+& $cmake @iconArgs
 if ($LASTEXITCODE -eq 0) {
-    & $cmake --build build\icon --config Release 2>&1 | Out-Null
+    & $cmake --build build\icon --config Release
     if ($LASTEXITCODE -eq 0) {
         $iconExe = Get-ChildItem build\icon -Recurse -Filter gen_icon.exe -ErrorAction SilentlyContinue |
             Select-Object -First 1

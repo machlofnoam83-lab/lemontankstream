@@ -92,12 +92,12 @@ bool DxgiScreenSource::initDxgi() {
     UINT flags = D3D11_CREATE_DEVICE_BGRA_SUPPORT;
     D3D_FEATURE_LEVEL levels[] = { D3D_FEATURE_LEVEL_11_1, D3D_FEATURE_LEVEL_11_0 };
     hr = D3D11CreateDevice(adapter.Get(), D3D_DRIVER_TYPE_UNKNOWN, nullptr, flags,
-                           levels, 2, D7D11_SDK_VERSION,
+                           levels, 2, D3D11_SDK_VERSION,
                            &m_d3d11, nullptr, &m_d3dCtx);
     if (FAILED(hr)) {
         // נסיון בלי feature level 11.1
         hr = D3D11CreateDevice(adapter.Get(), D3D_DRIVER_TYPE_UNKNOWN, nullptr, flags,
-                               levels + 1, 1, D7D11_SDK_VERSION,
+                               levels + 1, 1, D3D11_SDK_VERSION,
                                &m_d3d11, nullptr, &m_d3dCtx);
     }
     if (FAILED(hr)) return false;

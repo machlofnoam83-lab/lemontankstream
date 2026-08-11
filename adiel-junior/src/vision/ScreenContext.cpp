@@ -10,6 +10,7 @@
 #ifdef ADIEL_HAVE_OCR
 #if __has_include(<winrt/Windows.Media.Ocr.h>)
 #define AJ_HAS_WINRT_OCR 1
+#include <winrt/Windows.Foundation.h>
 #include <winrt/Windows.Globalization.h>
 #include <winrt/Windows.Graphics.Imaging.h>
 #include <winrt/Windows.Media.Ocr.h>
@@ -111,7 +112,8 @@ std::string ScreenContext::ocrRegion(const Frame& frame, int x, int y, int w, in
         const size_t bytes = static_cast<size_t>(w) * h * 4;
         winrt::Windows::Storage::Streams::Buffer buf(static_cast<uint32_t>(bytes));
         {
-            auto byteAccess = buf.as<::Windows::Storage::Streams::IBufferByteAccess>();
+            // cppwinrt: IBufferByteAccess הוא ממשק WinRT ב-...::Storage::Streams
+            auto byteAccess = buf.as<winrt::Windows::Storage::Streams::IBufferByteAccess>();
             uint8_t* dst = nullptr;
             byteAccess->Buffer(&dst);
             for (int yy = 0; yy < h; ++yy) {
@@ -124,9 +126,9 @@ std::string ScreenContext::ocrRegion(const Frame& frame, int x, int y, int w, in
             buf, winrt::Windows::Graphics::Imaging::BitmapPixelFormat::Bgra8,
             w, h);
 
-        auto result = engine.RecognizeAsync(bmp).get();
+        winrt::Windows::Media::Ocr::OcrResult result = engine.RecognizeAsync(bmp).get();
         std::string text;
-        for (auto const& line : result.Lines()) {
+        for (const auto& line : result.Lines()) {
             std::wstring ws = line.Text();
             text += utf16to8(ws) + "\n";
         }

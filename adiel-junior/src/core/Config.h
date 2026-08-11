@@ -84,8 +84,14 @@ struct Config {
     bool   hudClickThrough = true;     // דוקר = שקוף ללחיצות
     std::string hudFont = "Segoe UI";
 
+    // ---- זיכרון ואיסוף נתונים
+    std::string historyFile = "data/history.json";   // זיכרון מתמשך
+    std::string rawDataDir  = "data/raw";            // שיחות לקורפוס האימון
+    bool dataCollection = true;                      // שמירת שיחות אמיתיות לקורפוס
+
     // ---- אחר
     bool hotkeysEnabled = true;
+    bool trayEnabled = true;                         // מגש מערכת
     bool logToFile      = true;
     std::string logFile = "logs/adieljunior.log";
     bool startMinimized = false;

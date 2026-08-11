@@ -1,0 +1,20 @@
+{
+  "messages": [
+    {
+      "content": "שלום",
+      "role": "user"
+    },
+    {
+      "content": "שלום! מה נשמע? אני כאן כדי לעזור.",
+      "role": "assistant"
+    },
+    {
+      "content": "מה השעה",
+      "role": "user"
+    },
+    {
+      "content": "השעה כעת 01:59. כיצד אוכל לעזור?",
+      "role": "assistant"
+    }
+  ]
+}

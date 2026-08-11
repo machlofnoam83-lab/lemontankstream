@@ -3,6 +3,7 @@
 //  ממשק הולוגרפי: D2D1.3 + D3D12(11on12) + DirectComposition + DirectWrite.
 // =============================================================================
 #include "hud/D2dHud.h"
+#include "hud/HudNull.h"
 
 #ifdef _WIN32
 
@@ -122,7 +123,8 @@ bool D2dHud::createDevice() {
         if (SUCCEEDED(m_d3d12->CreateCommandQueue(&qdesc, IID_PPV_ARGS(&m_d3d12Queue)))) {
             IUnknown* queues[] = { m_d3d12Queue.Get() };
             hr = D3D11On12CreateDevice(m_d3d12.Get(), D3D11_CREATE_DEVICE_BGRA_SUPPORT,
-                                       nullptr, 0, queues, 1, &m_d3d11);
+                                       nullptr, 0, queues, 1, 0,
+                                       &m_d3d11, nullptr, nullptr);
             if (SUCCEEDED(hr)) {
                 m_d3d12Active = true;
                 logInfo("HUD: D3D12 פעיל (11on12)");
@@ -211,8 +213,8 @@ bool D2dHud::createResources() {
 
     // סגנון קו מקווקו (לטבעת המסתובבת)
     D2D1_STROKE_STYLE_PROPERTIES dashProps = D2D1::StrokeStyleProperties(
-        D2D1_CAP_STYLE_ROUND, D2D1_CAP_STYLE_ROUND, D2D1_LINE_JOIN_MITER, 10.0f,
-        D2D1_DASH_STYLE_DASH, 0.0f);
+        D2D1_CAP_STYLE_ROUND, D2D1_CAP_STYLE_ROUND, D2D1_CAP_STYLE_ROUND,
+        D2D1_LINE_JOIN_MITER, 10.0f, D2D1_DASH_STYLE_DASH, 0.0f);
     m_d2dFactory->CreateStrokeStyle(dashProps, nullptr, 0, &m_dashStroke);
 
     // גיאומטריית קשת (לטבעת המסתובבת)
@@ -303,7 +305,7 @@ void D2dHud::renderFrame() {
     }
     if (mode == "hidden") return;
 
-    D2D1_RECT_F rc{ 0, 0, static_cast<float>(m_winW), static_cast<float>(m_winH) };
+    RECT rc{ 0, 0, m_winW, m_winH };
     Microsoft::WRL::ComPtr<IDXGISurface> dxgiSurface;
     POINT offset{};
     HRESULT hr = S_OK;
@@ -423,6 +425,7 @@ void D2dHud::renderFrame() {
 }
 
 void D2dHud::renderReactor(ID2D1DeviceContext* ctx, D2D1_POINT_2F c, float r, double t) {
+    const float s = m_dpi / 96.0f;
     const float energy = std::clamp(m_model.getEnergy(), 0.0f, 1.0f);
     const float pulse = 1.0f + 0.05f * static_cast<float>(std::sin(t * 2.0 * 3.14159265 * 1.3)) +
                         0.10f * energy;

@@ -22,6 +22,8 @@
 
 // בדיקות עצמיות (קובץ נפרד)
 namespace aj { int runSelfTests(); }
+// צ'אט קונסולי (קובץ נפרד) — AdielJunior.exe --console
+namespace aj { int runConsoleChat(const Config& cfg); }
 
 namespace {
 
@@ -41,11 +43,27 @@ void printUsage() {
 
 } // namespace
 
+#ifdef _WIN32
+// כשמריצים מ-PowerShell/cmd — מחבר את הפלט לקונסולה של ההורה
+static void attachParentConsole() {
+    if (AttachConsole(ATTACH_PARENT_PROCESS)) {
+        FILE* f = nullptr;
+        freopen_s(&f, "CONOUT$", "w", stdout);
+        freopen_s(&f, "CONOUT$", "w", stderr);
+        freopen_s(&f, "CONIN$", "r", stdin);
+    }
+}
+#endif
+
 int main(int argc, char** argv) {
     using namespace aj;
 
+#ifdef _WIN32
+    attachParentConsole();
+#endif
+
     std::string configPath = "config/adieljunior.json";
-    bool demo = false, headless = false;
+    bool demo = false, headless = false, console = false, autostart = false;
 
     for (int i = 1; i < argc; ++i) {
         const std::string a = argv[i];
@@ -54,6 +72,8 @@ int main(int argc, char** argv) {
         if (a == "--selftest") { return runSelfTests(); }
         if (a == "--demo") demo = true;
         if (a == "--headless") headless = true;
+        if (a == "--console") console = true;
+        if (a == "--autostart") autostart = true;
         if (a == "--config" && i + 1 < argc) configPath = argv[++i];
     }
 
@@ -83,6 +103,35 @@ int main(int argc, char** argv) {
     if (headless) {
         cfg.hudEnabled = false;
     }
+
+#ifdef _WIN32
+    if (autostart) {
+        // הפעלה אוטומטית עם Windows (HKCU\...\Run)
+        HKEY key = nullptr;
+        if (RegOpenKeyExW(HKEY_CURRENT_USER,
+                          L"Software\\Microsoft\\Windows\\CurrentVersion\\Run",
+                          0, KEY_SET_VALUE, &key) == ERROR_SUCCESS) {
+            wchar_t exePath[MAX_PATH] = {0};
+            GetModuleFileNameW(nullptr, exePath, MAX_PATH);
+            std::wstring cmd = L"\"" + std::wstring(exePath) + L"\"";
+            if (RegSetValueExW(key, L"AdielJunior", 0, REG_SZ,
+                               reinterpret_cast<const BYTE*>(cmd.c_str()),
+                               static_cast<DWORD>((cmd.size() + 1) * sizeof(wchar_t))) == ERROR_SUCCESS) {
+                std::printf("Adiel Junior נרשם להפעלה אוטומטית עם Windows.\n");
+            }
+            RegCloseKey(key);
+        }
+        return 0;
+    }
+#endif
+
+    if (console) {
+        // מצב קונסול: צ'אט ישיר בטרמינל (ללא HUD) — מצוין לבדיקת המודל
+        return runConsoleChat(cfg);
+    }
+#ifndef _WIN32
+    (void)autostart; // שמירה על ניקיון אזהרות בפלטפורמות אחרות
+#endif
 
 #ifdef AJ_USE_WINRT
     // אתחול WinRT (לצורך OCR של Windows)

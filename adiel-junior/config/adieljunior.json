@@ -63,7 +63,11 @@
     "hotkeys": true,
     "log_to_file": true,
     "log_file": "logs/adieljunior.log",
-    "start_minimized": false
+    "start_minimized": false,
+    "tray": true,
+    "history_file": "data/history.json",
+    "raw_data_dir": "data/raw",
+    "data_collection": true
   },
   "hotkeys": {
     "listen": 76,

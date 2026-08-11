@@ -69,6 +69,17 @@ private:
     void speak(const std::string& text);
     std::string screenContextForAi(bool forceRefresh);
 
+    // ---- זיכרון ואיסוף נתונים ----
+    void loadMemory();                                   // טעינת היסטוריה מקובץ
+    void saveMemory();                                   // שמירת היסטוריה
+    void collectData(const std::string& user, const std::string& assistant);
+
+#ifdef _WIN32
+    // ---- מגש מערכת ----
+    void initTray(HWND hwnd);
+    void trayCommand(int id);
+#endif
+
 #ifdef _WIN32
     void onHotkey(int id);
 #endif
@@ -122,6 +133,7 @@ private:
 
     // מקשים חמים (Windows)
     void* m_hotkeyHwnd = nullptr;
+    bool m_trayAdded = false;
 };
 
 } // namespace aj
