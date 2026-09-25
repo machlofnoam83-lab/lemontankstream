@@ -312,11 +312,3 @@ export function entryTokenFromRequest(reqUrl, file) {
   return tokens.find((t) => safeTokenEqual(provided, t)) ?? null;
 }
 
-/** האם הבקשה היא בדיקת בריאות מותרת (ניטור) */
-export function isHealthProbe(info, file) {
-  const config = loadStealth(file);
-  const token = process.env.HEALTH_TOKEN;
-  if (!token) return false;
-  const provided = info.headerMap?.["x-health-token"] ?? "";
-  return safeTokenEqual(provided, token);
-}
