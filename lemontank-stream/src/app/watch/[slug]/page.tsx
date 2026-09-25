@@ -4,6 +4,7 @@ import { notFound, redirect } from "next/navigation";
 import { Player } from "@/components/site/player";
 import { ContentRow } from "@/components/site/content-row";
 import { AddToListButton, } from "@/components/site/add-to-list-button";
+import { StartPartyButton } from "@/components/site/party-widgets";
 import { CommentsSection } from "@/components/site/social-sections";
 import { buildPlayback } from "@/server/playback";
 import { getCurrentUser } from "@/lib/session";
@@ -91,6 +92,12 @@ export default async function WatchPage({
           <Link href={`/title/${playback.title.slug}`} className="text-lemon-300 hover:underline">
             ← חזרה לדף הכותר
           </Link>
+          <StartPartyButton
+            titleId={playback.title.id}
+            episodeId={playback.episode?.id ?? null}
+            positionSec={playback.resumeAtSec}
+            label="ארח צפייה משותפת"
+          />
           {playback.episode ? (
             <span className="rounded-full bg-white/10 px-2.5 py-1">
               עונה {playback.episode.season_number} · פרק {playback.episode.number}

@@ -3,6 +3,7 @@ import { withApi } from "@/server/api";
 import { jsonOk, ApiError } from "@/lib/http";
 import { all, get, run } from "@/lib/db";
 import { progressSchema } from "@/lib/validate";
+import { syncBadges } from "@/lib/gamification";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -37,7 +38,16 @@ export async function POST(req: NextRequest) {
       run("INSERT INTO analytics_events(kind, user_id, title_id, episode_id) VALUES('finish', ?, ?, ?)", [userId, input.title_id, input.episode_id]);
     }
 
-    return jsonOk({ saved: true, percent, completed: Boolean(completed) }, undefined, req);
+    // הישגים: צפייה שהסתיימה עשויה לזכות בתג — והמשתמש מקבל התראה מיד
+    let newBadges: string[] = [];
+    if (completed) {
+      try {
+        newBadges = syncBadges(userId).earned;
+      } catch {
+        /* הישגים לא מפילים שמירת התקדמות */
+      }
+    }
+    return jsonOk({ saved: true, percent, completed: Boolean(completed), newBadges }, undefined, req);
   });
 }
 

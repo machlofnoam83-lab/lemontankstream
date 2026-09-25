@@ -16,12 +16,17 @@ import { getCurrentSession, type SessionUser } from "@/lib/session";
 import { can, type Permission } from "@/lib/rbac";
 import { findActiveBan, banIp } from "@/lib/security/bans";
 import { inspectUrl, inspectValue, type InspectionHit } from "@/lib/security/inspect";
+import { consumeRateLimit as consumeKeyLimit } from "@/lib/ratelimit";
+import { keyHasScope, resolveBearer, type ApiScope } from "@/lib/apikeys";
+import { get as dbGet } from "@/lib/db";
 
 export type ApiContext = {
   req: NextRequest;
   params: Record<string, string>;
   user: SessionUser | null;
   sessionId: string | null;
+  /** כשיש אימות במפתח API — פרטי המפתח (אחרת null) */
+  apiKey?: { id: number; scopes: ApiScope[]; name: string } | null;
   /** גוף הבקשה מפוענח (JSON) או undefined */
   body: <T>() => Promise<T>;
   ip: string;
@@ -41,6 +46,10 @@ export type GuardOptions = {
   /** האם לקרוא ולאמת את גוף הבקשה כ-JSON לפני הקריאה ל-handler */
   parseBody?: boolean;
   maxBodyBytes?: number;
+  /** אישור בקשה עם מפתח API (Authorization: Bearer) ולא רק עם עוגיית סשן */
+  allowApiKey?: boolean;
+  /** ההרשאה הנדרשת מהמפתח — read כברירת מחדל */
+  apiKeyScope?: ApiScope;
 };
 
 /** מזהה משתמש מתוך פרמטרים (משמש לבאקטים של rate limit) */
@@ -81,10 +90,49 @@ export async function withApi(req: NextRequest, options: GuardOptions, handler: 
       }
     }
 
-    /* ── 2. סשן ───────────────────────────────────────────────────────── */
-    const session = await getCurrentSession();
-    sessionId = session?.session.id ?? null;
-    const user = session?.user ?? null;
+    /* ── 2. סשן או מפתח API ───────────────────────────────────────────── */
+    let apiKeyInfo: { id: number; scopes: ApiScope[]; name: string } | null = null;
+    let user: SessionUser | null = null;
+
+    if (options.allowApiKey) {
+      // מפתח API: אין עוגייה ולכן אין CSRF; המכסה היא של המפתח עצמו
+      let resolved = null;
+      try {
+        resolved = resolveBearer(req.headers.get("authorization"));
+      } catch (err) {
+        if (err instanceof ApiError) throw err;
+      }
+      if (resolved) {
+        const needed: ApiScope = options.apiKeyScope ?? "read";
+        if (!keyHasScope(resolved.scopes, needed)) {
+          await logSecurityEvent({ kind: "permission_denied", severity: "warning", ip, userId: resolved.userId, detail: `api_key need=${needed}` });
+          throw new ApiError("FORBIDDEN", 403, `למפתח אין הרשאת ${needed}`);
+        }
+        const bucket = `api_key:${resolved.record.id}`;
+        const result = consumeKeyLimit({ name: bucket, limit: resolved.record.rate_limit, windowSec: 60 }, `${ip}`);
+        if (!result.allowed) {
+          return new Response(
+            JSON.stringify({ ok: false, error: { code: "RATE_LIMITED", message: "חרגת ממכסת המפתח — נסה שוב בעוד רגע" } }),
+            { status: 429, headers: { "content-type": "application/json", "retry-after": String(result.resetInSec) } },
+          );
+        }
+        const row = dbGet<SessionUser>(
+          `SELECT id, email, name, role, status, plan_code, plan_code AS effective_plan, avatar_url,
+                  email_verified, twofa_enabled, max_profiles, mature_allowed, locale, created_at
+           FROM users WHERE id = ? AND status = 'active' AND deleted_at IS NULL`,
+          [resolved.userId],
+        );
+        if (!row) throw new ApiError("UNAUTHORIZED", 401, "המשתמש של המפתח אינו פעיל");
+        user = row;
+        apiKeyInfo = { id: resolved.record.id, scopes: resolved.scopes, name: resolved.record.name };
+      }
+    }
+
+    if (!user) {
+      const session = await getCurrentSession();
+      sessionId = session?.session.id ?? null;
+      user = session?.user ?? null;
+    }
 
     const needsAuth = options.auth === "required";
     const permission = options.permission;
@@ -99,7 +147,7 @@ export async function withApi(req: NextRequest, options: GuardOptions, handler: 
     }
 
     /* ── 3. CSRF לבקשות משנות מצב ─────────────────────────────────────── */
-    const csrfEnabled = options.csrf !== false;
+    const csrfEnabled = options.csrf !== false && !apiKeyInfo;
     if (csrfEnabled) {
       if (!user && !["POST"].includes(req.method)) {
         // בקשות GET ציבוריות — אין צורך
@@ -135,7 +183,7 @@ export async function withApi(req: NextRequest, options: GuardOptions, handler: 
     if (options.parseBody) await body();
 
     /* ── 5. הרצת הלוגיקה ─────────────────────────────────────────────── */
-    const response = await handler({ req, params, user, sessionId, body, ip });
+    const response = await handler({ req, params, user, sessionId, apiKey: apiKeyInfo, body, ip });
 
     /* ── 6. ביקורת ────────────────────────────────────────────────────── */
     if (options.audit) {

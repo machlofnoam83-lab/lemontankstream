@@ -172,6 +172,10 @@ export const DEFAULT_FLAGS: Record<string, { enabled: boolean; description: stri
   mobile_pwa: { enabled: true, description: "התקנה כאפליקציה (PWA)" },
   rtl_full: { enabled: true, description: "תמיכה מלאה ב-RTL" },
   accessibility: { enabled: true, description: "נגישות ותאימות WCAG" },
+  newsletter: { enabled: true, description: "רשימת תפוצה ועדכונים במייל" },
+  achievements: { enabled: true, description: "עמוד הישגים וטבלת מצטיינים" },
+  developer_api: { enabled: true, description: "מפתחות API ו-API ציבורי (v1)" },
+  party_sync_player: { enabled: true, description: "סנכרון נגן בחדרי צפייה משותפת" },
 };
 
 export function getFeatureFlags(): Record<string, { enabled: boolean; description: string; rollout_pct: number }> {

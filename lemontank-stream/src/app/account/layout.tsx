@@ -15,6 +15,10 @@ const NAV = [
   { href: "/account/security", label: "אבטחה ומכשירים", icon: "🔐" },
   { href: "/account/billing", label: "מנוי ותשלומים", icon: "💳" },
   { href: "/account/history", label: "היסטוריית צפייה", icon: "🕘" },
+  { href: "/account/achievements", label: "הישגים", icon: "🏆" },
+  { href: "/account/party", label: "צפייה משותפת", icon: "🎉" },
+  { href: "/account/developer", label: "מפתחים ו-API", icon: "🔑" },
+  { href: "/account/newsletter", label: "עדכונים במייל", icon: "📬" },
   { href: "/account/privacy", label: "פרטיות ונתונים", icon: "🛡️" },
 ];
 

@@ -6,6 +6,7 @@ import { continueWatching } from "@/lib/catalog";
 import { all, count, get } from "@/lib/db";
 import { requireUser } from "@/lib/session";
 import { formatMinutes, formatRelative } from "@/lib/format";
+import { badgeProgress, syncBadges, userPoints } from "@/lib/gamification";
 
 export const metadata: Metadata = { title: "האזור האישי", robots: { index: false } };
 export const dynamic = "force-dynamic";
@@ -40,6 +41,12 @@ export default async function AccountPage() {
   );
   const activeSessions = count("SELECT COUNT(*) c FROM sessions WHERE user_id = ? AND revoked_at IS NULL", [user.id]);
 
+  // הישגים — מוצג בסקירה כדי שיהיה תמיד "מה הצעד הבא"
+  syncBadges(user.id);
+  const badges = badgeProgress(user.id);
+  const earnedBadges = badges.filter((b) => b.earned);
+  const nextBadge = badges.filter((b) => !b.earned).sort((a, b) => b.percent - a.percent)[0];
+
   return (
     <div className="space-y-6">
       <header>
@@ -53,6 +60,41 @@ export default async function AccountPage() {
         <StatCard label="ברשימה שלי" value={stats.inList} icon={<span aria-hidden="true">🔖</span>} />
         <StatCard label="זמן צפייה" value={formatMinutes(stats.minutes)} icon={<span aria-hidden="true">⏱️</span>} />
       </div>
+
+      {/* ── הישגים: כמה הושג, כמה נקודות, ומה הצעד הבא ── */}
+      <Card className="p-4">
+        <div className="flex flex-wrap items-center justify-between gap-4">
+          <div>
+            <h2 className="text-xl font-black">🏆 ההישגים שלי</h2>
+            <p className="mt-1 text-[0.9rem] text-ink-300">
+              {earnedBadges.length} מתוך {badges.length} תגים · {userPoints(user.id).toLocaleString("he-IL")} נקודות
+            </p>
+            {nextBadge && (
+              <p className="mt-1 text-[0.85rem] text-ink-400">
+                הצעד הבא: {nextBadge.icon} {nextBadge.name} — {nextBadge.criterion.label} ({nextBadge.criterion.progress}/{nextBadge.criterion.target})
+              </p>
+            )}
+          </div>
+          <div className="flex items-center gap-3">
+            <div className="text-2xl">
+              {earnedBadges.slice(0, 6).map((badge) => (
+                <span key={badge.code} title={badge.name}>
+                  {badge.icon}
+                </span>
+              ))}
+            </div>
+            <Link href="/account/achievements" className="rounded-xl bg-lemon-400 px-4 py-2 font-bold text-ink-950">
+              לכל ההישגים
+            </Link>
+          </div>
+        </div>
+        <div className="mt-3 h-2 overflow-hidden rounded-full bg-white/10">
+          <div
+            className="h-full rounded-full bg-gradient-to-l from-lemon-300 to-lemon-500"
+            style={{ width: `${badges.length ? Math.round((earnedBadges.length / badges.length) * 100) : 0}%` }}
+          />
+        </div>
+      </Card>
 
       {!security?.twofa_enabled ? (
         <Card className="border-amber-500/30 bg-amber-500/[0.06] p-4">

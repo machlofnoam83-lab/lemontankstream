@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { catalogStats } from "@/lib/catalog";
 import { formatNumber } from "@/lib/format";
+import { NewsletterSignup } from "./newsletter-form";
 
 /** כותרת תחתונה — ניווט, מספרי הקטלוג והשורה המשפטית */
 export function SiteFooter() {
@@ -30,6 +31,9 @@ export function SiteFooter() {
         { href: "/account", label: "אזור אישי" },
         { href: "/account/security", label: "אבטחה ואימות דו-שלבי" },
         { href: "/my-list", label: "הרשימה שלי" },
+        { href: "/account/achievements", label: "ההישגים שלי" },
+        { href: "/account/party", label: "צפייה משותפת" },
+        { href: "/account/developer", label: "מפתחים ו-API" },
         { href: "/support", label: "תמיכה ויצירת קשר" },
       ],
     },
@@ -55,6 +59,14 @@ export function SiteFooter() {
           <p className="mt-3 text-sm leading-relaxed text-ink-400">
             פלטפורמת סטרימינג ישראלית — סרטים, סדרות ושידורים חיים בעברית. מנוי חינם לכל, ומנוי פלוס לאיכות 4K ולהורדות.
           </p>
+          <div className="mt-5">
+            <div className="text-[0.9rem] font-bold text-ink-200">📬 עדכון שבועי — מה חדש בקטלוג</div>
+            <div className="mt-2">
+              <NewsletterSignup compact />
+            </div>
+            <p className="mt-1.5 text-[0.8rem] text-ink-500">בלי ספאם. הסרה בלחיצה אחת.</p>
+          </div>
+
           <div className="mt-4 flex flex-wrap gap-2">
             <span className="rounded-full border border-white/10 bg-white/[0.04] px-2.5 py-1 text-[0.85rem] font-semibold text-ink-300">
               🔒 scrypt + CSP

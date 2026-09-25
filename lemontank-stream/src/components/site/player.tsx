@@ -14,6 +14,7 @@ import { CSRF_COOKIE } from "@/lib/cookies";
  */
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { usePartySync } from "./use-party-sync";
 import Link from "next/link";
 import { formatDuration } from "@/lib/format";
 import { readCookie } from "@/lib/client/api";
@@ -48,6 +49,12 @@ type Props = {
   autoplayNext?: boolean;
   preferredSubLang?: string;
   isPlus?: boolean;
+  /** צפייה משותפת — מזהה החדר; כשיש מזהה הנגן מסתנכרן עם המארח */
+  partyId?: string | null;
+  /** האם הצופה הזה הוא המארח (הוא היחיד שקובע מיקום) */
+  partyHost?: boolean;
+  /** קוד הצטרפות להצגה למארח, כדי שיוכל להזמין */
+  partyCode?: string | null;
 };
 
 const AUTOPLAY_OVERLAY_SEC = 25;
@@ -71,6 +78,9 @@ export function Player({
   autoplayNext = true,
   preferredSubLang = "he",
   isPlus = false,
+  partyId = null,
+  partyHost = false,
+  partyCode = null,
 }: Props) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const wrapRef = useRef<HTMLDivElement>(null);
@@ -95,6 +105,9 @@ export function Player({
 
   const currentSource = sources[srcIndex] ?? sources[0];
   const activeSub = useMemo(() => subtitles.find((s) => s.lang === subLang), [subtitles, subLang]);
+
+  /* ── צפייה משותפת ─────────────────────────────────────────────────────── */
+  const party = usePartySync({ videoRef, partyId, isHost: partyHost });
 
   /* ── שמירת התקדמות ────────────────────────────────────────────────────── */
   const saveProgress = useCallback(
@@ -346,6 +359,33 @@ export function Player({
       tabIndex={0}
       aria-label={`נגן וידאו — ${titleName}`}
     >
+      {partyId && (
+        <div className="pointer-events-none absolute inset-x-0 top-0 z-30 flex flex-wrap items-center gap-2 bg-gradient-to-b from-black/80 to-transparent px-3 py-2 text-[0.85rem]">
+          <span className="rounded-full bg-plus-500/90 px-3 py-1 font-bold text-white">
+            🎉 צפייה משותפת
+          </span>
+          {partyHost ? (
+            <span className="rounded-full bg-black/60 px-3 py-1 text-ink-200">אתה המארח — כולם הולכים אחריך</span>
+          ) : (
+            <span className="rounded-full bg-black/60 px-3 py-1 text-ink-200">
+              {party.connected ? (
+                <>מסונכרן עם <b className="text-white">{party.hostName || "המארח"}</b>{party.driftSec > 2.5 ? " · מתיישר…" : " · בסנכרון"}</>
+              ) : (
+                "מתחבר לחדר…"
+              )}
+            </span>
+          )}
+          <span className="rounded-full bg-black/60 px-3 py-1 text-ink-300">
+            👥 {party.members.length} בחדר
+          </span>
+          {partyCode && partyHost && (
+            <span className="rounded-full bg-black/60 px-3 py-1 text-ink-200">
+              קוד הזמנה: <b className="font-mono text-lemon-300" dir="ltr">{partyCode}</b>
+            </span>
+          )}
+          {party.error && <span className="rounded-full bg-red-500/80 px-3 py-1 text-white">{party.error}</span>}
+        </div>
+      )}
       <video
         ref={videoRef}
         className="h-full w-full bg-black"

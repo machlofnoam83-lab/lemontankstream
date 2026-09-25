@@ -1,5 +1,6 @@
 import type { NextRequest } from "next/server";
 import { withApi } from "@/server/api";
+import { syncBadges } from "@/lib/gamification";
 import { jsonOk } from "@/lib/http";
 import { get, run } from "@/lib/db";
 import { z } from "zod";
@@ -30,6 +31,11 @@ export async function POST(req: NextRequest) {
 
     run("UPDATE titles SET rating_site = ?, votes_count = ? WHERE id = ?", [Number(combined), Number(agg?.cnt ?? 0), input.title_id]);
 
+    try {
+      syncBadges(userId);
+    } catch {
+      /* ignore */
+    }
     return jsonOk({ stars: input.stars, average: Number(combined), votes: Number(agg?.cnt ?? 0) }, undefined, req);
   });
 }

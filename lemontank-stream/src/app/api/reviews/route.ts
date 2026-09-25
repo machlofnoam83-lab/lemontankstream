@@ -1,5 +1,6 @@
 import type { NextRequest } from "next/server";
 import { withApi } from "@/server/api";
+import { syncBadges } from "@/lib/gamification";
 import { jsonOk, ApiError } from "@/lib/http";
 import { all, run } from "@/lib/db";
 import { reviewSchema, sanitizeMultiline, sanitizeText } from "@/lib/validate";
@@ -49,6 +50,11 @@ export async function POST(req: NextRequest) {
       ],
     );
 
+    try {
+      syncBadges(ctx.user!.id);
+    } catch {
+      /* ignore */
+    }
     return jsonOk(
       { id: Number(res.lastInsertRowid), status, message: status === "pending" ? "הביקורת נשלחה לאישור" : "הביקורת פורסמה" },
       { status: 201 },

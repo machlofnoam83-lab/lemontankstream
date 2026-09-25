@@ -30,7 +30,9 @@ export type AuditAction =
   | "security.ban" | "security.unban" | "security.settings_update"
   | "admin.export" | "admin.backup" | "admin.restore" | "admin.maintenance_toggle"
   | "live.create" | "live.update" | "live.delete"
-  | "person.create" | "person.update" | "person.delete";
+  | "person.create" | "person.update" | "person.delete"
+  | "party.create" | "party.end" | "newsletter.subscribe" | "newsletter.broadcast"
+  | "api_key.create" | "api_key.revoke" | "badge.award" | "flag.update";
 
 export type AuditSeverity = "info" | "warning" | "critical";
 

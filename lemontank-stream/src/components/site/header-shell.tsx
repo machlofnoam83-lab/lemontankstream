@@ -15,6 +15,7 @@ const NAV = [
   { href: "/popular", label: "פופולרי" },
   { href: "/genres", label: "ז'אנרים" },
   { href: "/live", label: "שידור חי" },
+  { href: "/account/party", label: "צפייה משותפת" },
 ];
 
 const isActive = (pathname: string, href: string) =>
