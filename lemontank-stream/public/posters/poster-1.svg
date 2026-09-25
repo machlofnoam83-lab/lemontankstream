@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 600" width="400" height="600" role="img" aria-label="האות האחרון">
+  <defs>
+    <linearGradient id="g1" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0f2027"/><stop offset="100%" stop-color="#2c5364"/>
+    </linearGradient>
+  </defs>
+  <rect width="400" height="600" fill="url(#g1)"/>
+  <circle cx="320" cy="90" r="70" fill="#f5b301" opacity="0.18"/>
+  <circle cx="70" cy="520" r="110" fill="#f5b301" opacity="0.12"/>
+  <text x="200" y="300" text-anchor="middle" font-family="system-ui,Segoe UI,Arial" font-size="44" font-weight="800" fill="#ffffff" direction="rtl">האות האחרון</text>
+  <text x="200" y="350" text-anchor="middle" font-family="system-ui,Segoe UI,Arial" font-size="20" fill="#f5b301" direction="rtl">LemonTank Stream</text>
+</svg>
