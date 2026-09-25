@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { ContentRow } from "@/components/site/content-row";
 import { EpisodePicker } from "@/components/site/episode-picker";
 import { AddToListButton } from "@/components/site/add-to-list-button";
+import { AddToCustomList } from "@/components/site/add-to-custom-list";
 import { DownloadButton, LikeButtons, ShareButton, StarRating } from "@/components/site/title-actions";
 import { CommentsSection, ReviewsSection } from "@/components/site/social-sections";
 import {
@@ -207,6 +208,7 @@ export default async function TitlePage({ params }: { params: Promise<{ slug: st
                     {resumeTitlePercent > 0.02 ? `המשך לצפות (${Math.round(resumeTitlePercent * 100)}%)` : title.kind === "series" ? "צפה בפרק הראשון" : "צפה עכשיו"}
                   </Link>
                   {user ? <AddToListButton titleId={title.id} initial={inList} /> : null}
+                  {user ? <AddToCustomList titleId={title.id} /> : null}
                 </>
               )}
               <ShareButton title={title.name_he} slug={title.slug} />

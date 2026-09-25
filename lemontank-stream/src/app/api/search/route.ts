@@ -1,7 +1,8 @@
 import type { NextRequest } from "next/server";
 import { withApi } from "@/server/api";
+import { getMaturityCeiling } from "@/lib/session";
 import { jsonOk } from "@/lib/http";
-import { searchCatalog } from "@/lib/catalog";
+import { maturityToAge, searchCatalog } from "@/lib/catalog";
 import { sanitizeText } from "@/lib/validate";
 import { isStaff } from "@/lib/rbac";
 
@@ -20,7 +21,12 @@ export async function GET(req: NextRequest) {
     const isStaffUser = isStaff(ctx.user?.role);
     const isPlus = ctx.user?.effective_plan === "plus";
 
-    const items = searchCatalog(q, { limit: limit * 2 }).filter((item) => {
+    // מצב ילדים: הפרופיל הפעיל מגביל גיל — מסונן לפני שהמידע נשלח
+    const ceiling = await getMaturityCeiling();
+    const ceilingAge = ceiling ? maturityToAge(ceiling) : null;
+
+    const items = searchCatalog(q, { limit: limit * 3 }).filter((item) => {
+      if (ceilingAge !== null && maturityToAge(String(item.maturity ?? "18+")) > ceilingAge) return false;
       if (isStaffUser || isPlus) return true;
       return item.plan_access === "free";
     });

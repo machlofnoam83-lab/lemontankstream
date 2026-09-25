@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { apiCall } from "@/lib/client/api";
 import { useToast } from "@/components/ui/toast";
+import { deviceFingerprint, deviceLabel } from "@/lib/client/device";
 
 /** לייק / דיסלייק — נשמר בטבלת watchlist עם kind ייעודי */
 export function LikeButtons({ titleId, initialLike = false, initialDislike = false }: { titleId: number; initialLike?: boolean; initialDislike?: boolean }) {
@@ -111,9 +112,13 @@ export function ShareButton({ title, slug }: { title: string; slug: string }) {
   );
 }
 
-/** הורדה — זמין למנויי פלוס בלבד (הגם בצד השרת) */
+/**
+ * הורדה — נבדקת גם בשרת (מסלול, סימון הכותר, ותוקף הטוקן).
+ * הטוקן נשמר במרכז ההורדות; אין קישור קבוע שאפשר להעביר הלאה לנצח.
+ */
 export function DownloadButton({ titleId, episodeId, allowed }: { titleId: number; episodeId?: number | null; allowed: boolean }) {
   const [busy, setBusy] = useState(false);
+  const [saved, setSaved] = useState(false);
   const toast = useToast();
 
   const start = async () => {
@@ -122,25 +127,36 @@ export function DownloadButton({ titleId, episodeId, allowed }: { titleId: numbe
       return;
     }
     setBusy(true);
-    const res = await apiCall<{ url: string }>("/api/downloads", { method: "POST", body: { title_id: titleId, episode_id: episodeId ?? null } });
+    const res = await apiCall<{ download: { quality: string }; note: string }>("/api/downloads", {
+      method: "POST",
+      body: {
+        title_id: titleId,
+        episode_id: episodeId ?? null,
+        quality: "1080p",
+        device_fingerprint: deviceFingerprint(),
+        device_label: deviceLabel(),
+      },
+    });
     setBusy(false);
     if (!res.ok) {
       toast.push(res.error.message, "error");
       return;
     }
-    window.location.href = res.data.url;
+    setSaved(true);
+    toast.push(`נשמר בהורדות · ${res.data.download.quality}`, "success");
   };
 
   return (
     <button
       onClick={start}
-      disabled={busy}
+      disabled={busy || saved}
       className={`inline-flex items-center gap-2 rounded-xl border px-3 py-2.5 text-sm ${
         allowed ? "border-white/15 bg-white/5 hover:bg-white/15" : "border-white/10 bg-white/[0.03] text-ink-300"
       } disabled:opacity-50`}
       aria-label="הורדה לצפייה אופליין"
     >
-      ⬇️ <span className="hidden sm:inline">{allowed ? "הורדה" : "הורדה (פלוס)"}</span>
+      {saved ? "✓ בהורדות" : "⬇️"}
+      <span className="hidden sm:inline">{saved ? "נשמר" : allowed ? "הורדה" : "הורדה (פלוס)"}</span>
     </button>
   );
 }

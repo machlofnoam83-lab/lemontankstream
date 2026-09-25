@@ -5,6 +5,7 @@ import { all, run, tx, get } from "@/lib/db";
 import { listCatalog, catalogStats } from "@/lib/catalog";
 import { titleSchema, sanitizeText, sanitizeMultiline, slugify } from "@/lib/validate";
 import { isStaff } from "@/lib/rbac";
+import { getMaturityCeiling } from "@/lib/session";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -21,7 +22,11 @@ export async function GET(req: NextRequest) {
     const requestedPlan = (sp.get("plan") as "free" | "plus") || undefined;
     const effectivePlan = staff || isPlus || requestedPlan === "plus" ? requestedPlan : "free";
 
+    // מצב ילדים: הפרופיל הפעיל מגביל את הגיל — הסינון מתבצע בשאילתה עצמה
+    const ceiling = await getMaturityCeiling();
+
     const { items, total } = listCatalog({
+      maturityMax: ceiling,
       kind: (sp.get("kind") as "movie" | "series") || undefined,
       plan: effectivePlan,
       genreSlug: sp.get("genre") || undefined,

@@ -9,6 +9,7 @@ const SECTIONS: { title: string; items: { href: string; label: string; icon: str
     items: [
       { href: "/admin", label: "דשבורד", icon: "📊" },
       { href: "/admin/analytics", label: "אנליטיקה", icon: "📈" },
+      { href: "/admin/insights", label: "תובנות והכנסות", icon: "💰" },
     ],
   },
   {
@@ -20,6 +21,7 @@ const SECTIONS: { title: string; items: { href: string; label: string; icon: str
       { href: "/admin/live", label: "שידורים חיים", icon: "📡" },
       { href: "/admin/promos", label: "קמפיינים ובאנרים", icon: "📣" },
       { href: "/admin/import", label: "ייבוא / ייצוא", icon: "📥" },
+      { href: "/admin/requests", label: "בקשות תוכן", icon: "🗳️" },
     ],
   },
   {

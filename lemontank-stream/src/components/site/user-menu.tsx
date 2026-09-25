@@ -59,9 +59,13 @@ export function UserMenu({ user, notifications = 0 }: { user: SessionUser; notif
               <div className="truncate text-[0.85rem] text-ink-400">{user.email}</div>
             </div>
             <MenuLink href="/account" onClick={() => setOpen(false)}>👤 החשבון שלי</MenuLink>
-            <MenuLink href="/account/profiles" onClick={() => setOpen(false)}>👨‍👩‍👧 פרופילים</MenuLink>
+            <MenuLink href="/profiles" onClick={() => setOpen(false)}>🎭 מי צופה? (החלפת פרופיל)</MenuLink>
+            <MenuLink href="/account/profiles" onClick={() => setOpen(false)}>👨‍👩‍👧 ניהול פרופילים</MenuLink>
+            <MenuLink href="/lists" onClick={() => setOpen(false)}>📚 הרשימות שלי</MenuLink>
             <MenuLink href="/my-list" onClick={() => setOpen(false)}>🔖 הרשימה שלי</MenuLink>
             <MenuLink href="/account/history" onClick={() => setOpen(false)}>🕘 היסטוריית צפייה</MenuLink>
+            <MenuLink href="/wrapped" onClick={() => setOpen(false)}>🎞️ השנה שלי</MenuLink>
+            <MenuLink href="/account/downloads" onClick={() => setOpen(false)}>📥 הורדות ומכשירים</MenuLink>
             <MenuLink href={`/notifications`} onClick={() => setOpen(false)}>
               🔔 התראות {notifications > 0 ? <span className="ms-1 rounded-full bg-red-500 px-1.5 text-[0.8rem]">{notifications}</span> : null}
             </MenuLink>

@@ -5,6 +5,8 @@ import { Player } from "@/components/site/player";
 import { ContentRow } from "@/components/site/content-row";
 import { AddToListButton, } from "@/components/site/add-to-list-button";
 import { StartPartyButton } from "@/components/site/party-widgets";
+import { AddToCustomList } from "@/components/site/add-to-custom-list";
+import { DownloadButton } from "@/components/site/title-actions";
 import { CommentsSection } from "@/components/site/social-sections";
 import { buildPlayback } from "@/server/playback";
 import { getCurrentUser } from "@/lib/session";
@@ -115,6 +117,14 @@ export default async function WatchPage({
 
         <div className="flex flex-wrap items-center gap-2">
           <AddToListButton titleId={playback.title.id} initial={inList} />
+          {user ? <AddToCustomList titleId={playback.title.id} compact /> : null}
+          {user ? (
+            <DownloadButton
+              titleId={playback.title.id}
+              episodeId={playback.episode?.id ?? null}
+              allowed={user.effective_plan === "plus"}
+            />
+          ) : null}
           <Link href={`/title/${playback.title.slug}`} className="rounded-xl border border-white/15 bg-white/5 px-4 py-2.5 text-sm hover:bg-white/15">
             כל הפרקים והפרטים
           </Link>

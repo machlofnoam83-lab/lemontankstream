@@ -200,9 +200,23 @@ const adminId = insert(
   [adminEmail, adminEmail, hashPassword(adminPassword), adminName, "owner", "active", "plus", 1, 5, daysAgo(120)],
 );
 
+// פרופיל ברירת מחדל לאדמין — כדי שמסך "מי צופה?" יעבוד מהרגע הראשון
+insert(
+  `INSERT INTO profiles(user_id, name, is_kid, maturity_limit, sort_order) VALUES(?,?,0,'18+',0)`,
+  [adminId, adminName.split(" ")[0] || "הפרופיל שלי"],
+);
+console.log("🎭 נוצר פרופיל ברירת מחדל למנהל");
+
 if (withDemo) {
   const { seedDemoUsers, seedDemoContent } = await import("./seed-demo.mjs");
   const userIds = seedDemoUsers({ db, insert, daysAgo, hashPassword });
+  // לכל משתמש דמו — פרופיל ברירת מחדל (כמו בהרשמה רגילה)
+  for (const userId of userIds) {
+    insert(`INSERT INTO profiles(user_id, name, is_kid, maturity_limit, sort_order) VALUES(?,?,0,'18+',0)`, [
+      userId,
+      "הפרופיל שלי",
+    ]);
+  }
   seedDemoContent({ db, insert, daysAgo, genreIds, adminId, userIds, crypto });
   console.log(`👤 נוצרו ${userIds.length} משתמשי דמו (סיסמה: Demo-Pass-2026!)`);
 } else {

@@ -14,6 +14,11 @@ export type RateRule = { limit: number; windowSec: number; name: string };
 /** חוקי ברירת מחדל לכל שכבת API — ניתנים לכוונון */
 export const RATE_RULES = {
   login: { name: "login", limit: 8, windowSec: 300 },          // 8 ניסיונות ב-5 דק'
+  // מעבר פרופיל רגיל (בלי קוד) — דלי נדיב, כדי שהחלפות במשפחה לא ייחסמו
+  profileSwitch: { name: "profile_switch", limit: 40, windowSec: 300 },
+  // ניסויי קוד (PIN) — דלי קשיח במיוחד: 8 ניסיונות ל-5 דק' לאותו משתמש.
+  // זה מה שמגן מפני ניחוש PIN בן 4 ספרות, בלי לפגוע במעברים רגילים.
+  pinAttempt: { name: "pin_attempt", limit: 8, windowSec: 300 },
   register: { name: "register", limit: 5, windowSec: 3600 },
   passwordReset: { name: "password_reset", limit: 5, windowSec: 3600 },
   api: { name: "api", limit: 240, windowSec: 60 },
@@ -60,6 +65,25 @@ export function consumeRateLimit(rule: RateRule, key: string): RateResult {
 
   const allowed = hits <= rule.limit;
   return { allowed, remaining: Math.max(0, rule.limit - hits), limit: rule.limit, resetInSec };
+}
+
+/**
+ * קריאה בלבד של מצב המכסה (בלי לצרוך).
+ * שימושי כשצריך לחסום לפני ניסיון אבל לספור רק כישלונות — למשל ניסויי PIN.
+ */
+export function peekRateLimit(rule: RateRule, key: string): RateResult {
+  const bucket = `${rule.name}:${key}`.slice(0, 200);
+  const start = windowStart(rule.windowSec);
+  const resetInSec = Math.ceil((new Date(start).getTime() + rule.windowSec * 1000 - Date.now()) / 1000);
+  const row = get<{ hits: number }>("SELECT hits FROM rate_limits WHERE bucket=? AND window_start=?", [bucket, start]);
+  const hits = Number(row?.hits ?? 0);
+  return { allowed: hits < rule.limit, remaining: Math.max(0, rule.limit - hits), limit: rule.limit, resetInSec };
+}
+
+/** רישום כישלון (בלי לחסום) — משלים ל-peekRateLimit */
+export function recordFailure(rule: RateRule, key: string): RateResult {
+  const result = consumeRateLimit(rule, key);
+  return { ...result, allowed: result.remaining > 0 };
 }
 
 /** בודק מגבלה ל-IP של הבקשה; רושם אירוע אבטחה אוטומטית בחריגה */

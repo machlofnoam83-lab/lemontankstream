@@ -218,6 +218,23 @@ export async function getCurrentSession(): Promise<ValidatedSession | null> {
   return validateSession(store.get(SESSION_COOKIE)?.value);
 }
 
+/**
+ * הפרופיל הפעיל ("מי צופה?") של המשתמש המחובר.
+ * משמש לאכיפת מצב ילדים ולסינון תוכן — בצד השרת בלבד.
+ */
+export async function getActiveProfile() {
+  const validated = await getCurrentSession();
+  if (!validated) return null;
+  const { activeProfile } = await import("./profiles");
+  return activeProfile(validated.user.id, validated.session.profile_id ?? null);
+}
+
+/** מגבלת הגיל של הפרופיל הפעיל (undefined = אין הגבלה) */
+export async function getMaturityCeiling(): Promise<string | undefined> {
+  const { maturityCeiling } = await import("./profiles");
+  return maturityCeiling(await getActiveProfile());
+}
+
 /** כמו getCurrentUser אבל זורק 401 — לשימוש ב-API */
 export async function requireUser(): Promise<SessionUser> {
   const user = await getCurrentUser();

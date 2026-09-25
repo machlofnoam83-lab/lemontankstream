@@ -908,6 +908,64 @@ CREATE TRIGGER IF NOT EXISTS trg_episodes_ad AFTER DELETE ON episodes BEGIN
   UPDATE titles SET episodes_count = MAX(0, episodes_count - 1) WHERE id = old.title_id;
 END;
 
+-- ═══════════════════════════════════════════════════════════════════════════
+--  רשימות מותאמות אישית — המשתמש יוצר אוסף משלו (למשל "לצפות עם אמא")
+-- ═══════════════════════════════════════════════════════════════════════════
+
+-- בקשות תוכן — "בקשו כותר". המשתמשים מבקשים, האחרים מחזקים, האדמין מסמן טופל.
+CREATE TABLE IF NOT EXISTS title_requests (
+  id          INTEGER PRIMARY KEY AUTOINCREMENT,
+  user_id     INTEGER REFERENCES users(id) ON DELETE SET NULL,
+  name        TEXT    NOT NULL,
+  kind        TEXT    NOT NULL DEFAULT 'movie',        -- movie|series|any
+  year        INTEGER,
+  note        TEXT,
+  status      TEXT    NOT NULL DEFAULT 'open',         -- open|planned|added|declined
+  admin_note  TEXT,
+  title_id    INTEGER REFERENCES titles(id) ON DELETE SET NULL,  -- הכותר שנוסף בסוף
+  handled_by  INTEGER REFERENCES users(id) ON DELETE SET NULL,
+  handled_at  TEXT,
+  created_at  TEXT    NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ','now'))
+) STRICT;
+CREATE INDEX IF NOT EXISTS idx_title_requests_status ON title_requests(status, created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_title_requests_user   ON title_requests(user_id, created_at DESC);
+
+-- הצבעות "גם אני רוצה" על בקשה (משתמש אחד = קול אחד)
+CREATE TABLE IF NOT EXISTS title_request_votes (
+  request_id INTEGER NOT NULL REFERENCES title_requests(id) ON DELETE CASCADE,
+  user_id    INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  created_at TEXT    NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ','now')),
+  PRIMARY KEY (request_id, user_id)
+) STRICT;
+
+CREATE TABLE IF NOT EXISTS user_lists (
+  id          INTEGER PRIMARY KEY AUTOINCREMENT,
+  user_id     INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  name        TEXT    NOT NULL,
+  slug        TEXT    NOT NULL,
+  description TEXT,
+  cover_url   TEXT,
+  is_public   INTEGER NOT NULL DEFAULT 0,
+  share_code  TEXT,                                  -- להזמנה בלי חשיפת הבעלים
+  sort_order  INTEGER NOT NULL DEFAULT 0,
+  created_at  TEXT    NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ','now')),
+  updated_at  TEXT    NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ','now')),
+  UNIQUE (user_id, slug)
+) STRICT;
+CREATE INDEX IF NOT EXISTS idx_user_lists_user ON user_lists(user_id, sort_order);
+CREATE INDEX IF NOT EXISTS idx_user_lists_code ON user_lists(share_code);
+
+CREATE TABLE IF NOT EXISTS user_list_items (
+  id        INTEGER PRIMARY KEY AUTOINCREMENT,
+  list_id   INTEGER NOT NULL REFERENCES user_lists(id) ON DELETE CASCADE,
+  title_id  INTEGER NOT NULL REFERENCES titles(id) ON DELETE CASCADE,
+  note      TEXT,                                    -- הערה אישית: "דקה 40 — השיא"
+  position  INTEGER NOT NULL DEFAULT 0,
+  added_at  TEXT    NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ','now')),
+  UNIQUE (list_id, title_id)
+) STRICT;
+CREATE INDEX IF NOT EXISTS idx_user_list_items ON user_list_items(list_id, position);
+
 -- הגנה על שדות קריטיים: אי אפשר לשנות role/plan_code דרך עדכון שגרתי
 CREATE TRIGGER IF NOT EXISTS trg_users_protect_role BEFORE UPDATE OF role ON users
   WHEN new.role NOT IN ('user','editor','admin','owner')
@@ -925,4 +983,5 @@ export const coreTables = [
   "watch_parties", "badges", "user_badges", "coupons", "live_channels",
   "subtitle_tracks", "audio_tracks", "people", "credits", "title_relations",
   "api_keys", "devices", "auth_tokens", "import_jobs",
+  "user_lists", "user_list_items", "title_requests", "title_request_votes",
 ] as const;

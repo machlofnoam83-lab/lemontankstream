@@ -16,6 +16,7 @@ const NAV = [
   { href: "/genres", label: "ז'אנרים" },
   { href: "/live", label: "שידור חי" },
   { href: "/account/party", label: "צפייה משותפת" },
+  { href: "/requests", label: "בקשו כותר" },
 ];
 
 const isActive = (pathname: string, href: string) =>
@@ -29,10 +30,12 @@ export function HeaderShell({
   user,
   notifications,
   isStaffUser,
+  profile,
 }: {
   user: SessionUser | null;
   notifications: number;
   isStaffUser: boolean;
+  profile: { id: number; name: string; avatar_url: string | null; is_kid: number } | null;
 }) {
   const pathname = usePathname();
   const [scrolled, setScrolled] = useState(false);
@@ -114,6 +117,26 @@ export function HeaderShell({
                   ניהול
                 </Link>
               ) : null}
+              {profile && (
+                <Link
+                  href="/profiles"
+                  title="החלפת פרופיל"
+                  className="hidden items-center gap-2 rounded-full border border-white/12 bg-white/[0.05] py-1 pl-3 pr-1 text-[0.85rem] transition hover:bg-white/[0.1] sm:flex"
+                >
+                  <span className="truncate max-w-[7rem]">{profile.name}</span>
+                  {profile.is_kid ? (
+                    <span className="rounded-full bg-free-500/20 px-2 py-0.5 text-[0.72rem] text-free-400">ילדים</span>
+                  ) : null}
+                  <span className="flex h-7 w-7 items-center justify-center overflow-hidden rounded-full bg-lemon-400 text-ink-950">
+                    {profile.avatar_url ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img src={profile.avatar_url} alt="" className="h-7 w-7 object-cover" />
+                    ) : (
+                      <span className="text-[0.8rem] font-black">{profile.name.slice(0, 1)}</span>
+                    )}
+                  </span>
+                </Link>
+              )}
               <UserMenu user={user} notifications={notifications} />
             </>
           ) : (
