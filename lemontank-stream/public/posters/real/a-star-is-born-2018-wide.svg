@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900" role="img" aria-label="כוכב נולד">
+  <defs>
+    <linearGradient id="bg" x1="1" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#070d24"/>
+      <stop offset="60%" stop-color="#050508"/>
+      <stop offset="100%" stop-color="#000"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="26%" cy="42%" r="62%">
+      <stop offset="0%" stop-color="#7aa2ff" stop-opacity="0.42"/>
+      <stop offset="100%" stop-color="#7aa2ff" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="beam" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#7aa2ff" stop-opacity="0.8"/>
+      <stop offset="100%" stop-color="#cddcff" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="side" x1="1" y1="0" x2="0" y2="0">
+      <stop offset="0%" stop-color="#050508"/>
+      <stop offset="52%" stop-color="#050508" stop-opacity="0.85"/>
+      <stop offset="100%" stop-color="#050508" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="1600" height="900" fill="url(#bg)"/>
+  <circle cx="430" cy="380" r="440" fill="url(#glow)"/>
+  <rect x="-838.72" y="-500" width="53.236000000000004" height="2000" fill="url(#beam)" opacity="0.20" transform="rotate(-17 800 450)"/>
+  <rect x="-594.72" y="-500" width="61.285999999999994" height="2000" fill="url(#beam)" opacity="0.23" transform="rotate(-17 800 450)"/>
+  <rect x="-381.2" y="-500" width="51.81" height="2000" fill="url(#beam)" opacity="0.20" transform="rotate(-17 800 450)"/>
+  <rect x="-195.36" y="-500" width="26.418" height="2000" fill="url(#beam)" opacity="0.11" transform="rotate(-17 800 450)"/>
+  <rect x="23.6" y="-500" width="20.07" height="2000" fill="url(#beam)" opacity="0.09" transform="rotate(-17 800 450)"/>
+  <rect x="310.88" y="-500" width="53.006" height="2000" fill="url(#beam)" opacity="0.20" transform="rotate(-17 800 450)"/>
+  <rect x="515.2" y="-500" width="38.239999999999995" height="2000" fill="url(#beam)" opacity="0.15" transform="rotate(-17 800 450)"/>
+  <rect x="778.8" y="-500" width="57.56" height="2000" fill="url(#beam)" opacity="0.22" transform="rotate(-17 800 450)"/>
+  <rect x="977.2" y="-500" width="39.39" height="2000" fill="url(#beam)" opacity="0.15" transform="rotate(-17 800 450)"/>
+  <rect width="1600" height="900" fill="#000" opacity="0.18"/>
+
+  <rect x="0" y="0" width="1600" height="900" fill="url(#side)"/>
+  <g font-family="Heebo, Assistant, Rubik, Arial, sans-serif" direction="rtl" text-anchor="middle">
+    <text x="1168" y="364" font-size="24" font-weight="800" fill="#7aa2ff" letter-spacing="3">LEMONTANK ORIGINAL</text>
+    <text x="1168" y="430" font-size="92" font-weight="900" fill="#fff" letter-spacing="-3">כוכב נולד</text>
+  </g>
+  <rect x="0" y="0" width="1600" height="900" fill="none" stroke="#ffffff" stroke-opacity="0.06"/>
+</svg>

@@ -5,7 +5,7 @@ build/
 dist/
 
 # ── מסד נתונים מקומי (SQLite) — לא נכנס ל-Git ──────────────────────────────
-data/
+/data/
 *.db
 *.db-wal
 *.db-shm

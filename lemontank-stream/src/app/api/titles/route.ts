@@ -15,9 +15,15 @@ export async function GET(req: NextRequest) {
     const sp = new URL(req.url).searchParams;
     const staff = isStaff(ctx.user?.role);
 
+    // משתמש חינם לא רואה פריטי פלוס בהאשפה הכללית — הסינון נעשה ב-SQL
+    // (ולא אחרי החלוקה לעמודים, אחרת המספר הכולל לא מתאים למה שמוצג).
+    const isPlus = ctx.user?.effective_plan === "plus";
+    const requestedPlan = (sp.get("plan") as "free" | "plus") || undefined;
+    const effectivePlan = staff || isPlus || requestedPlan === "plus" ? requestedPlan : "free";
+
     const { items, total } = listCatalog({
       kind: (sp.get("kind") as "movie" | "series") || undefined,
-      plan: (sp.get("plan") as "free" | "plus") || undefined,
+      plan: effectivePlan,
       genreSlug: sp.get("genre") || undefined,
       year: sp.get("year") ? Number(sp.get("year")) : undefined,
       q: sanitizeText(sp.get("q") ?? "", 80) || undefined,
@@ -29,13 +35,7 @@ export async function GET(req: NextRequest) {
       downloadableOnly: sp.get("downloadable") === "1",
     });
 
-    // משתמש חינם לא מקבל פריטי פלוס בהאשפה כללית — אלא אם ביקש במפורש את קטגוריית הפלוס
-    const isPlus = ctx.user?.effective_plan === "plus";
-    const filtered = staff || isPlus || sp.get("plan") === "plus"
-      ? items
-      : items.filter((i) => i.plan_access === "free");
-
-    return jsonOk({ items: filtered, total, stats: staff ? catalogStats() : undefined }, undefined, req);
+    return jsonOk({ items, total, stats: staff ? catalogStats() : undefined }, undefined, req);
   });
 }
 

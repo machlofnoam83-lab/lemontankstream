@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900" role="img" aria-label="מלחמת הכוכבים: האימפריה מכה שנית">
+  <defs>
+    <linearGradient id="bg" x1="1" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#2a0b06"/>
+      <stop offset="60%" stop-color="#050508"/>
+      <stop offset="100%" stop-color="#000"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="26%" cy="42%" r="62%">
+      <stop offset="0%" stop-color="#ff5a3c" stop-opacity="0.42"/>
+      <stop offset="100%" stop-color="#ff5a3c" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="beam" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#ff5a3c" stop-opacity="0.8"/>
+      <stop offset="100%" stop-color="#ffb199" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="side" x1="1" y1="0" x2="0" y2="0">
+      <stop offset="0%" stop-color="#050508"/>
+      <stop offset="52%" stop-color="#050508" stop-opacity="0.85"/>
+      <stop offset="100%" stop-color="#050508" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="1600" height="900" fill="url(#bg)"/>
+  <circle cx="430" cy="380" r="440" fill="url(#glow)"/>
+  <rect x="-881.44" y="-500" width="28.672" height="2000" fill="url(#beam)" opacity="0.12" transform="rotate(-17 800 450)"/>
+  <rect x="-665.36" y="-500" width="20.668" height="2000" fill="url(#beam)" opacity="0.09" transform="rotate(-17 800 450)"/>
+  <rect x="-398.88" y="-500" width="41.644000000000005" height="2000" fill="url(#beam)" opacity="0.16" transform="rotate(-17 800 450)"/>
+  <rect x="-139.76" y="-500" width="58.388" height="2000" fill="url(#beam)" opacity="0.22" transform="rotate(-17 800 450)"/>
+  <rect x="97.52" y="-500" width="62.574" height="2000" fill="url(#beam)" opacity="0.24" transform="rotate(-17 800 450)"/>
+  <rect x="329.36" y="-500" width="63.632" height="2000" fill="url(#beam)" opacity="0.24" transform="rotate(-17 800 450)"/>
+  <rect x="519.84" y="-500" width="40.908" height="2000" fill="url(#beam)" opacity="0.16" transform="rotate(-17 800 450)"/>
+  <rect x="719.92" y="-500" width="23.704" height="2000" fill="url(#beam)" opacity="0.10" transform="rotate(-17 800 450)"/>
+  <rect x="982.48" y="-500" width="42.426" height="2000" fill="url(#beam)" opacity="0.16" transform="rotate(-17 800 450)"/>
+  <rect width="1600" height="900" fill="#000" opacity="0.18"/>
+
+  <rect x="0" y="0" width="1600" height="900" fill="url(#side)"/>
+  <g font-family="Heebo, Assistant, Rubik, Arial, sans-serif" direction="rtl" text-anchor="middle">
+    <text x="1168" y="364" font-size="24" font-weight="800" fill="#ff5a3c" letter-spacing="3">LEMONTANK ORIGINAL</text>
+    <text x="1168" y="430" font-size="92" font-weight="900" fill="#fff" letter-spacing="-3">מלחמת הכוכבים: האימפריה מכה שנית</text>
+  </g>
+  <rect x="0" y="0" width="1600" height="900" fill="none" stroke="#ffffff" stroke-opacity="0.06"/>
+</svg>
