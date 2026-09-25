@@ -114,25 +114,35 @@ export default async function TitlePage({ params }: { params: Promise<{ slug: st
   return (
     <div className="space-y-10">
       {/* ── גיבור הכותר ── */}
-      <div className="relative overflow-hidden rounded-2xl border border-white/5">
+      <div className="relative overflow-hidden rounded-[26px] border border-white/[0.07] shadow-[0_60px_120px_-60px_rgba(0,0,0,1)]">
         <div className="absolute inset-0">
           {title.backdrop_url || title.poster_url ? (
             // eslint-disable-next-line @next/next/no-img-element
-            <img src={title.backdrop_url ?? title.poster_url ?? ""} alt="" className="h-full w-full object-cover" />
+            <img
+              src={title.backdrop_url ?? title.poster_url ?? ""}
+              alt=""
+              className="h-full w-full animate-ken-burns object-cover"
+              fetchPriority="high"
+            />
           ) : (
             <div className="poster-fallback h-full w-full" style={{ ["--poster-color" as string]: title.color }} />
           )}
-          <div className="absolute inset-0 bg-gradient-to-l from-ink-950 via-ink-950/85 to-ink-950/40" />
-          <div className="absolute inset-0 bg-gradient-to-t from-ink-950 via-transparent to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-l from-ink-950 via-ink-950/85 to-ink-950/45" />
+          <div className="absolute inset-0 bg-gradient-to-t from-ink-950 via-ink-950/25 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-b from-ink-950/55 via-transparent to-transparent" />
         </div>
 
-        <div className="relative grid gap-6 p-5 md:grid-cols-[220px_1fr] md:p-8">
+        <div className="relative grid gap-7 p-5 md:grid-cols-[240px_1fr] md:p-10">
           <div className="mx-auto w-40 md:mx-0 md:w-full">
             {title.poster_url ? (
               // eslint-disable-next-line @next/next/no-img-element
-              <img src={title.poster_url} alt={`פוסטר ${title.name_he}`} className="w-full rounded-xl shadow-2xl ring-1 ring-white/10" />
+              <img
+                src={title.poster_url}
+                alt={`פוסטר ${title.name_he}`}
+                className="w-full rounded-2xl shadow-[0_30px_70px_-30px_rgba(0,0,0,1)] ring-1 ring-white/12 transition-transform duration-500 [transition-timing-function:var(--ease-cinema)] hover:-translate-y-1.5 hover:ring-lemon-400/40"
+              />
             ) : (
-              <div className="poster-fallback aspect-2/3 w-full rounded-xl text-lg" style={{ ["--poster-color" as string]: title.color }}>
+              <div className="poster-fallback aspect-2/3 w-full rounded-2xl text-lg ring-1 ring-white/12" style={{ ["--poster-color" as string]: title.color }}>
                 {title.name_he}
               </div>
             )}
@@ -146,25 +156,23 @@ export default async function TitlePage({ params }: { params: Promise<{ slug: st
               {title.status !== "published" ? <span className="rounded-full bg-amber-500/20 px-3 py-1 text-[11px] font-bold text-amber-300">טיוטה (לא מפורסם)</span> : null}
             </div>
 
-            <h1 className="text-3xl font-black leading-tight md:text-5xl">{title.name_he}</h1>
+            <h1 className="text-3xl font-black leading-[1.05] tracking-tight drop-shadow-[0_6px_30px_rgba(0,0,0,0.9)] md:text-6xl">{title.name_he}</h1>
             {title.name_en || title.original_name ? (
               <p className="text-sm text-ink-300" dir="ltr">{title.name_en ?? title.original_name}</p>
             ) : null}
             {title.tagline ? <p className="text-lemon-200">{title.tagline}</p> : null}
 
-            <div className="flex flex-wrap items-center gap-3 text-sm text-ink-300">
-              {title.year ? <span>{title.year}</span> : null}
-              <span className="rounded border border-white/20 px-1.5 py-0.5 text-xs">{maturityLabel(title.maturity)}</span>
+            <div className="flex flex-wrap items-center gap-2 text-sm font-semibold text-ink-200">
+              {title.year ? <span className="chip-meta">{title.year}</span> : null}
+              <span className="chip-meta">{maturityLabel(title.maturity)}</span>
               {title.kind === "movie" ? (
-                <span>{formatRuntime((title.runtime_min ?? 0) * 60)}</span>
+                <span className="chip-meta">⏱ {formatRuntime((title.runtime_min ?? 0) * 60)}</span>
               ) : (
-                <span>
-                  {title.seasons_count} עונות · {title.episodes_count} פרקים
-                </span>
+                <span className="chip-meta">📺 {title.seasons_count} עונות · {title.episodes_count} פרקים</span>
               )}
-              {title.rating_imdb ? <span className="text-lemon-300">IMDb ★ {title.rating_imdb.toFixed(1)}</span> : null}
-              {title.rating_site ? <span className="text-lemon-300">דירוג האתר ★ {Number(title.rating_site).toFixed(1)}</span> : null}
-              <span>{formatNumber(title.views_count)} צפיות</span>
+              {title.rating_imdb ? <span className="chip-meta text-lemon-300">★ {title.rating_imdb.toFixed(1)}</span> : null}
+              {title.rating_site ? <span className="chip-meta text-lemon-300">דירוג האתר ★ {Number(title.rating_site).toFixed(1)}</span> : null}
+              <span className="chip-meta">{formatNumber(title.views_count)} צפיות</span>
             </div>
 
             {title.overview ? <p className="max-w-3xl text-sm leading-relaxed text-ink-200 md:text-base">{title.overview}</p> : null}
@@ -172,18 +180,29 @@ export default async function TitlePage({ params }: { params: Promise<{ slug: st
             <div className="flex flex-wrap items-center gap-2.5">
               {titleLocked || episodeLocked ? (
                 <>
-                  <Link href="/plans" className="rounded-xl bg-gradient-to-l from-plus-500 to-plus-600 px-6 py-3 text-sm font-black text-white">
+                  <Link
+                    href="/plans"
+                    className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-l from-plus-500 to-plus-600 px-6 py-3.5 text-sm font-black text-white shadow-[0_18px_44px_-16px_rgba(139,92,246,1)] transition hover:-translate-y-0.5 hover:brightness-110"
+                  >
                     ⭐ שדרג לפלוס כדי לצפות
                   </Link>
                   {title.trailer_url ? (
-                    <a href={title.trailer_url} target="_blank" rel="noreferrer" className="rounded-xl border border-white/20 bg-white/5 px-5 py-3 text-sm font-bold">
+                    <a
+                      href={title.trailer_url}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="rounded-xl border border-white/20 bg-white/10 px-5 py-3.5 text-sm font-bold backdrop-blur-md transition hover:bg-white/20"
+                    >
                       ▶ צפה בטריילר
                     </a>
                   ) : null}
                 </>
               ) : (
                 <>
-                  <Link href={playHref} className="inline-flex items-center gap-2 rounded-xl bg-lemon-400 px-6 py-3 text-sm font-black text-ink-900 hover:bg-lemon-300">
+                  <Link
+                    href={playHref}
+                    className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-b from-lemon-300 to-lemon-400 px-7 py-3.5 text-sm font-black text-ink-950 shadow-[0_18px_44px_-16px_rgba(247,194,43,0.95)] transition hover:-translate-y-0.5 hover:brightness-105"
+                  >
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" className="flip-rtl"><path d="M8 5v14l11-7z" /></svg>
                     {resumeTitlePercent > 0.02 ? `המשך לצפות (${Math.round(resumeTitlePercent * 100)}%)` : title.kind === "series" ? "צפה בפרק הראשון" : "צפה עכשיו"}
                   </Link>
@@ -212,7 +231,7 @@ export default async function TitlePage({ params }: { params: Promise<{ slug: st
             )}
 
             {/* מטא-דאטה */}
-            <dl className="grid grid-cols-2 gap-x-6 gap-y-2 border-t border-white/10 pt-4 text-xs md:grid-cols-3">
+            <dl className="grid grid-cols-2 gap-x-6 gap-y-3 rounded-2xl border border-white/[0.07] bg-black/25 p-4 text-xs backdrop-blur-md md:grid-cols-3">
               {title.director ? (
                 <div>
                   <dt className="text-ink-400">בימוי</dt>
@@ -254,7 +273,11 @@ export default async function TitlePage({ params }: { params: Promise<{ slug: st
             {genres.length ? (
               <div className="flex flex-wrap gap-2">
                 {genres.map((g) => (
-                  <Link key={g.id} href={`/genres/${g.slug}`} className="rounded-full border border-white/15 px-3 py-1 text-xs text-ink-200 hover:border-lemon-400/50 hover:text-lemon-300">
+                  <Link
+                    key={g.id}
+                    href={`/genres/${g.slug}`}
+                    className="rounded-full border border-white/12 bg-white/[0.04] px-3.5 py-1.5 text-xs font-semibold text-ink-200 transition hover:border-lemon-400/50 hover:bg-lemon-400/10 hover:text-lemon-200"
+                  >
                     {g.icon} {g.name_he}
                   </Link>
                 ))}

@@ -50,10 +50,19 @@ export default async function PlansPage() {
   return (
     <div className="space-y-8">
       <header className="text-center">
-        <h1 className="text-3xl font-black md:text-4xl">בחר את המסלול שלך 🍋</h1>
-        <p className="mx-auto mt-2 max-w-2xl text-sm text-ink-300">
+        <h1 className="text-3xl font-black tracking-tight md:text-5xl">
+          בחר את <span className="text-gradient">המסלול</span> שלך 🍋
+        </h1>
+        <p className="mx-auto mt-3 max-w-2xl text-sm leading-relaxed text-ink-300 md:text-base">
           מתחילים בחינם, משדרגים כשבא לכם. בלי התחייבות, ביטול בכל רגע בלחיצה.
         </p>
+        <div className="mt-5 flex flex-wrap items-center justify-center gap-2 text-[11px] font-semibold text-ink-300">
+          {["7 ימי ניסיון חינם", "ביטול בכל רגע", "תשלום מאובטח", "ללא פרסומות בפלוס"].map((chip) => (
+            <span key={chip} className="rounded-full border border-white/10 bg-white/[0.04] px-3 py-1.5">
+              ✓ {chip}
+            </span>
+          ))}
+        </div>
       </header>
 
       <div className="grid gap-5 md:grid-cols-2">
@@ -65,41 +74,69 @@ export default async function PlansPage() {
           return (
             <section
               key={plan.code}
-              className={`relative flex flex-col rounded-2xl border p-6 ${
-                isPlus ? "border-plus-500/40 bg-gradient-to-b from-plus-600/15 to-ink-850" : "border-white/10 bg-white/[0.03]"
+              className={`relative flex flex-col overflow-hidden rounded-[24px] p-7 transition-transform duration-300 [transition-timing-function:var(--ease-cinema)] hover:-translate-y-1 ${
+                isPlus
+                  ? "border border-plus-500/40 bg-gradient-to-b from-plus-600/20 to-ink-900/70 shadow-[0_40px_90px_-50px_rgba(139,92,246,0.95)]"
+                  : "card-surface"
               }`}
               aria-label={`מסלול ${plan.name_he}`}
             >
               {isPlus ? (
-                <span className="absolute -top-3 right-6 rounded-full bg-gradient-to-l from-plus-500 to-plus-600 px-3 py-1 text-[11px] font-black text-white">
-                  הפופולרי ביותר
-                </span>
+                <>
+                  <div className="pointer-events-none absolute -right-20 -top-24 h-56 w-56 rounded-full bg-plus-500/25 blur-3xl" aria-hidden="true" />
+                  <span className="absolute -top-0.5 right-7 rounded-b-xl bg-gradient-to-b from-plus-500 to-plus-600 px-3.5 py-1.5 text-[11px] font-black text-white shadow-[0_10px_30px_-12px_rgba(139,92,246,1)]">
+                    הפופולרי ביותר
+                  </span>
+                </>
               ) : null}
 
               <div className="flex items-start justify-between">
                 <div>
-                  <h2 className="text-xl font-black">{isPlus ? "⭐ " : ""}{plan.name_he}</h2>
+                  <h2 className={`text-2xl font-black ${isPlus ? "text-plus-300" : "text-white"}`}>{isPlus ? "⭐ " : ""}{plan.name_he}</h2>
                   {plan.tagline ? <p className="mt-1 text-sm text-ink-300">{plan.tagline}</p> : null}
                 </div>
                 {isCurrent ? <Badge tone="success">המסלול הנוכחי שלך</Badge> : null}
               </div>
 
-              <div className="mt-4 flex items-end gap-2">
-                <span className="text-4xl font-black">{plan.price_ils === 0 ? "₪0" : formatPrice(plan.price_ils)}</span>
-                <span className="pb-1 text-sm text-ink-400">/ חודש</span>
-                {plan.old_price_ils ? <span className="pb-1 text-sm text-ink-500 line-through">{formatPrice(plan.old_price_ils)}</span> : null}
+              <div className="mt-6 flex items-end gap-2.5">
+                <span className={`text-5xl font-black tracking-tight ${isPlus ? "text-gradient" : "text-white"}`}>
+                  {plan.price_ils === 0 ? "₪0" : formatPrice(plan.price_ils)}
+                </span>
+                <span className="pb-1.5 text-sm text-ink-400">/ חודש</span>
+                {plan.old_price_ils ? (
+                  <span className="pb-1.5 text-sm text-ink-500 line-through">{formatPrice(plan.old_price_ils)}</span>
+                ) : null}
               </div>
 
-              <ul className="mt-5 flex-1 space-y-2 text-sm text-ink-200">
-                <li>✓ {isPlus ? `עד ${plan.max_streams} מסכים במקביל` : "מסך אחד בכל פעם"}</li>
-                <li>✓ {isPlus ? `${plan.max_profiles} פרופילים למשפחה` : "2 פרופילים"}</li>
-                <li>✓ איכות עד {plan.max_quality}</li>
-                <li>{plan.downloads_allowed ? "✓ הורדות לצפייה אופליין" : "✗ בלי הורדות"}</li>
-                <li>{plan.ads_enabled ? "• עם פרסומות קצרות" : "✓ בלי פרסומות בכלל"}</li>
-                {plan.early_access ? <li>✓ גישה מוקדמת לפרקים חדשים</li> : null}
-                {features.map((f) => (
-                  <li key={f}>✓ {f}</li>
-                ))}
+              <ul className="mt-6 flex-1 space-y-2.5 text-sm text-ink-200">
+                {[
+                  isPlus ? `עד ${plan.max_streams} מסכים במקביל` : "מסך אחד בכל פעם",
+                  isPlus ? `${plan.max_profiles} פרופילים למשפחה` : "2 פרופילים",
+                  `איכות עד ${plan.max_quality}`,
+                  { text: plan.downloads_allowed ? "הורדות לצפייה אופליין" : "בלי הורדות", ok: Boolean(plan.downloads_allowed) },
+                  { text: plan.ads_enabled ? "עם פרסומות קצרות" : "בלי פרסומות בכלל", ok: !plan.ads_enabled },
+                  ...(plan.early_access ? ["גישה מוקדמת לפרקים חדשים"] : []),
+                  ...features,
+                ].map((raw) => {
+                  const item = typeof raw === "string" ? { text: raw, ok: true } : raw;
+                  return (
+                    <li key={item.text} className="flex items-start gap-2.5">
+                      <span
+                        className={`mt-0.5 flex h-4.5 w-4.5 shrink-0 items-center justify-center rounded-full text-[10px] font-black ${
+                          item.ok
+                            ? isPlus
+                              ? "bg-plus-500/25 text-plus-300"
+                              : "bg-emerald-500/20 text-emerald-300"
+                            : "bg-white/[0.07] text-ink-400"
+                        }`}
+                        aria-hidden="true"
+                      >
+                        {item.ok ? "✓" : "✗"}
+                      </span>
+                      <span className={item.ok ? "" : "text-ink-400"}>{item.text}</span>
+                    </li>
+                  );
+                })}
               </ul>
 
               <div className="mt-6">
@@ -120,18 +157,21 @@ export default async function PlansPage() {
       </div>
 
       {/* השוואת תכונות */}
-      <section className="card-surface rounded-2xl p-5">
-        <h2 className="mb-4 text-lg font-bold">השוואה מפורטת</h2>
-        <div className="overflow-x-auto">
+      <section className="panel-ink overflow-hidden rounded-[22px]">
+        <h2 className="section-heading px-5 pt-5 !text-base">
+          <span className="section-heading-bar" aria-hidden="true" />
+          השוואה מפורטת
+        </h2>
+        <div className="mt-4 overflow-x-auto">
           <table className="w-full text-sm">
-            <thead className="text-ink-300">
+            <thead className="bg-white/[0.04] text-[11px] uppercase tracking-wide text-ink-300">
               <tr>
-                <th className="py-2 text-right">תכונה</th>
-                <th className="py-2">חינם</th>
-                <th className="py-2 text-plus-400">פלוס</th>
+                <th className="px-5 py-3 text-right font-bold">תכונה</th>
+                <th className="px-4 py-3 font-bold">חינם</th>
+                <th className="px-4 py-3 font-bold text-plus-400">פלוס ⭐</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-white/5">
+            <tbody className="divide-y divide-white/[0.06] [&>tr:hover]:bg-white/[0.03]">
               {[
                 ["תוכן חינם", "✓", "✓"],
                 ["תוכן פרימיום (פלוס)", "✗", "✓"],
@@ -144,9 +184,13 @@ export default async function PlansPage() {
                 ["תמיכה", "דוא״ל", "צ׳אט בעדיפות"],
               ].map(([feature, free, plus]) => (
                 <tr key={feature}>
-                  <td className="py-2.5 text-ink-200">{feature}</td>
-                  <td className="py-2.5 text-center text-ink-300">{free}</td>
-                  <td className="py-2.5 text-center font-bold text-plus-400">{plus}</td>
+                  <td className="px-5 py-3.5 font-semibold text-ink-100">{feature}</td>
+                  <td className="px-4 py-3.5 text-center text-ink-300">
+                    <FeatureMark value={free} />
+                  </td>
+                  <td className="px-4 py-3.5 text-center font-bold text-plus-300">
+                    <FeatureMark value={plus} />
+                  </td>
                 </tr>
               ))}
             </tbody>
@@ -192,4 +236,11 @@ export default async function PlansPage() {
       </section>
     </div>
   );
+}
+
+/** סימון ✓ / ✗ בטבלת ההשוואה — עם טון צבע תואם */
+function FeatureMark({ value }: { value: string }) {
+  if (value === "✓") return <span className="text-emerald-400">✓</span>;
+  if (value === "✗") return <span className="text-ink-500">✗</span>;
+  return <span>{value}</span>;
 }
