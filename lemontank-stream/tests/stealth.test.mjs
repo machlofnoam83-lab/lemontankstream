@@ -238,6 +238,36 @@ it("שרת חמקן: אין זכר ל-Next.js בקוד שנשלח לדפדפן",
   assert.ok(body.includes(`/${prefix}/`), "הנכסים מוגשים תחת התחילית המוסווית");
 });
 
+it("שרת חמקן: דפדפן שדורש gzip מקבל את הדף המלא (בלי גוף קרוע)", async () => {
+  // דפדפנים תמיד שולחים Accept-Encoding — בעבר ההסוואה השחיתה תשובה דחוסה
+  const raw = await rawRequest(port, "/", { ...AUTH, "accept-encoding": "gzip, deflate, br" }, 15000);
+  assert.equal(statusOf(raw), 200);
+  const head = raw.split("\r\n\r\n")[0].toLowerCase();
+  assert.doesNotMatch(head, /content-encoding: (gzip|br|deflate)/, "הגוף חייב להגיע בלתי-דחוס כשמסווטים אותו");
+  const body = raw.split("\r\n\r\n").slice(1).join("\r\n\r\n");
+  assert.ok(body.includes("</html>"), "הדף הושלם — לא גוף קטוע");
+});
+
+it("שרת חמקן: ה-bootstrap של React מוסווה והנכסים מסונכרנים", async () => {
+  const raw = await rawRequest(port, "/", AUTH, 15000);
+  const body = raw.split("\r\n\r\n").slice(1).join("\r\n\r\n");
+  assert.equal(body.includes("__next_f"), false, "שם ה-bootstrap המקורי לא אמור להופיע");
+  const alias = loadStealth(configFile).bootstrapAlias;
+  assert.ok(alias && alias !== "off", "נוצר שם מוסווה");
+  assert.ok(body.includes(`self.${alias}=self.${alias}||[]`), "ה-HTML משתמש בשם המוסווה");
+  // וכל הצ'אנקים שהדפדפן טוען מוסווים באותו שם בדיוק — אחרת האתר נשבר
+  const chunkUrls = [...new Set(body.match(/\/_[a-f0-9]{8}\/static\/chunks\/[A-Za-z0-9._-]+\.js/g) ?? [])].slice(0, 10);
+  assert.ok(chunkUrls.length > 0, "נמצאו נתיבי צ'אנקים מוסווים");
+  let seenAlias = false;
+  for (const url of chunkUrls) {
+    const chunk = await rawRequest(port, url, AUTH, 15000);
+    assert.equal(statusOf(chunk), 200, `הצ'אנק ${url} לא נטען`);
+    assert.equal(chunk.includes("__next_f"), false, `הצ'אנק ${url} לא מוסווה`);
+    if (chunk.includes(alias)) seenAlias = true;
+  }
+  assert.ok(seenAlias, "השם המוסווה מופיע בצ'אנק שהדפדפן טוען — סנכרון מלא");
+});
+
 it("שרת חמקן: /admin מוסתר כ-404 (לא מסגיר שמערכת ניהול קיימת)", async () => {
   const raw = await rawRequest(port, "/admin", AUTH, 15000);
   assert.equal(statusOf(raw), 404);

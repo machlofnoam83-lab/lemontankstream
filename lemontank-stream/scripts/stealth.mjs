@@ -190,9 +190,15 @@ switch (command) {
 
   case "fingerprint": {
     const url = args[1] ?? "http://127.0.0.1:3000";
-    console.log(`\n${C.bold}🔍 מה האתר מסגיר לרשת${C.off} — ${url}\n`);
+    // סימן מותאם: אודיט פנימי חייב לעבור את נעילת המקור (אחרת לא תראה כלום)
+    const auditToken = args[2] ?? process.env.STEALTH_ORIGIN_TOKEN ?? config.tokens[0] ?? "";
+    console.log(`\n${C.bold}🔍 מה האתר מסגיר לרשת${C.off} — ${url}${auditToken ? C.dim + " (עם סימן לאודיט פנימי)" + C.off : ""}\n`);
     try {
-      const res = await fetch(url, { redirect: "manual" });
+      const res = await fetch(url, {
+        redirect: "manual",
+        headers: auditToken ? { "x-lt-origin": auditToken } : {},
+        signal: AbortSignal.timeout(12_000),
+      });
       const headers = [...res.headers.entries()];
       const leaks = [];
       for (const [name, value] of headers) {
@@ -208,8 +214,15 @@ switch (command) {
         const name = cookie.split("=")[0];
         if (/lt_|lemontank/i.test(name)) leaks.push(`שם עוגייה מזהה: ${name}`);
       }
-      if (res.headers.get("x-robots-tag")?.includes("index")) leaks.push("האתר מתיר אינדוקס (X-Robots-Tag)");
+      const robotsTag = String(res.headers.get("x-robots-tag") ?? "").toLowerCase();
+      if (!robotsTag) leaks.push("חסר X-Robots-Tag — מנועי חיפוש יאנדקסו את האתר");
+      else if (robotsTag.split(/[,\s]+/).includes("index")) leaks.push("האתר מתיר אינדוקס (X-Robots-Tag: index)");
       if (!res.headers.get("x-content-type-options")) leaks.push("חסרה הגנת nosniff");
+
+      // סריקת גוף התשובה — החלק שהסורקים באמת קוראים
+      const body = (await res.text()).slice(0, 400_000);
+      if (/\/_next\//.test(body)) leaks.push("הגוף מכיל נתיבי /_next/ — מזוהה כ-Next.js");
+      if (/__NEXT_DATA__|next-router-state-tree|self.__next_f/i.test(body)) leaks.push("הגוף מכיל מבנה נתונים של Next.js");
 
       if (!leaks.length) {
         console.log(`${C.green}✅ לא נמצאו טביעות אצבע גלויות${C.off}\n`);
@@ -219,7 +232,10 @@ switch (command) {
       }
       console.log(`${C.dim}כותרות שחזרו (${headers.length}): ${headers.map(([n]) => n).join(", ").slice(0, 300)}${C.off}\n`);
     } catch (err) {
-      console.log(`❌ לא הצלחתי להתחבר: ${err.message}\n`);
+      // אין תשובה = בדיוק מה שמצב חמקן אמור לעשות למי שאין לו סימן
+      console.log(`${C.green}✅ אין תשובה בכלל${C.off} ${C.dim}(${err.name === "TimeoutError" ? "החיבור הושתק" : err.message})${C.off}`);
+      console.log(`${C.dim}לסורק ישיר זה נראה כמו פורט סגור — זו המטרה. לאודיט פנימי: ` +
+        `node scripts/stealth.mjs fingerprint ${url} <סימן> · רשימת המורשים: node scripts/stealth.mjs status${C.off}\n`);
     }
     break;
   }

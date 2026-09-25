@@ -87,11 +87,24 @@ const engine = createEngine({ dbFile: process.env.DATABASE_FILE, appRoot: APP_RO
 let STEALTH = loadStealth();
 
 // תחילית נכסים אקראית — נוצרת פעם אחת ונשמרת, כדי שה-HTML והנכסים יישארו מסונכרנים
-if (STEALTH.enabled === "on" && !STEALTH.assetPrefix) {
+if (
+  STEALTH.enabled === "on" &&
+  STEALTH.assetMask === "on" &&
+  (!STEALTH.assetPrefix || !STEALTH.bootstrapAlias)
+) {
   try {
-    STEALTH = saveStealth({ ...STEALTH, assetPrefix: `_${crypto.randomBytes(4).toString("hex")}`, assetMask: "on" });
+    STEALTH = saveStealth({
+      ...STEALTH,
+      assetPrefix: STEALTH.assetPrefix || `_${crypto.randomBytes(4).toString("hex")}`,
+      // "off" = ביטול מפורש של ההסוואה (אם אי פעם צריך לחזור למקור)
+      bootstrapAlias:
+        STEALTH.bootstrapAlias && STEALTH.bootstrapAlias !== "off"
+          ? STEALTH.bootstrapAlias
+          : `__${crypto.randomBytes(4).toString("hex")}`,
+      assetMask: "on",
+    });
   } catch (err) {
-    console.warn("[stealth] לא ניתן לשמור תחילית נכסים:", err?.message);
+    console.warn("[stealth] לא ניתן לשמור זהות מוסווית:", err?.message);
   }
 }
 
@@ -183,6 +196,20 @@ function installHeaderStealth(res) {
   };
 }
 
+/**
+ * הסוואה טקסטואלית בכל גוף טקסט (HTML/CSS/JS/JSON): נתיבי נכסים וגם
+ * שם ה-bootstrap הפנימי של React (__next_f) — טביעת אצבע ברורה לסורקים.
+ * הבתים הדחוסים לא נוגעים להם בכלל.
+ */
+function maskText(buffer) {
+  let text = buffer.toString("utf8");
+  if (text.includes(MASK_FROM)) text = text.split(MASK_FROM).join(maskPrefix);
+  if (STEALTH.bootstrapAlias && STEALTH.bootstrapAlias !== "off" && text.includes("__next_f")) {
+    text = text.split("__next_f").join(STEALTH.bootstrapAlias);
+  }
+  return Buffer.from(text, "utf8");
+}
+
 function installHtmlMasking(res) {
   if (!maskPrefix || STEALTH.assetMask !== "on") return;
   const originalWrite = res.write.bind(res);
@@ -229,17 +256,38 @@ function installHtmlMasking(res) {
     };
   }
 
-  /** מחזיר את מה שנצבר עד כה אחרי החלפת התחילית, ומאפס את הצבירה */
+  /**
+   * מחזיר את מה שנצבר עד כה אחרי החלפת התחילית, ומאפס את הצבירה.
+   * אם התשובה דחוסה (gzip/br) — מחזירים את הבתים כמו שהם: החלפת מחרוזת
+   * על תוכן בינארי הייתה משחתת את הקובץ ושוברת את הדף בדפדפן.
+   */
   const takeMasked = () => {
     if (!chunks.length) return null;
     const all = Buffer.concat(chunks);
     chunks = [];
     buffered = 0;
-    return Buffer.from(all.toString("utf8").split(MASK_FROM).join(maskPrefix), "utf8");
+    const encoding = String(res.getHeader("content-encoding") ?? "identity").toLowerCase();
+    if (encoding && encoding !== "identity") return all;
+    return maskText(all);
+  };
+
+  /** האם הדחיסה הופעלה אחרי שכבר התחלנו לצבור? אז מפסיקים להסוות ומשחררים הכל */
+  const abandonMasking = () => {
+    const encoding = String(res.getHeader("content-encoding") ?? "identity").toLowerCase();
+    if (encoding && encoding !== "identity" && masking === true) {
+      const raw = chunks.length ? Buffer.concat(chunks) : null;
+      chunks = [];
+      buffered = 0;
+      masking = false;
+      if (raw) originalWrite(raw);
+      return true;
+    }
+    return false;
   };
 
   res.write = function write(chunk, encoding, callback) {
     if (!shouldMask()) return originalWrite(chunk, encoding, callback);
+    if (abandonMasking()) return originalWrite(chunk, encoding, callback);
     const buf = typeof chunk === "string" ? Buffer.from(chunk, "utf8") : chunk;
     buffered += buf.length;
     if (buffered > MAX) {
@@ -255,6 +303,7 @@ function installHtmlMasking(res) {
 
   res.end = function end(chunk, encoding, callback) {
     if (!shouldMask()) return originalEnd(chunk, encoding, callback);
+    if (abandonMasking()) return originalEnd(chunk, encoding, callback);
     const done = typeof encoding === "function" ? encoding : callback;
 
     if (chunk && typeof chunk !== "function") {
@@ -397,6 +446,9 @@ function sanitizeHeaders(info) {
   // מצב חמקן מועבר לאפליקציה (middleware לא יכול לקרוא קבצים) — הכותרת נכתבת
   // רק כאן, אחרי מחיקת כל כותרות ה-x-lt-* שהגיעו מבחוץ.
   headers["x-lt-stealth"] = STEALTH.enabled === "on" ? "on" : "off";
+  // במצב חמקן מסתירים נתיבי נכסים בתוך גוף התשובה, ולכן הגוף חייב להגיע
+  // בלתי-דחוס. הדחיסה לדפדפן מתבצעת ממילא ב-Cloudflare מול הלקוח.
+  if (STEALTH.enabled === "on" && STEALTH.assetMask === "on") headers["accept-encoding"] = "identity";
   const proto = headers["x-forwarded-proto"];
   headers["x-lt-proto"] = proto === "http" || proto === "https" ? proto : (info.peerInternal ? "http" : "https");
   headers["x-request-id"] = headers["x-request-id"] ?? crypto.randomUUID();

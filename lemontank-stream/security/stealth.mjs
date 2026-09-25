@@ -59,6 +59,7 @@ const DEFAULT_CONFIG = {
   robotsBait: "off",           // מלכודת בקבצי robots: נתיב מפתה + חסימה
   assetMask: "on",             // הסוואת /_next/ בתחילית אקראית
   assetPrefix: null,           // נוצר אוטומטית בהפעלה הראשונה
+  bootstrapAlias: null,        // שם פנימי מוסווה ל-__next_f (נוצר אוטומטית)
   canaries: [],                // נתיבי מלכודת סודיים לאיתור דליפת השרת
   updatedAt: null,
 };
