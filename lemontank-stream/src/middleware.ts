@@ -10,6 +10,7 @@
  */
 
 import { NextResponse, type NextRequest } from "next/server";
+// הערה: כתובת ה-IP מגיעה מחתימת השער (server.mjs) — ראו src/lib/security/internal.ts
 
 const SESSION_COOKIE = "lt_session";
 
@@ -91,18 +92,25 @@ export async function middleware(req: NextRequest): Promise<NextResponse> {
 
   /* ── 1. זיהוי דפוסי תקיפה ──────────────────────────────────────────────── */
   const probe = `${pathname}${search}`;
+  // כתובת הלקוח: מעדיפים את זו שקבע שער האבטחה (server.mjs), אחרת X-Forwarded-For
+  const clientIp = () =>
+    req.headers.get("x-lt-ip") ?? req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "unknown";
+  // אם הבקשה נחתמה בידי השער — האירוע כבר נרשם שם, ואין טעם בפנייה נוספת
+  const signedByGateway = Boolean(req.headers.get("x-lt-sig"));
+
   for (const { name, re } of ATTACK_PATTERNS) {
     if (re.test(probe)) {
-      // רישום אירוע האבטחה (await — קורה רק בניסיונות תקיפה, ולכן הזמן זניח)
-      await fetch(new URL("/api/security/report", req.nextUrl.origin), {
-        method: "POST",
-        headers: { "content-type": "application/json", "x-internal-report": process.env.APP_SECRET ?? "dev" },
-        body: JSON.stringify({
-          kind: `attack_pattern_${name}`,
-          ip: req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "unknown",
-          detail: probe.slice(0, 400),
-        }),
-      }).catch(() => undefined);
+      if (!signedByGateway) {
+        await fetch(new URL("/api/security/report", req.nextUrl.origin), {
+          method: "POST",
+          headers: { "content-type": "application/json", "x-internal-report": process.env.APP_SECRET ?? "dev" },
+          body: JSON.stringify({
+            kind: `attack_pattern_${name}`,
+            ip: clientIp(),
+            detail: probe.slice(0, 400),
+          }),
+        }).catch(() => undefined);
+      }
 
       const res = NextResponse.json(
         { ok: false, error: { code: "BLOCKED", message: "הבקשה נחסמה על ידי מערכת האבטחה" } },

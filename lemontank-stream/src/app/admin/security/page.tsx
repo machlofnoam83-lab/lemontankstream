@@ -2,10 +2,13 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Badge, Card, DataTable, StatCard } from "@/components/ui/primitives";
 import { SecurityActions } from "@/components/admin/security-actions";
+import { SecurityCenter } from "@/components/admin/security-center";
 import { all, count, get } from "@/lib/db";
 import { formatNumber, formatRelative } from "@/lib/format";
 import { getSettings } from "@/lib/settings";
 import { getCurrentUser } from "@/lib/session";
+import { banStats } from "@/lib/security/bans";
+import { can } from "@/lib/rbac";
 
 export const metadata: Metadata = { title: "בקרת אבטחה", robots: { index: false } };
 export const dynamic = "force-dynamic";
@@ -32,8 +35,11 @@ export default async function AdminSecurityPage() {
      WHERE created_at > datetime('now','-3 day') AND ip IS NOT NULL GROUP BY ip ORDER BY hits DESC LIMIT 12`,
   );
 
+  const banInfo = banStats();
+
   const stats = {
     events24h: count("SELECT COUNT(*) c FROM security_events WHERE created_at > datetime('now','-1 day')"),
+    activeBans: banInfo.active,
     critical7d: count("SELECT COUNT(*) c FROM security_events WHERE severity='critical' AND created_at > datetime('now','-7 day')"),
     csrf: count("SELECT COUNT(*) c FROM security_events WHERE kind LIKE 'csrf%' AND created_at > datetime('now','-7 day')"),
     attacks: count("SELECT COUNT(*) c FROM security_events WHERE kind LIKE 'attack_pattern%' AND created_at > datetime('now','-7 day')"),
@@ -67,6 +73,8 @@ export default async function AdminSecurityPage() {
 
   return (
     <div className="space-y-5">
+      <SecurityCenter canManage={can(actor?.role ?? "user", "security.manage")} />
+
       <header className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h1 className="text-2xl font-black">🛡️ בקרת אבטחה</h1>

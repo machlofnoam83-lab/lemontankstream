@@ -14,6 +14,8 @@ import { logSecurityEvent, writeAudit, type AuditAction } from "@/lib/audit";
 import { assertCsrf } from "@/lib/csrf";
 import { getCurrentSession, type SessionUser } from "@/lib/session";
 import { can, type Permission } from "@/lib/rbac";
+import { findActiveBan, banIp } from "@/lib/security/bans";
+import { inspectUrl, inspectValue, type InspectionHit } from "@/lib/security/inspect";
 
 export type ApiContext = {
   req: NextRequest;
@@ -52,6 +54,18 @@ export async function withApi(req: NextRequest, options: GuardOptions, handler: 
   let sessionId: string | null = null;
 
   try {
+    /* ── 0. חסימת IP — שכבת הגנה כפולה (השער חוסם לפני, וגם כאן) ─────── */
+    const activeBan = findActiveBan(ip);
+    if (activeBan) {
+      return new Response(
+        JSON.stringify({
+          ok: false,
+          error: { code: "IP_BANNED", message: "הגישה מהכתובת שלך נחסמה על ידי מערכת האבטחה", reason: activeBan.category },
+        }),
+        { status: 403, headers: { "content-type": "application/json", "cache-control": "no-store" } },
+      );
+    }
+
     /* ── 1. הגבלת קצב ─────────────────────────────────────────────────── */
     if (options.rateLimit) {
       const rule = RATE_RULES[options.rateLimit];
@@ -101,6 +115,10 @@ export async function withApi(req: NextRequest, options: GuardOptions, handler: 
       }
     }
 
+    /* ── 3.5 סריקת עומס זדוני בכתובת ובפרמטרים ───────────────────────── */
+    const urlHit = inspectUrl(req.url);
+    if (urlHit) await rejectMalicious(req, ip, urlHit, user?.id ?? null);
+
     /* ── 4. גוף הבקשה ────────────────────────────────────────────────── */
     let parsedBody: unknown;
     let bodyRead = false;
@@ -108,6 +126,9 @@ export async function withApi(req: NextRequest, options: GuardOptions, handler: 
       if (!bodyRead) {
         parsedBody = await readJson<T>(req, options.maxBodyBytes ?? 256 * 1024);
         bodyRead = true;
+        // סריקת הגוף עצמו — כאן תוקפים מנסים להזריק SQL/סקריפט לטופס
+        const bodyHit = inspectValue(parsedBody);
+        if (bodyHit) await rejectMalicious(req, ip, bodyHit, user?.id ?? null);
       }
       return parsedBody as T;
     };
@@ -134,6 +155,44 @@ export async function withApi(req: NextRequest, options: GuardOptions, handler: 
   } catch (err) {
     return jsonError(err, req);
   }
+}
+
+/**
+ * דוח על עומס זדוני: רישום, חסימת IP וחסימת הבקשה.
+ * זו הנקודה שבה "SQL injection" הופך מניסיון לחסימה בפועל.
+ */
+async function rejectMalicious(req: NextRequest, ip: string, hit: InspectionHit, userId: number | null): Promise<never> {
+  const route = new URL(req.url).pathname;
+
+  await logSecurityEvent({
+    kind: `payload_${hit.category}`,
+    severity: hit.severity,
+    ip,
+    userId,
+    detail: `${hit.rule} @ ${route} :: ${hit.sample.slice(0, 200)}`,
+  });
+  writeAudit(
+    { action: "security.sqli_attempt", entity: "request", entityId: route, severity: hit.severity, detail: `${hit.rule} (${hit.category})` },
+    { req, actorId: userId },
+  );
+
+  if (hit.ban) {
+    const settings = (await import("@/lib/security/bans")).securitySettings();
+    if (settings.autoban !== "off") {
+      banIp({
+        ip,
+        category: hit.category,
+        reason: `עומס זדוני בגוף הבקשה: ${hit.rule}`,
+        severity: hit.severity,
+        path: route,
+        method: req.method,
+        userAgent: req.headers.get("user-agent"),
+        action: hit.rule,
+      });
+    }
+  }
+
+  throw new ApiError("FORBIDDEN", 403, { rule: hit.rule, category: hit.category }, "הבקשה נחסמה על ידי מערכת האבטחה");
 }
 
 /** תקציר בטוח של גוף הבקשה ליומן הביקורת — מסתיר סיסמאות וטוקנים */

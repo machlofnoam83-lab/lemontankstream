@@ -40,6 +40,30 @@ npm run build && npm run start
 > הסיסמה מודפסת בסוף הרצת `scripts/seed.mjs`. **החלף אותה מיד** בכניסה הראשונה
 > דרך `/account/security`, והפעל 2FA — יש לך הרשאת בעלים מלאה על המערכת.
 
+### 🛡️ אבטחה — שער אחד לכל התעבורה
+
+האתר רץ מאחורי **שער אבטחה** (`server.mjs`) שכל בקשה עוברת דרכו לפני Next.js:
+
+| שכבה | מה היא עושה |
+|---|---|
+| זיהוי תקיפות | SQLi, XSS, חדירת נתיבים, הרצת פקודות, SSRF, XXE, הברחת בקשות |
+| חסימת כלים | Burp Suite, OWASP ZAP, sqlmap, nikto, nuclei וכל סורק פגיעויות |
+| מלכודות | `/.env`, `/.git`, `/wp-login.php`, `/phpmyadmin` — כל נגיעה = חסימה ל-24 שעות |
+| מודיעין איומים | TOR, מרכזי נתונים, רשימות חסימה — מתעדכן בסקריפט |
+| חסימת IP אוטומטית | זיהוי → חסימה, עם **החמרה** על כל חזרה (עד 30 יום) |
+| הגבלת קצב | תקרה לדקה פר-IP, חסימת הצפות וכוח גס על התחברות |
+| הסתרת זהות | בלי `Server`, בלי `X-Powered-By`, שגיאות גנריות, נתיבי מערכת חסומים |
+
+```bash
+npm run security:status            # מצב המערכת, חסימות ומדיניות
+node scripts/security.mjs bans     # מי חסום ולמה
+node scripts/security.mjs unban 1.2.3.4
+node scripts/security.mjs verify   # 30 בדיקות של המנוע
+```
+
+הכל נשלט גם מהפאנל: **/admin/security** → מרכז הבקרה.
+פירוט מלא, צ'קליסט לפרודקשן ומגבלות: **[SECURITY.md](SECURITY.md)**.
+
 ### 📚 טעינת קטלוג אמיתי (225 כותרים)
 
 בנוסף לתוכן שאתה מעלה בעצמך, אפשר לטעון **קטלוג התחלתי אמיתי** —
@@ -202,6 +226,9 @@ test $TEST_BASE_URL || TEST_BASE_URL=http://localhost:3000 npm test
 | `node scripts/clear-content.mjs [--yes]` | מחיקת כל התוכן (יבש כברירת מחדל; `--users` גם משתמשים) |
 | `node scripts/seed-real-catalog.mjs` | טעינת קטלוג אמיתי (225 כותרים) — `--collections` / `--posters` / `--reset` |
 | `node scripts/gen-posters.mjs` | יצירת כרזות קולנועיות מקוריות (SVG) לכל הכותרים |
+| `node scripts/security.mjs <status\|bans\|ban\|unban\|mode\|set\|purge\|verify>` | ניהול מערכת האבטחה מהטרמינל |
+| `node scripts/update-threat-intel.mjs` | עדכון רשימות TOR וטווחי ענן (cron יומי) |
+| `node scripts/reset-password.mjs <email> [סיסמה]` | איפוס סיסמה וניתוק סשנים |
 | `psql "$DATABASE_URL" -f sql/schema.postgres.sql` | יצירת הסכימה ב-Postgres |
 
 ---

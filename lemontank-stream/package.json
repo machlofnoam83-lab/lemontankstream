@@ -4,11 +4,14 @@
   "private": true,
   "description": "LemonTank Stream - Hebrew movie & series streaming platform (Free / Plus)",
   "scripts": {
-    "dev": "next dev -H 0.0.0.0 -p 3000",
+    "dev": "node server.mjs --dev",
     "build": "next build",
-    "start": "next start -H 0.0.0.0 -p 3000",
+    "start": "node server.mjs",
     "typecheck": "tsc --noEmit",
-    "test": "node --test tests/*.test.mjs"
+    "test": "node --test tests/*.test.mjs",
+    "start:next": "next start -H 0.0.0.0 -p 3000",
+    "security": "node scripts/security.mjs",
+    "security:status": "node scripts/security.mjs status"
   },
   "dependencies": {
     "next": "^15.5.26",

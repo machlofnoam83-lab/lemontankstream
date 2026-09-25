@@ -27,6 +27,7 @@ export type AuditAction =
   | "review.moderate" | "comment.moderate" | "report.handle"
   | "security.csrf_failed" | "security.permission_denied" | "security.sqli_attempt"
   | "security.rate_limit" | "security.suspicious_request" | "security.breach_scan"
+  | "security.ban" | "security.unban" | "security.settings_update"
   | "admin.export" | "admin.backup" | "admin.restore" | "admin.maintenance_toggle"
   | "live.create" | "live.update" | "live.delete"
   | "person.create" | "person.update" | "person.delete";

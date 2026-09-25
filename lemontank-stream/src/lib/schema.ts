@@ -12,7 +12,7 @@
  *  4. טריגרים מעדכנים updated_at אוטומטית ומונעים שינוי שדות מוגנים.
  */
 
-export const SCHEMA_VERSION = 1;
+export const SCHEMA_VERSION = 2;
 
 export const SCHEMA_SQL = /* sql */ `
 PRAGMA foreign_keys = ON;
@@ -691,6 +691,46 @@ CREATE TABLE IF NOT EXISTS security_events (
 ) STRICT;
 CREATE INDEX IF NOT EXISTS idx_sec_events ON security_events(created_at DESC);
 
+-- ── חסימות IP ───────────────────────────────────────────────────────────────
+-- נכתב גם ע"י שער האבטחה (security/store.mjs) לפני ש-Next נטען.
+CREATE TABLE IF NOT EXISTS ip_bans (
+  id          INTEGER PRIMARY KEY AUTOINCREMENT,
+  ip          TEXT    NOT NULL,
+  ip_hash     TEXT,
+  reason      TEXT    NOT NULL,
+  category    TEXT    NOT NULL,                        -- sqli|xss|honeypot|tool|flood|brute|...
+  severity    TEXT    NOT NULL DEFAULT 'warning',
+  strikes     INTEGER NOT NULL DEFAULT 1,              -- כל חזרה מכפילה את זמן החסימה
+  hits        INTEGER NOT NULL DEFAULT 0,
+  path        TEXT,
+  method      TEXT,
+  user_agent  TEXT,
+  action      TEXT,
+  auto        INTEGER NOT NULL DEFAULT 1,              -- 1 = נחסם אוטומטית ע"י המנוע
+  permanent   INTEGER NOT NULL DEFAULT 0,
+  created_at  TEXT    NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ','now')),
+  expires_at  TEXT,
+  lifted_at   TEXT,
+  lifted_by   TEXT
+);
+CREATE INDEX IF NOT EXISTS idx_ip_bans_ip      ON ip_bans(ip, expires_at);
+CREATE INDEX IF NOT EXISTS idx_ip_bans_active  ON ip_bans(lifted_at, expires_at);
+CREATE INDEX IF NOT EXISTS idx_ip_bans_created ON ip_bans(created_at DESC);
+
+-- ── הגדרות מערכת האבטחה (נשלטות מהפאנל) ─────────────────────────────────────
+CREATE TABLE IF NOT EXISTS security_settings (
+  key        TEXT PRIMARY KEY,
+  value      TEXT NOT NULL,
+  updated_at TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ','now'))
+) STRICT;
+
+-- ── מונים לחלונות זמן (הגבלת קצב, ניקוד איומים, כשלי התחברות) ────────────────
+CREATE TABLE IF NOT EXISTS security_counters (
+  key        TEXT PRIMARY KEY,
+  value      INTEGER NOT NULL DEFAULT 0,
+  window_end TEXT
+) STRICT;
+
 CREATE TABLE IF NOT EXISTS analytics_events (
   id         INTEGER PRIMARY KEY AUTOINCREMENT,
   user_id    INTEGER,
@@ -880,7 +920,7 @@ export const coreTables = [
   "titles", "genres", "title_genres", "seasons", "episodes", "media_assets",
   "watch_progress", "watchlist", "ratings", "reviews", "comments",
   "notifications", "collections", "collection_titles", "promos", "feature_flags",
-  "settings", "audit_log", "security_events", "analytics_events",
+  "settings", "audit_log", "security_events", "ip_bans", "security_settings", "security_counters", "analytics_events",
   "title_views_daily", "reports", "support_tickets", "downloads",
   "watch_parties", "badges", "user_badges", "coupons", "live_channels",
   "subtitle_tracks", "audio_tracks", "people", "credits", "title_relations",

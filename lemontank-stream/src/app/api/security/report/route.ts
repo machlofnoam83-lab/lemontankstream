@@ -19,6 +19,18 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ ok: false }, { status: 403 });
   }
 
+  // שכבת הגנה נוספת: הדיווח הפנימי מותר רק מבקשה שהגיעה מהשרת המקומי
+  // (middleware → אותה מכונה). בקשה מהאינטרנט לא יכולה להזריק אירועים.
+  const peerInternal = req.headers.get("x-lt-peer") === "internal";
+  const host = (req.headers.get("host") ?? "").split(":")[0];
+  const localHost = host === "localhost" || host === "127.0.0.1" || host === "::1" || host === "[::1]";
+  const forwardedFor = (req.headers.get("x-forwarded-for") ?? "").split(",")[0]?.trim() ?? "";
+  const internalIp = /^(127\.|::1$|10\.|192\.168\.|172\.(1[6-9]|2\d|3[01])\.|f[cd][0-9a-f]{2}:)/i.test(forwardedFor);
+
+  if (!(peerInternal || (localHost && internalIp))) {
+    return NextResponse.json({ ok: false }, { status: 403 });
+  }
+
   const body = (await req.json().catch(() => ({}))) as { kind?: string; ip?: string; detail?: string };
 
   try {

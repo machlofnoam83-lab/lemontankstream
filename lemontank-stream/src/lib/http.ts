@@ -4,6 +4,7 @@
 
 import { NextResponse, type NextRequest } from "next/server";
 import { ZodError } from "zod";
+import { gatewayInfo } from "@/lib/security/internal";
 
 export type ApiOk<T> = { ok: true; data: T; requestId: string };
 export type ApiErr = { ok: false; error: { code: string; message: string; details?: unknown }; requestId: string };
@@ -17,11 +18,16 @@ export function requestId(req?: Request): string {
 }
 
 /**
- * חילוץ כתובת IP אמיתית.
+ * חילוץ כתובת IP אמיתית (עם עדיפות לחתימת השער).
  * אנו סומכים על כותרות proxy רק כשמוגדר TRUST_PROXY=true (ברירת מחדל: כן בסביבת
  * הפלטפורמה, שם יש reverse proxy). אחרת משתמשים במה שיש ב-socket.
  */
 export function clientIp(req: Request): string {
+  // 1. אם הבקשה עברה דרך שער האבטחה (server.mjs) — משתמשים בכתובת שהוא קבע,
+  //    אחרי אימות חתימת HMAC. אין דרך לזייף אותה מבחוץ.
+  const gateway = gatewayInfo(req);
+  if (gateway.verified && gateway.ip) return gateway.ip;
+
   const trustProxy = process.env.TRUST_PROXY !== "false";
   if (trustProxy) {
     const xff = req.headers.get("x-forwarded-for");

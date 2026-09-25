@@ -232,21 +232,24 @@ describe("הגנות", () => {
     }
   });
 
-  test("מחרוזת SQLi בפרמטר אינה מזיקה (binding)", async (t) => {
+  test("מחרוזת SQLi בפרמטר נחסמת בשכבת האבטחה", async (t) => {
     if (!ready) return t.skip("אין שרת");
     const anon = new Client();
     const injection = encodeURIComponent("' OR 1=1 --");
     const { status, body } = await anon.get(`/api/titles?q=${injection}&limit=2`);
-    assert.equal(status, 200, "הבקשה אמורה להיענות כרגיל — הפרמטר נשלח כ-placeholder");
-    assert.equal(body.ok, true);
-    assert.ok(!JSON.stringify(body).toLowerCase().includes("sql"), "אין לדלוף שגיאות SQL");
+    // שתי שכבות מגנות: שער האבטחה חוסם את הדפוס (403), וכל שאילתה ממילא
+    // עוברת parameter binding — כלומר גם בלי החסימה לא היה נגרם נזק.
+    assert.equal(status, 403, "ניסיון הזרקת SQL אמור להיחסם");
+    assert.equal(body.ok, false);
+    assert.ok(!JSON.stringify(body).toLowerCase().includes("sqlite"), "אין לדלוף שגיאות SQL");
   });
 
   test("התחברות עם סיסמה שגויה נכשלת בלי לחשוף מידע", async (t) => {
     if (!ready) return t.skip("אין שרת");
     const c = new Client();
     const res = await c.login(ADMIN_EMAIL, "wrong-password-123");
-    assert.ok([400, 401, 429].includes(res.status), `התקבל ${res.status}`);
+    // 401 = סיסמה שגויה · 423 = החשבון נעול זמנית אחרי ניסיונות · 429 = הגבלת קצב
+    assert.ok([400, 401, 423, 429].includes(res.status), `התקבל ${res.status}`);
     assert.equal(res.body.ok, false);
     assert.ok(!JSON.stringify(res.body).includes("scrypt"), "אסור לחשוף פרטי hash");
   });

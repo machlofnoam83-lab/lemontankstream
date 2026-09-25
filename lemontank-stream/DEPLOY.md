@@ -255,3 +255,52 @@ SQLite מספיק בהחלט לעשרות אלפי משתמשים. אם בכל �
 | העלאה נכשלת ב-413 | מגבלת ה-reverse proxy | הגדל `client_max_body_size` ב-nginx |
 | "נעול — נדרש פלוס" למנהל | התפקיד לא עודכן | התחבר כמנהל; צוות מקבל גישה מלאה אוטומטית |
 | האתר איטי תחת עומס | WAL+דיסק איטי | SSD, `ANALYZE` מ-`/admin/health`, או שדרוג ל-Postgres |
+
+
+---
+
+## 🛡️ אבטחת הפריסה (מעודכן)
+
+### הרצה נכונה
+
+```bash
+npm run build
+npm run start            # מריץ את שער האבטחה (server.mjs) — לא "next start" ישירות!
+```
+
+השער מאזין על הפורט הציבורי ו-Next.js רץ בתוך אותו תהליך — אין פורט פנימי חשוף.
+שירות systemd מוכן: `deploy/lemontank.service` (כולל הקשחת systemd, מגבלות זיכרון ו-Restart).
+
+### משתני סביבה לפרודקשן
+
+```env
+NODE_ENV="production"
+COOKIE_SECURE="true"
+APP_URL="https://your-domain.co.il"
+ALLOWED_HOSTS="your-domain.co.il,www.your-domain.co.il"   # חוסם Host מזויף
+TRUST_PROXY="strict"                                       # ניתוח XFF מדויק מול nginx
+TRUSTED_PROXY_CIDRS="127.0.0.1/32"
+REQUIRE_GATEWAY="1"                                        # דורש חתימת שער בכל בקשה
+SECURITY_MODE="monitor"                                    # שבוע ראשון: לוגים בלבד
+```
+
+### nginx + fail2ban
+
+* `deploy/nginx-security.conf` — HTTPS, HSTS, הגבלת קצב בשכבת ה-proxy, חסימת נתיבי סריקה.
+* `deploy/nginx-lt-proxy.conf` — העברת כותרות נכונה (ו-`TRUST_PROXY="strict"`).
+* `deploy/fail2ban-lemontank.conf` — חוסם ברמת חומת האש כתובות שנתפסו בשער האבטחה.
+  השער כותב `logs/security.log` (JSON לכל שורה) — זהו הלוג ש-fail2ban קורא.
+
+### מודיעין איומים יומי
+
+```cron
+30 4 * * * cd /opt/lemontank && node scripts/update-threat-intel.mjs >> logs/intel.log 2>&1
+0  5 * * * cd /opt/lemontank && node scripts/security.mjs purge 90 >> logs/security.log 2>&1
+```
+
+### ניטור שבועי (5 דקות)
+
+1. `/admin/security` — יש חסימות חדשות? התוקפנים הגיוניים?
+2. `node scripts/security.mjs status` — מצב המנוע והמדיניות.
+3. `journalctl -u lemontank -n 200 --no-pager | grep -i "security"` — חריגות.
+4. `npm test` — 27 בדיקות, כולל 12 בדיקות אבטחה. אמורות לעבור תמיד.
