@@ -76,7 +76,7 @@ export function Field({
 }) {
   return (
     <div className="space-y-1.5">
-      <label htmlFor={htmlFor} className="block text-[13px] font-semibold text-ink-200">
+      <label htmlFor={htmlFor} className="block text-[0.95rem] font-semibold text-ink-200">
         {label} {required ? <span className="text-lemon-400">*</span> : null}
       </label>
       {children}
@@ -175,7 +175,7 @@ export function Badge({ children, tone = "neutral", className = "" }: { children
     info: "bg-sky-500/15 text-sky-300 border-sky-500/35",
   };
   return (
-    <span className={`inline-flex items-center gap-1 whitespace-nowrap rounded-full border px-2.5 py-0.5 text-[11px] font-bold ${tones[tone]} ${className}`}>
+    <span className={`inline-flex items-center gap-1 whitespace-nowrap rounded-full border px-2.5 py-0.5 text-[0.85rem] font-bold ${tones[tone]} ${className}`}>
       {children}
     </span>
   );
@@ -252,8 +252,8 @@ export function StatCard({
           </span>
         ) : null}
       </div>
-      <div className={`mt-2.5 text-[26px] font-black leading-none tracking-tight ${c.value}`}>{value}</div>
-      {hint ? <div className="mt-1.5 text-[11px] text-ink-400">{hint}</div> : null}
+      <div className={`mt-2.5 text-[1.75rem] font-black leading-none tracking-tight ${c.value}`}>{value}</div>
+      {hint ? <div className="mt-1.5 text-[0.85rem] text-ink-400">{hint}</div> : null}
     </Card>
   );
 }
@@ -300,7 +300,7 @@ export function DataTable({ head, children, className = "" }: { head: React.Reac
   return (
     <div className={`overflow-x-auto rounded-2xl border border-white/8 panel-ink ${className}`}>
       <table className="admin-table">
-        <thead className="sticky top-0 z-10 bg-ink-850/95 text-[11px] uppercase tracking-wide text-ink-300 backdrop-blur">
+        <thead className="sticky top-0 z-10 bg-ink-850/95 text-[0.85rem] uppercase tracking-wide text-ink-300 backdrop-blur">
           <tr>
             {head.map((h, i) => (
               <th key={i} className="whitespace-nowrap px-4 py-3 text-right font-bold">

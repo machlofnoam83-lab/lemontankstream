@@ -73,14 +73,14 @@ export function FlagsEditor({ initial }: { initial: Flag[] }) {
           <li key={flag.key} className="flex flex-wrap items-center justify-between gap-3 py-3">
             <div className="min-w-52 flex-1">
               <div className="flex items-center gap-2">
-                <span dir="ltr" className="font-mono text-[11px] text-ink-300">{flag.key}</span>
+                <span dir="ltr" className="font-mono text-[0.85rem] text-ink-300">{flag.key}</span>
                 <Badge tone={flag.enabled ? "success" : "neutral"}>{flag.enabled ? "פעיל" : "כבוי"}</Badge>
               </div>
-              <p className="mt-0.5 text-[11px] text-ink-400">{flag.description}</p>
+              <p className="mt-0.5 text-[0.85rem] text-ink-400">{flag.description}</p>
             </div>
 
             <div className="flex items-center gap-3">
-              <label className="flex items-center gap-2 text-[11px] text-ink-400">
+              <label className="flex items-center gap-2 text-[0.85rem] text-ink-400">
                 תפוצה
                 <input
                   type="range"
@@ -113,7 +113,7 @@ export function FlagsEditor({ initial }: { initial: Flag[] }) {
         ))}
       </ul>
 
-      <p className="mt-4 text-[11px] text-ink-500">
+      <p className="mt-4 text-[0.85rem] text-ink-500">
         תפוצה חלקית משמשת לבדיקות A/B: משתמשים נבחרים באחוזים לפי מזהה יציב. 100% = כולם, 0% = אף אחד.
       </p>
     </Card>

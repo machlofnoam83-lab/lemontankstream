@@ -97,12 +97,12 @@ export function ImportPanel() {
           <Button variant="subtle" onClick={() => fileRef.current?.click()}>בחר קובץ JSON…</Button>
           <Button variant="ghost" onClick={() => setRaw(EXAMPLE)}>טען דוגמה</Button>
           <Button variant="ghost" onClick={() => { setRaw(""); setReport(null); setError(null); }}>נקה</Button>
-          {parseCount >= 0 ? <span className="text-[11px] text-ink-400">זוהו {parseCount} כותרים</span> : parseCount === -1 && raw ? <span className="text-[11px] text-amber-300">JSON לא תקין</span> : null}
+          {parseCount >= 0 ? <span className="text-[0.85rem] text-ink-400">זוהו {parseCount} כותרים</span> : parseCount === -1 && raw ? <span className="text-[0.85rem] text-amber-300">JSON לא תקין</span> : null}
         </div>
 
         <div className="mt-4">
           <Field label="תוכן ה-JSON" htmlFor="import-json">
-            <Textarea id="import-json" value={raw} onChange={(e) => setRaw(e.target.value)} rows={14} dir="ltr" className="font-mono text-[11px]" placeholder={EXAMPLE} />
+            <Textarea id="import-json" value={raw} onChange={(e) => setRaw(e.target.value)} rows={14} dir="ltr" className="font-mono text-[0.85rem]" placeholder={EXAMPLE} />
           </Field>
         </div>
 

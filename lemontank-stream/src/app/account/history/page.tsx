@@ -65,7 +65,7 @@ export default async function HistoryPage() {
                 {row.episode ? (
                   <div className="text-xs text-ink-400">עונה {row.season_number} · פרק {row.episode_number} — {row.episode}</div>
                 ) : null}
-                <div className="mt-1 flex items-center gap-3 text-[11px] text-ink-400">
+                <div className="mt-1 flex items-center gap-3 text-[0.85rem] text-ink-400">
                   <span>{Math.round(Number(row.percent) * 100)}%</span>
                   <span>{formatRelative(row.updated_at)}</span>
                   {row.duration_sec ? <span>{formatDuration(row.duration_sec)}</span> : null}

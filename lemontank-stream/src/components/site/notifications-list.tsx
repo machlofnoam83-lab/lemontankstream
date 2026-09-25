@@ -53,7 +53,7 @@ export function NotificationsList({ items: initial }: { items: Item[] }) {
               <div className="min-w-0 flex-1">
                 <h2 className="text-sm font-bold">{n.title}</h2>
                 {n.body ? <p className="mt-1 text-xs text-ink-300">{n.body}</p> : null}
-                <div className="mt-2 flex items-center gap-3 text-[11px] text-ink-400">
+                <div className="mt-2 flex items-center gap-3 text-[0.85rem] text-ink-400">
                   <span>{formatRelative(n.created_at)}</span>
                   {n.link ? (
                     <Link href={n.link} onClick={() => markOne(n.id)} className="text-lemon-300 hover:underline">

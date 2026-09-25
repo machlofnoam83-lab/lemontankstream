@@ -167,7 +167,7 @@ export function SecurityPanels({
               שכבת הגנה שנייה עם אפליקציית Authenticator. מומלץ בחום — במיוחד לחשבונות מנהל.
             </p>
           </div>
-          <span className={twoFactorEnabled ? "badge-free" : "rounded-full border border-amber-500/40 bg-amber-500/15 px-2 py-0.5 text-[11px] font-bold text-amber-300"}>
+          <span className={twoFactorEnabled ? "badge-free" : "rounded-full border border-amber-500/40 bg-amber-500/15 px-2 py-0.5 text-[0.85rem] font-bold text-amber-300"}>
             {twoFactorEnabled ? "פעיל ✓" : "לא פעיל"}
           </span>
         </div>
@@ -204,10 +204,10 @@ export function SecurityPanels({
             </p>
             <div className="rounded-xl bg-white p-3">
               {/* QR נוצר כקישור otpauth — אפשר גם להעתיק את המפתח */}
-              <div className="break-all font-mono text-[11px] text-black" dir="ltr">{setup.otpauth}</div>
+              <div className="break-all font-mono text-[0.85rem] text-black" dir="ltr">{setup.otpauth}</div>
             </div>
             <div className="rounded-xl border border-white/10 bg-black/30 p-3">
-              <span className="text-[10px] text-ink-400">מפתח סודי (הקלד ידנית):</span>
+              <span className="text-[0.8rem] text-ink-400">מפתח סודי (הקלד ידנית):</span>
               <div className="font-mono text-sm tracking-widest" dir="ltr">{setup.secret.match(/.{1,4}/g)?.join(" ")}</div>
             </div>
             <div className="flex flex-wrap items-end gap-2">
@@ -236,10 +236,10 @@ export function SecurityPanels({
             <li key={s.id} className="flex flex-wrap items-center justify-between gap-3 py-3 text-sm">
               <div className="min-w-0">
                 <div className="font-medium">{s.device_label ?? "מכשיר לא מזוהה"}</div>
-                <div className="text-[11px] text-ink-400">
+                <div className="text-[0.85rem] text-ink-400">
                   IP: <span className="font-mono" dir="ltr">{s.ip ?? "—"}</span> · נראה לאחרונה {formatRelative(s.last_seen_at)}
                 </div>
-                <div className="max-w-lg truncate text-[10px] text-ink-500" dir="ltr">{s.user_agent ?? ""}</div>
+                <div className="max-w-lg truncate text-[0.8rem] text-ink-500" dir="ltr">{s.user_agent ?? ""}</div>
               </div>
               <Button size="sm" variant="danger" onClick={() => revokeSession(s.id)}>נתק</Button>
             </li>

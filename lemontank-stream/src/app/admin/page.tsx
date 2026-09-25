@@ -88,13 +88,13 @@ export default async function AdminDashboard() {
                   <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-lemon-400 text-xs font-black text-ink-900">{step.n}</span>
                   <span>
                     <b className="block text-sm text-ink-100">{step.t}</b>
-                    <span className="mt-0.5 block text-[11px] text-ink-400">{step.d}</span>
+                    <span className="mt-0.5 block text-[0.85rem] text-ink-400">{step.d}</span>
                   </span>
                 </Link>
               </li>
             ))}
           </ol>
-          <p className="mt-3 text-[11px] text-ink-500">
+          <p className="mt-3 text-[0.85rem] text-ink-500">
             טיפ: אפשר לייבא רשימת כותרים שלמה בבת אחת — <Link href="/admin/import" className="text-lemon-300 hover:underline">ייבוא תוכן</Link>.
           </p>
         </Card>
@@ -134,13 +134,13 @@ export default async function AdminDashboard() {
             <div className="mt-4 flex h-32 items-end gap-1.5" role="img" aria-label="גרף הרשמות יומי">
               {usersByDay.map((d) => (
                 <div key={d.day} className="flex flex-1 flex-col items-center gap-1">
-                  <span className="text-[9px] text-ink-400">{d.count}</span>
+                  <span className="text-[0.75rem] text-ink-400">{d.count}</span>
                   <div
                     className="w-full rounded-t bg-gradient-to-t from-lemon-600 to-lemon-400"
                     style={{ height: `${(Number(d.count) / maxDay) * 100}%`, minHeight: "3px" }}
                     title={`${d.day}: ${d.count}`}
                   />
-                  <span className="text-[8px] text-ink-500">{d.day.slice(5)}</span>
+                  <span className="text-[0.7rem] text-ink-500">{d.day.slice(5)}</span>
                 </div>
               ))}
             </div>
@@ -171,7 +171,7 @@ export default async function AdminDashboard() {
               <dd className="mt-1 text-lg font-bold text-red-300">{formatNumber(Number(get<{ c: number }>("SELECT COUNT(*) c FROM security_events WHERE kind LIKE 'attack_pattern%' AND created_at > datetime('now','-1 day')")?.c ?? 0))}</dd>
             </div>
           </dl>
-          <div className="mt-3 flex flex-wrap gap-2 text-[11px]">
+          <div className="mt-3 flex flex-wrap gap-2 text-[0.85rem]">
             <Badge tone="success">מנוע: {db.settings.journalMode ?? "journal"}</Badge>
             <Badge tone="info">מסד: {formatBytes(db.sizeBytes)}</Badge>
             <Badge tone="neutral">{db.tableCount} טבלאות</Badge>

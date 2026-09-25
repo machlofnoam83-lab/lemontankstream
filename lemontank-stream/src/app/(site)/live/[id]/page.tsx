@@ -95,7 +95,7 @@ export default async function LiveChannelPage({ params }: { params: Promise<{ id
           <Link href="/plans" className="mt-4 inline-block rounded-xl bg-lemon-400 px-6 py-3 font-bold text-ink-900">
             שדרג לפלוס
           </Link>
-          <p className="mt-3 text-[11px] text-ink-500">
+          <p className="mt-3 text-[0.85rem] text-ink-500">
             {user ? "אפשר גם לממש קופון בעמוד המסלולים." : "אין לך חשבון? הרשמה לוקחת פחות מדקה."}
           </p>
         </Card>
@@ -115,7 +115,7 @@ export default async function LiveChannelPage({ params }: { params: Promise<{ id
               הדפדפן שלך לא תומך בנגן וידאו.
             </video>
           </div>
-          <div className="flex flex-wrap items-center justify-between gap-2 border-t border-white/10 px-4 py-3 text-[11px] text-ink-400">
+          <div className="flex flex-wrap items-center justify-between gap-2 border-t border-white/10 px-4 py-3 text-[0.85rem] text-ink-400">
             <span>מקור השידור: <span dir="ltr" className="font-mono">{safeHost(channel.stream_url)}</span></span>
             <span>אם השידור לא מתחיל — ייתכן שהמקור דורש נגן HLS או שהערוץ מוגבל גאוגרפית.</span>
           </div>
@@ -130,7 +130,7 @@ export default async function LiveChannelPage({ params }: { params: Promise<{ id
           <ul className="mt-3 divide-y divide-white/5 text-xs">
             {epg.slice(0, 20).map((entry, i) => (
               <li key={`${entry.time ?? i}-${entry.title ?? ""}`} className="flex items-center justify-between gap-3 py-2">
-                <span dir="ltr" className="font-mono text-[11px] text-ink-300">{entry.time ?? ""}{entry.until ? `–${entry.until}` : ""}</span>
+                <span dir="ltr" className="font-mono text-[0.85rem] text-ink-300">{entry.time ?? ""}{entry.until ? `–${entry.until}` : ""}</span>
                 <span>{entry.title ?? "—"}</span>
               </li>
             ))}
@@ -138,7 +138,7 @@ export default async function LiveChannelPage({ params }: { params: Promise<{ id
         </Card>
       ) : null}
 
-      <p className="text-center text-[11px] text-ink-500">
+      <p className="text-center text-[0.85rem] text-ink-500">
         {SITE.name} · השידור מועבר כפי שהוא מהספק. דיווח על תקלה: <Link href="/support" className="text-lemon-300 hover:underline">מרכז התמיכה</Link>
       </p>
     </div>

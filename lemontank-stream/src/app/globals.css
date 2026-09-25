@@ -53,6 +53,35 @@
   --ease-cinema: cubic-bezier(0.22, 1, 0.36, 1);
 }
 
+/* ── טיפוגרפיה קריאה: סקאלת גדלים מוגדלת ───────────────────────────────────
+   הקריטריון: קטן מדי = לא קריא. לכן כל הדרגות גדלות,
+   והרצפה עולה במיוחד (xs 12→14px, sm 14→16px) — כדי שכל תווית בממשק תיקרא.
+   הגדלים ב-rem, ולכן מכבדים גם הגדלת טקסט בדפדפן ובמערכת ההפעלה. */
+@theme {
+  --text-xs: 0.875rem;              /* 12px → 14px  · תוויות, תגיות, מטא */
+  --text-xs--line-height: 1.45;
+  --text-sm: 1rem;                  /* 14px → 16px  · גוף טקסט משני */
+  --text-sm--line-height: 1.5;
+  --text-base: 1.0625rem;           /* 16px → 17px  · גוף טקסט ראשי */
+  --text-base--line-height: 1.6;
+  --text-lg: 1.1875rem;             /* 18px → 19px */
+  --text-lg--line-height: 1.5;
+  --text-xl: 1.3125rem;             /* 20px → 21px */
+  --text-xl--line-height: 1.45;
+  --text-2xl: 1.5625rem;            /* 24px → 25px */
+  --text-2xl--line-height: 1.35;
+  --text-3xl: 1.9375rem;            /* 30px → 31px */
+  --text-3xl--line-height: 1.25;
+  --text-4xl: 2.375rem;             /* 36px → 38px */
+  --text-4xl--line-height: 1.2;
+  --text-5xl: 3.125rem;             /* 48px → 50px */
+  --text-5xl--line-height: 1.1;
+  --text-6xl: 3.875rem;             /* 60px → 62px */
+  --text-6xl--line-height: 1.05;
+  --text-7xl: 4.625rem;             /* 72px → 74px */
+  --text-7xl--line-height: 1;
+}
+
 /* ─────────────────────────────── בסיס ───────────────────────────────────── */
 
 * {
@@ -171,9 +200,9 @@ h1 { letter-spacing: -0.035em; }
   background: linear-gradient(135deg, #8b5cf6, #6d28d9);
   color: #fff;
   border-radius: 999px;
-  font-size: 0.7rem;
+  font-size: 0.875rem;
   font-weight: 800;
-  padding: 0.18rem 0.6rem;
+  padding: 0.2rem 0.65rem;
   letter-spacing: 0.01em;
   box-shadow: 0 4px 14px -4px rgb(139 92 246 / 0.7);
   white-space: nowrap;
@@ -184,9 +213,9 @@ h1 { letter-spacing: -0.035em; }
   color: #6ee7a0;
   border: 1px solid rgb(34 197 94 / 0.4);
   border-radius: 999px;
-  font-size: 0.7rem;
+  font-size: 0.875rem;
   font-weight: 800;
-  padding: 0.18rem 0.6rem;
+  padding: 0.2rem 0.65rem;
   white-space: nowrap;
 }
 
@@ -199,8 +228,8 @@ h1 { letter-spacing: -0.035em; }
   border: 1px solid rgb(255 255 255 / 0.18);
   background: rgb(0 0 0 / 0.45);
   backdrop-filter: blur(6px);
-  padding: 0.1rem 0.45rem;
-  font-size: 10px;
+  padding: 0.15rem 0.5rem;
+  font-size: 0.8rem;
   font-weight: 700;
   color: #fff;
   white-space: nowrap;
@@ -257,7 +286,7 @@ h1 { letter-spacing: -0.035em; }
   display: flex;
   align-items: center;
   gap: 0.7rem;
-  font-size: 1.15rem;
+  font-size: 1.35rem;
   font-weight: 900;
   letter-spacing: -0.02em;
 }
@@ -337,7 +366,7 @@ h1 { letter-spacing: -0.035em; }
   width: 100%;
   border-collapse: separate;
   border-spacing: 0;
-  font-size: 0.875rem;
+  font-size: 1rem;
 }
 
 @utility text-gradient {

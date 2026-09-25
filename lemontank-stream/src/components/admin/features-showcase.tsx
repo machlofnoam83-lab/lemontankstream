@@ -26,11 +26,11 @@ export function CardsShowcase({ flags }: { flags: Array<{ key: string; enabled: 
                 <span aria-hidden="true">{group.icon}</span>
                 {group.title}
               </h2>
-              <span className="text-[11px] text-ink-400">{on}/{items.length} פעילים</span>
+              <span className="text-[0.85rem] text-ink-400">{on}/{items.length} פעילים</span>
             </div>
             <ul className="mt-3 space-y-1.5">
               {items.map((item) => (
-                <li key={item.key} className="flex items-start gap-2 text-[11px]">
+                <li key={item.key} className="flex items-start gap-2 text-[0.85rem]">
                   <span className={item.enabled ? "text-emerald-400" : "text-ink-600"} aria-hidden="true">{item.enabled ? "●" : "○"}</span>
                   <span className={item.enabled ? "text-ink-200" : "text-ink-500"} title={item.key}>{item.description}</span>
                 </li>

@@ -131,8 +131,8 @@ export default async function AdminTitlesPage({
                   </td>
                   <td className="px-3 py-2">
                     <Link href={`/admin/titles/${t.id}`} className="font-medium hover:text-lemon-300">{t.name_he}</Link>
-                    {t.is_featured ? <span className="ms-2 text-[10px] text-lemon-400">⭐</span> : null}
-                    <div className="font-mono text-[10px] text-ink-500" dir="ltr">/{t.slug}</div>
+                    {t.is_featured ? <span className="ms-2 text-[0.8rem] text-lemon-400">⭐</span> : null}
+                    <div className="font-mono text-[0.8rem] text-ink-500" dir="ltr">/{t.slug}</div>
                   </td>
                   <td className="px-3 py-2 text-xs">{t.kind === "movie" ? "סרט" : "סדרה"}</td>
                   <td className="px-3 py-2 text-xs">{t.year ?? "—"}</td>
@@ -144,7 +144,7 @@ export default async function AdminTitlesPage({
                   </td>
                   <td className="px-3 py-2 text-xs">{t.kind === "series" ? `${t.seasons_count}/${t.episodes_count}` : "—"}</td>
                   <td className="px-3 py-2 text-xs">{formatNumber(t.views_count)}</td>
-                  <td className="px-3 py-2 text-[11px] text-ink-400">{formatRelative(t.updated_at)}</td>
+                  <td className="px-3 py-2 text-[0.85rem] text-ink-400">{formatRelative(t.updated_at)}</td>
                   <td className="px-3 py-2">
                     <div className="flex gap-2 whitespace-nowrap">
                       <Link href={`/admin/titles/${t.id}`} className="text-xs text-lemon-300 hover:underline">עריכה</Link>

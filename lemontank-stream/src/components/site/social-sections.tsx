@@ -100,7 +100,7 @@ export function CommentsSection({ titleId, episodeId, enabled = true }: { titleI
                 </span>
                 <span className="text-sm font-bold">{c.user_name}</span>
                 {c.user_plan === "plus" ? <span className="badge-plus">פלוס</span> : null}
-                <span className="ms-auto text-[11px] text-ink-400">{formatRelative(c.created_at)}</span>
+                <span className="ms-auto text-[0.85rem] text-ink-400">{formatRelative(c.created_at)}</span>
               </div>
               <p className="mt-2 whitespace-pre-wrap text-sm text-ink-200">{c.body}</p>
             </li>
@@ -191,7 +191,7 @@ export function ReviewsSection({ titleId, canReview }: { titleId: number; canRev
                 <span className="text-sm font-bold">{r.user_name}</span>
                 {r.user_plan === "plus" ? <span className="badge-plus">פלוס</span> : null}
                 {r.stars ? <span className="text-xs text-lemon-300">★ {r.stars}/10</span> : null}
-                <span className="ms-auto text-[11px] text-ink-400">{formatRelative(r.created_at)}</span>
+                <span className="ms-auto text-[0.85rem] text-ink-400">{formatRelative(r.created_at)}</span>
               </div>
               {r.headline ? <h3 className="mt-2 font-bold">{r.headline}</h3> : null}
               {r.has_spoilers && !revealed[r.id] ? (

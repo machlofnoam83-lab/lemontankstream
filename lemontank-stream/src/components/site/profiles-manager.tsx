@@ -120,13 +120,13 @@ export function ProfilesManager({ initialProfiles, maxProfiles, isPlus }: { init
               </span>
               <div className="min-w-0">
                 <div className="truncate font-bold">{p.name}</div>
-                <div className="text-[11px] text-ink-400">
+                <div className="text-[0.85rem] text-ink-400">
                   {p.is_kid ? `🧸 פרופיל ילדים · עד ${p.maturity_limit}` : `גיל מותר: ${p.maturity_limit}`}
                 </div>
                 <div className="mt-1 flex flex-wrap gap-1">
-                  {p.has_pin ? <span className="rounded bg-white/10 px-1.5 py-0.5 text-[10px]">🔒 PIN</span> : null}
-                  <span className="rounded bg-white/10 px-1.5 py-0.5 text-[10px]">אודיו: {p.lang_audio}</span>
-                  <span className="rounded bg-white/10 px-1.5 py-0.5 text-[10px]">כתוביות: {p.lang_subs}</span>
+                  {p.has_pin ? <span className="rounded bg-white/10 px-1.5 py-0.5 text-[0.8rem]">🔒 PIN</span> : null}
+                  <span className="rounded bg-white/10 px-1.5 py-0.5 text-[0.8rem]">אודיו: {p.lang_audio}</span>
+                  <span className="rounded bg-white/10 px-1.5 py-0.5 text-[0.8rem]">כתוביות: {p.lang_subs}</span>
                 </div>
               </div>
             </div>

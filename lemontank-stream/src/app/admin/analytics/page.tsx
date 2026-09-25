@@ -119,10 +119,10 @@ export default async function AdminAnalyticsPage() {
               {topTitles.map((t) => (
                 <tr key={t.id} className="hover:bg-white/[0.03]">
                   <td className="px-3 py-2 text-xs">{t.name_he}</td>
-                  <td className="px-3 py-2 text-[11px] text-ink-400">{t.kind === "series" ? "סדרה" : "סרט"}</td>
-                  <td className="px-3 py-2 text-[11px]">{t.plan_access === "plus" ? "⭐ פלוס" : "חינם"}</td>
+                  <td className="px-3 py-2 text-[0.85rem] text-ink-400">{t.kind === "series" ? "סדרה" : "סרט"}</td>
+                  <td className="px-3 py-2 text-[0.85rem]">{t.plan_access === "plus" ? "⭐ פלוס" : "חינם"}</td>
                   <td className="px-3 py-2 text-xs">{formatNumber(Number(t.views))}</td>
-                  <td className="px-3 py-2 text-[11px] text-ink-400">{formatMinutes(Number(t.minutes))}</td>
+                  <td className="px-3 py-2 text-[0.85rem] text-ink-400">{formatMinutes(Number(t.minutes))}</td>
                 </tr>
               ))}
             </DataTable>
@@ -142,7 +142,7 @@ export default async function AdminAnalyticsPage() {
             ) : (
               <ul className="flex flex-wrap gap-2">
                 {searcheEvents.map((s) => (
-                  <li key={s.q} className="rounded-full bg-white/5 px-3 py-1 text-[11px]">
+                  <li key={s.q} className="rounded-full bg-white/5 px-3 py-1 text-[0.85rem]">
                     {s.q} <span className="text-ink-500">×{s.c}</span>
                   </li>
                 ))}
@@ -162,7 +162,7 @@ export default async function AdminAnalyticsPage() {
               {topEpisodes.map((e) => (
                 <tr key={e.id}>
                   <td className="px-3 py-2 text-xs">{e.name_he}</td>
-                  <td className="px-3 py-2 text-[11px] text-ink-400">{e.series}</td>
+                  <td className="px-3 py-2 text-[0.85rem] text-ink-400">{e.series}</td>
                   <td className="px-3 py-2 text-xs">{formatNumber(Number(e.views_count))}</td>
                 </tr>
               ))}
@@ -184,7 +184,7 @@ export default async function AdminAnalyticsPage() {
               ))}
             </DataTable>
           )}
-          <p className="mt-3 text-[11px] text-ink-500">
+          <p className="mt-3 text-[0.85rem] text-ink-500">
             צופים עם התקדמות צפייה ב-30 יום: {formatNumber(totals.withProgress30)} — זה המדד האמיתי לחזרה, לא מספר החיפושים.
           </p>
         </Card>

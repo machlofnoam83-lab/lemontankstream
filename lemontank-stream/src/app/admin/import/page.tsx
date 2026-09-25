@@ -48,7 +48,7 @@ export default function AdminImportPage() {
           <DataTable head={["#", "מקור", "סטטוס", "סה״כ", "יובאו", "דולגו", "מבצע", "מתי"]}>
             {jobs.map((job) => (
               <tr key={job.id}>
-                <td className="px-3 py-2 font-mono text-[11px] text-ink-500">{job.id}</td>
+                <td className="px-3 py-2 font-mono text-[0.85rem] text-ink-500">{job.id}</td>
                 <td className="px-3 py-2 text-xs" dir="ltr">{job.source}</td>
                 <td className="px-3 py-2">
                   <Badge tone={job.status === "done" ? "success" : job.status === "failed" ? "danger" : "warn"}>
@@ -58,8 +58,8 @@ export default function AdminImportPage() {
                 <td className="px-3 py-2 text-xs">{formatNumber(Number(job.total))}</td>
                 <td className="px-3 py-2 text-xs text-emerald-300">{formatNumber(Number(job.processed))}</td>
                 <td className="px-3 py-2 text-xs text-ink-400">{formatNumber(Number(job.failed))}</td>
-                <td className="px-3 py-2 text-[11px] text-ink-400" dir="ltr">{job.started_by_email ?? "—"}</td>
-                <td className="px-3 py-2 text-[11px] text-ink-400">{formatRelative(job.finished_at ?? job.created_at)}</td>
+                <td className="px-3 py-2 text-[0.85rem] text-ink-400" dir="ltr">{job.started_by_email ?? "—"}</td>
+                <td className="px-3 py-2 text-[0.85rem] text-ink-400">{formatRelative(job.finished_at ?? job.created_at)}</td>
               </tr>
             ))}
           </DataTable>

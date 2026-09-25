@@ -154,7 +154,7 @@ export function LoginForm({ next = "/" }: { next?: string }) {
         </Link>
       </p>
 
-      <div className="rounded-xl border border-white/10 bg-white/[0.02] p-3 text-center text-[11px] text-ink-400">
+      <div className="rounded-xl border border-white/10 bg-white/[0.02] p-3 text-center text-[0.85rem] text-ink-400">
         🔒 החיבור מוצפן, הסיסמאות נשמרות כ-scrypt, וכל ניסיון התחברות נרשם ביומן האבטחה.
       </div>
     </form>

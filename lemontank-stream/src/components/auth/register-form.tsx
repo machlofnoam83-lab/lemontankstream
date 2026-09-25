@@ -109,7 +109,7 @@ export function RegisterForm({ plans, initialPlan = "free", referral }: { plans:
                 <span key={i} className={`h-1.5 flex-1 rounded-full ${i < strength ? strengthColors[strength] : "bg-white/10"}`} />
               ))}
             </div>
-            <p className="text-[11px] text-ink-400">
+            <p className="text-[0.85rem] text-ink-400">
               חוזק סיסמה: <span className="font-bold text-ink-200">{strengthLabels[strength]}</span>
             </p>
           </div>
@@ -136,14 +136,14 @@ export function RegisterForm({ plans, initialPlan = "free", referral }: { plans:
                 <span className="font-bold">{p.code === "plus" ? "⭐ פלוס" : "חינם"}</span>
                 <span className="text-sm">{p.price_ils === 0 ? "₪0" : `₪${Number(p.price_ils).toFixed(2)}/חודש`}</span>
               </span>
-              <span className="mt-1 block text-[11px] text-ink-400">
+              <span className="mt-1 block text-[0.85rem] text-ink-400">
                 {p.code === "plus" ? "כל התוכן, 4K, 4 מסכים, הורדות, בלי פרסומות" : "כל תוכן החינם, 720p, מסך אחד"}
               </span>
             </label>
           ))}
         </div>
         {plan === "plus" ? (
-          <p className="text-[11px] text-plus-400">7 ימי ניסיון חינם — אפשר לבטל בכל רגע בלי התחייבות.</p>
+          <p className="text-[0.85rem] text-plus-400">7 ימי ניסיון חינם — אפשר לבטל בכל רגע בלי התחייבות.</p>
         ) : null}
       </fieldset>
 

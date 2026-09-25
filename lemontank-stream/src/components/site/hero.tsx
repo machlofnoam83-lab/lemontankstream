@@ -79,7 +79,7 @@ export function Hero({ slides, isPlus }: { slides: Slide[]; isPlus: boolean }) {
         {/* תוכן */}
         <div className="relative flex min-h-[78vw] flex-col justify-end gap-4 p-6 sm:min-h-[420px] md:min-h-[560px] md:max-w-3xl md:p-12">
           <div className="animate-fade-up flex flex-wrap items-center gap-2">
-            <span className="rounded-full bg-gradient-to-b from-lemon-300 to-lemon-400 px-3 py-1 text-[11px] font-black text-ink-950 shadow-[0_8px_24px_-10px_rgba(247,194,43,0.9)]">
+            <span className="rounded-full bg-gradient-to-b from-lemon-300 to-lemon-400 px-3 py-1 text-[0.85rem] font-black text-ink-950 shadow-[0_8px_24px_-10px_rgba(247,194,43,0.9)]">
               {current.kind === "movie" ? "🎬 סרט" : "📺 סדרה"} מומלץ
             </span>
             {current.plan_access === "plus" ? (
@@ -88,7 +88,7 @@ export function Hero({ slides, isPlus }: { slides: Slide[]; isPlus: boolean }) {
               <span className="badge-free">זמין בחינם</span>
             )}
             {current.is_original ? (
-              <span className="rounded-full border border-white/25 bg-white/5 px-3 py-1 text-[11px] font-bold text-white backdrop-blur">
+              <span className="rounded-full border border-white/25 bg-white/5 px-3 py-1 text-[0.85rem] font-bold text-white backdrop-blur">
                 מקורי LemonTank
               </span>
             ) : null}
@@ -102,7 +102,7 @@ export function Hero({ slides, isPlus }: { slides: Slide[]; isPlus: boolean }) {
 
           <div className="flex flex-wrap items-center gap-2.5 text-xs font-semibold text-ink-200 md:text-sm">
             {current.year ? <span>{current.year}</span> : null}
-            <span className="rounded-md border border-white/25 px-1.5 py-0.5 text-[11px]">{current.maturity}</span>
+            <span className="rounded-md border border-white/25 px-1.5 py-0.5 text-[0.85rem]">{current.maturity}</span>
             {current.kind === "series" ? (
               <span>
                 {current.seasons_count} עונות · {current.episodes_count} פרקים

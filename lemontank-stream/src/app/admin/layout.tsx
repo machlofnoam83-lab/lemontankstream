@@ -48,7 +48,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
                 <span className="text-sm font-black tracking-tight">
                   Lemon<span className="text-gradient">Tank</span>
                 </span>
-                <span className="mt-0.5 text-[10px] font-bold uppercase tracking-[0.18em] text-lemon-300/80">פאנל ניהול</span>
+                <span className="mt-0.5 text-[0.8rem] font-bold uppercase tracking-[0.18em] text-lemon-300/80">פאנל ניהול</span>
               </span>
             </Link>
 
@@ -59,7 +59,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
                 </span>
               ))}
               <span className="hidden items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 sm:inline-flex">
-                <span className="flex h-5 w-5 items-center justify-center rounded-full bg-gradient-to-b from-lemon-300 to-lemon-400 text-[10px] font-black text-ink-950" aria-hidden="true">
+                <span className="flex h-5 w-5 items-center justify-center rounded-full bg-gradient-to-b from-lemon-300 to-lemon-400 text-[0.8rem] font-black text-ink-950" aria-hidden="true">
                   {user.name.trim().charAt(0)}
                 </span>
                 <span className="text-ink-200">{user.name}</span>

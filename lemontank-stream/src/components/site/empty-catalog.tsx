@@ -39,12 +39,12 @@ export function EmptyCatalog({ isStaff, className = "" }: { isStaff: boolean; cl
             >
               <span className="text-2xl" aria-hidden="true">{item.icon}</span>
               <p className="mt-2 font-bold text-ink-100 group-hover:text-lemon-300">{item.title}</p>
-              <p className="mt-1 text-[11px] text-ink-400">{item.hint}</p>
+              <p className="mt-1 text-[0.85rem] text-ink-400">{item.hint}</p>
             </Link>
           ))}
         </div>
 
-        <p className="mt-4 text-[11px] text-ink-500">
+        <p className="mt-4 text-[0.85rem] text-ink-500">
           רוצה לראות איך זה נראה עם תוכן לפני שאתה מעלה את שלך?{" "}
           <span dir="ltr" className="font-mono text-ink-300">node scripts/seed.mjs --reset --demo</span> · למחיקה:{" "}
           <span dir="ltr" className="font-mono text-ink-300">node scripts/clear-content.mjs --yes --users</span>

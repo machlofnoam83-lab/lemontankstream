@@ -63,7 +63,7 @@ export default async function LivePage() {
                         )}
                       </span>
                       <span className="text-center text-sm font-bold">{c.name_he}</span>
-                      <span className="flex items-center gap-1 text-[10px] text-ink-400">
+                      <span className="flex items-center gap-1 text-[0.8rem] text-ink-400">
                         {c.number ? <span>ערוץ {c.number}</span> : null}
                         {locked ? <span className="badge-plus">פלוס</span> : <span className="live-dot inline-block h-1.5 w-1.5 rounded-full bg-red-500" />}
                       </span>

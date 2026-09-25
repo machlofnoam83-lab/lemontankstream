@@ -121,7 +121,7 @@ export function MediaUploader({
         }}
       />
 
-      {hint ? <p className="mt-1 text-[11px] text-ink-400">{hint}</p> : null}
+      {hint ? <p className="mt-1 text-[0.85rem] text-ink-400">{hint}</p> : null}
 
       {progress !== null ? (
         <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-white/10">
@@ -137,12 +137,12 @@ export function MediaUploader({
             // eslint-disable-next-line @next/next/no-img-element
             <img src={url} alt="תצוגה מקדימה" className="h-20 w-auto rounded-lg object-cover ring-1 ring-white/10" />
           ) : (
-            <span className="truncate rounded-lg bg-black/30 px-2 py-1 font-mono text-[10px] text-ink-300" dir="ltr">{url}</span>
+            <span className="truncate rounded-lg bg-black/30 px-2 py-1 font-mono text-[0.8rem] text-ink-300" dir="ltr">{url}</span>
           )}
           <button
             type="button"
             onClick={() => { setUrl(null); onUploaded?.({ id: 0, url: "" }); }}
-            className="text-[11px] text-red-300 hover:underline"
+            className="text-[0.85rem] text-red-300 hover:underline"
           >
             הסר
           </button>

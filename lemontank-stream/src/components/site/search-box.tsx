@@ -72,7 +72,7 @@ export function SearchBox({ compact = false, autoFocus = false }: { compact?: bo
           aria-label="חיפוש סרטים וסדרות"
           className={`w-full rounded-full border border-white/15 bg-ink-900/90 py-2 pr-9 pl-3 text-sm placeholder:text-ink-400 focus:border-lemon-400/70 ${compact ? "md:w-52" : ""}`}
         />
-        {loading ? <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[10px] text-ink-400">…</span> : null}
+        {loading ? <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[0.8rem] text-ink-400">…</span> : null}
       </form>
 
       {open && items.length > 0 ? (
@@ -85,17 +85,17 @@ export function SearchBox({ compact = false, autoFocus = false }: { compact?: bo
                   onClick={() => setOpen(false)}
                   className="flex items-center gap-3 px-3 py-2 hover:bg-white/5"
                 >
-                  <span className="h-12 w-9 shrink-0 overflow-hidden rounded bg-ink-800 text-[9px]">
+                  <span className="h-12 w-9 shrink-0 overflow-hidden rounded bg-ink-800 text-[0.75rem]">
                     {it.poster_url ? (
                       // eslint-disable-next-line @next/next/no-img-element
                       <img src={it.poster_url} alt="" className="h-full w-full object-cover" loading="lazy" />
                     ) : (
-                      <span className="poster-fallback h-full w-full text-[8px]">{it.name_he}</span>
+                      <span className="poster-fallback h-full w-full text-[0.7rem]">{it.name_he}</span>
                     )}
                   </span>
                   <span className="min-w-0 flex-1">
                     <span className="block truncate text-sm font-medium">{it.name_he}</span>
-                    <span className="block text-[11px] text-ink-400">
+                    <span className="block text-[0.85rem] text-ink-400">
                       {it.kind === "movie" ? "סרט" : "סדרה"} {it.year ? `· ${it.year}` : ""}
                     </span>
                   </span>

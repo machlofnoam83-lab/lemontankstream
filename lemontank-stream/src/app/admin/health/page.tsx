@@ -97,13 +97,13 @@ export default async function AdminHealthPage() {
               <li key={check.label} className="flex items-start justify-between gap-3 rounded-xl border border-white/8 bg-white/[0.02] p-2.5">
                 <div>
                   <p className="text-xs font-medium">{check.label}</p>
-                  <p className="mt-0.5 text-[11px] text-ink-400" dir="auto">{check.detail}</p>
+                  <p className="mt-0.5 text-[0.85rem] text-ink-400" dir="auto">{check.detail}</p>
                 </div>
                 <Badge tone={check.ok ? "success" : "warn"}>{check.ok ? "תקין" : "לבדוק"}</Badge>
               </li>
             ))}
           </ul>
-          <p className="mt-3 text-[11px] text-ink-500">
+          <p className="mt-3 text-[0.85rem] text-ink-500">
             להפקת מפתחות חדשים: <span dir="ltr" className="font-mono">node scripts/gen-secrets.mjs</span> — ראו גם README בהמשך.
           </p>
         </Card>
@@ -114,7 +114,7 @@ export default async function AdminHealthPage() {
             <DataTable head={["טבלה", "רשומות"]}>
               {tableCounts.slice(0, 18).map((t) => (
                 <tr key={t.name}>
-                  <td className="px-3 py-2 font-mono text-[11px]" dir="ltr">{t.name}</td>
+                  <td className="px-3 py-2 font-mono text-[0.85rem]" dir="ltr">{t.name}</td>
                   <td className="px-3 py-2 text-xs">{t.rows < 0 ? "—" : formatNumber(t.rows)}</td>
                 </tr>
               ))}
@@ -123,14 +123,14 @@ export default async function AdminHealthPage() {
 
           <Card className="p-5">
             <h2 className="mb-3 text-sm font-bold">💾 סביבה</h2>
-            <ul className="space-y-1.5 text-[11px]">
+            <ul className="space-y-1.5 text-[0.85rem]">
               <li className="flex justify-between"><span className="text-ink-400">Node</span><span dir="ltr" className="font-mono">{process.version}</span></li>
               <li className="flex justify-between"><span className="text-ink-400">פלטפורמה</span><span dir="ltr" className="font-mono">{process.platform}/{process.arch}</span></li>
               <li className="flex justify-between"><span className="text-ink-400">סביבה</span><span dir="ltr" className="font-mono">{process.env.NODE_ENV ?? "development"}</span></li>
               <li className="flex justify-between"><span className="text-ink-400">מצב יומן</span><span dir="ltr" className="font-mono">{stats.settings.journalMode ?? "—"}</span></li>
               <li className="flex justify-between"><span className="text-ink-400">זיכרון Node</span><span dir="ltr" className="font-mono">{formatBytes(process.memoryUsage().heapUsed)}</span></li>
             </ul>
-            <p className="mt-3 text-[11px] text-ink-400">
+            <p className="mt-3 text-[0.85rem] text-ink-400">
               גיבוי: <Link href="/api/export?type=backup" className="text-lemon-300 hover:underline">הורד גיבוי JSON מלא</Link> (בעלים בלבד). מומלץ לגבות לפני כל עדכון גרסה.
             </p>
           </Card>

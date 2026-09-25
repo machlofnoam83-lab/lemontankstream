@@ -22,7 +22,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
           </span>
           <span className="text-2xl font-black tracking-tight">
             Lemon<span className="text-gradient">Tank</span>
-            <span className="mt-1 block text-[11px] font-bold uppercase tracking-[0.22em] text-ink-400">Stream</span>
+            <span className="mt-1 block text-[0.85rem] font-bold uppercase tracking-[0.22em] text-ink-400">Stream</span>
           </span>
         </Link>
 
@@ -41,7 +41,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
           </Link>
         </p>
 
-        <p className="relative mt-3 flex items-center gap-1.5 text-[11px] text-ink-500">
+        <p className="relative mt-3 flex items-center gap-1.5 text-[0.85rem] text-ink-500">
           <span aria-hidden="true">🔒</span> חיבור מוצפן · סיסמאות נשמרות ב-scrypt · אימות דו-שלבי זמין
         </p>
       </div>

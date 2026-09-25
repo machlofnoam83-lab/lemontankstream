@@ -59,7 +59,7 @@ export function TitlesBulkActions({ children }: { children: React.ReactNode }) {
         <Button size="sm" variant={action === "delete" ? "danger" : "primary"} onClick={run} loading={busy}>
           החל
         </Button>
-        <span className="text-[11px] text-ink-500">הפעולה נרשמת ביומן הביקורת עם שם המבצע</span>
+        <span className="text-[0.85rem] text-ink-500">הפעולה נרשמת ביומן הביקורת עם שם המבצע</span>
       </div>
       {children}
     </div>

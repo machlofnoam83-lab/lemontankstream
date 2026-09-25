@@ -56,7 +56,7 @@ export function SecurityActions({
     <Card className="p-5">
       <h2 className="text-sm font-bold">🔧 פעולות אבטחה ותחזוקה</h2>
       {!canManage ? (
-        <p className="mt-2 text-[11px] text-amber-300">פעולות התחזוקה זמינות לחשבון בעלים בלבד. ניתן לצפות בכל הנתונים למטה.</p>
+        <p className="mt-2 text-[0.85rem] text-amber-300">פעולות התחזוקה זמינות לחשבון בעלים בלבד. ניתן לצפות בכל הנתונים למטה.</p>
       ) : null}
       <div className="mt-3 flex flex-wrap items-center gap-2">
         <Button size="sm" variant="ghost" disabled={!canManage} onClick={() => call("prune")} loading={busy === "prune"}>
@@ -71,7 +71,7 @@ export function SecurityActions({
         <Button size="sm" variant="ghost" disabled={!canManage} onClick={() => call("optimize")} loading={busy === "optimize"}>
           אופטימיזציה (VACUUM)
         </Button>
-        <span className="text-[11px] text-ink-400">
+        <span className="text-[0.85rem] text-ink-400">
           סטטוס נוכחי: שלמות={integrity}, הפרות מפתח זר={fkViolations}
         </span>
       </div>

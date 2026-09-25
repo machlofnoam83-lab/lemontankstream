@@ -161,9 +161,9 @@ export function CrudManager({
         return <Badge tone={col.tone?.[String(value)] ?? "neutral"}>{label}</Badge>;
       }
       case "date":
-        return <span className="text-[11px] text-ink-400">{value ? formatRelative(String(value)) : "—"}</span>;
+        return <span className="text-[0.85rem] text-ink-400">{value ? formatRelative(String(value)) : "—"}</span>;
       case "mono":
-        return <span dir="ltr" className="font-mono text-[11px]">{value != null && value !== "" ? String(value) : "—"}</span>;
+        return <span dir="ltr" className="font-mono text-[0.85rem]">{value != null && value !== "" ? String(value) : "—"}</span>;
       case "image":
         return value ? (
           // eslint-disable-next-line @next/next/no-img-element
@@ -173,7 +173,7 @@ export function CrudManager({
         return (
           <span className="inline-flex items-center gap-2">
             <span className="h-4 w-4 rounded-full border border-white/20" style={{ background: String(value ?? "#000") }} />
-            <span dir="ltr" className="font-mono text-[10px]">{String(value ?? "")}</span>
+            <span dir="ltr" className="font-mono text-[0.8rem]">{String(value ?? "")}</span>
           </span>
         );
       case "count":
@@ -192,7 +192,7 @@ export function CrudManager({
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-2">
           <Input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="סינון מהיר…" aria-label="סינון" className="w-56" />
-          <span className="text-[11px] text-ink-400">{filtered.length} רשומות</span>
+          <span className="text-[0.85rem] text-ink-400">{filtered.length} רשומות</span>
         </div>
         <Button onClick={startCreate}>+ {entityLabel} חדש</Button>
       </div>
@@ -245,7 +245,7 @@ export function CrudManager({
                     checked={Boolean(values[f.name])}
                     onChange={(e) => setValues((prev) => ({ ...prev, [f.name]: e.target.checked }))}
                   />
-                  {f.hint ? <p className="mt-1 text-[11px] text-ink-400">{f.hint}</p> : null}
+                  {f.hint ? <p className="mt-1 text-[0.85rem] text-ink-400">{f.hint}</p> : null}
                 </div>
               ) : f.type === "select" ? (
                 <Field label={f.label} htmlFor={`f-${f.name}`} hint={f.hint}>

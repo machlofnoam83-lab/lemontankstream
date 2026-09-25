@@ -65,10 +65,10 @@ export function SubscriptionsTable({ items }: { items: AdminSubscription[] }) {
     <DataTable head={["#", "משתמש", "מסלול", "סטטוס", "התחלה", "סוף תקופה", "ניסיון", "ספק", "שולם", "פעולות"]}>
       {items.map((sub) => (
         <tr key={sub.id} className="hover:bg-white/[0.03]">
-          <td className="px-3 py-2 font-mono text-[11px] text-ink-500">{sub.id}</td>
+          <td className="px-3 py-2 font-mono text-[0.85rem] text-ink-500">{sub.id}</td>
           <td className="px-3 py-2">
             <span className="block text-xs font-medium">{sub.name}</span>
-            <span className="block text-[10px] text-ink-500" dir="ltr">{sub.email}</span>
+            <span className="block text-[0.8rem] text-ink-500" dir="ltr">{sub.email}</span>
           </td>
           <td className="px-3 py-2">
             <Badge tone={sub.plan_code === "plus" ? "plus" : "free"}>{sub.plan_code === "plus" ? "פלוס" : "חינם"}</Badge>
@@ -77,12 +77,12 @@ export function SubscriptionsTable({ items }: { items: AdminSubscription[] }) {
             <Badge tone={sub.status === "active" ? "success" : sub.status === "trialing" ? "info" : sub.status === "past_due" ? "warn" : "danger"}>
               {STATUS_LABEL[sub.status] ?? sub.status}
             </Badge>
-            {sub.cancel_at_period_end ? <span className="ms-1 text-[10px] text-amber-300">(יסתיים)</span> : null}
+            {sub.cancel_at_period_end ? <span className="ms-1 text-[0.8rem] text-amber-300">(יסתיים)</span> : null}
           </td>
-          <td className="px-3 py-2 text-[11px] text-ink-400">{formatDate(sub.started_at)}</td>
-          <td className="px-3 py-2 text-[11px] text-ink-400">{sub.current_period_end ? formatDate(sub.current_period_end) : "—"}</td>
-          <td className="px-3 py-2 text-[11px] text-ink-400">{sub.trial_end ? formatDate(sub.trial_end) : "—"}</td>
-          <td className="px-3 py-2 text-[11px] text-ink-500" dir="ltr">{sub.provider}</td>
+          <td className="px-3 py-2 text-[0.85rem] text-ink-400">{formatDate(sub.started_at)}</td>
+          <td className="px-3 py-2 text-[0.85rem] text-ink-400">{sub.current_period_end ? formatDate(sub.current_period_end) : "—"}</td>
+          <td className="px-3 py-2 text-[0.85rem] text-ink-400">{sub.trial_end ? formatDate(sub.trial_end) : "—"}</td>
+          <td className="px-3 py-2 text-[0.85rem] text-ink-500" dir="ltr">{sub.provider}</td>
           <td className="px-3 py-2 text-xs">{formatPrice(Number(sub.paid_total ?? 0))}</td>
           <td className="px-3 py-2">
             <div className="flex flex-wrap items-center gap-1">

@@ -80,7 +80,7 @@ export function AdminNav({ role }: { role: string }) {
         <div className="sticky top-24 space-y-5">
           {SECTIONS.map((section) => (
             <div key={section.title}>
-              <h2 className="mb-2 px-3 text-[10.5px] font-black uppercase tracking-[0.14em] text-ink-500">{section.title}</h2>
+              <h2 className="mb-2 px-3 text-[0.82rem] font-black uppercase tracking-[0.14em] text-ink-500">{section.title}</h2>
               <ul className="space-y-0.5">
                 {section.items.map((item) => {
                   const active = isActive(pathname, item.href);
@@ -99,7 +99,7 @@ export function AdminNav({ role }: { role: string }) {
                           <span className="absolute inset-y-1.5 right-0 w-[3px] rounded-full bg-gradient-to-b from-lemon-300 to-lemon-500 shadow-[0_0_14px_1px_rgba(247,194,43,0.7)]" aria-hidden="true" />
                         ) : null}
                         <span
-                          className={`flex h-7 w-7 items-center justify-center rounded-lg text-[13px] transition-colors ${
+                          className={`flex h-7 w-7 items-center justify-center rounded-lg text-[0.95rem] transition-colors ${
                             active ? "bg-lemon-400/15" : "bg-white/[0.04] group-hover:bg-white/[0.08]"
                           }`}
                           aria-hidden="true"
@@ -115,7 +115,7 @@ export function AdminNav({ role }: { role: string }) {
             </div>
           ))}
 
-          <div className="card-surface rounded-2xl p-3.5 text-[11px] leading-relaxed text-ink-400">
+          <div className="card-surface rounded-2xl p-3.5 text-[0.85rem] leading-relaxed text-ink-400">
             <p className="font-bold text-ink-200">מחובר כ: {role}</p>
             <p className="mt-1">ההרשאות נאכפות בצד השרת בכל בקשה — לא בממשק.</p>
           </div>

@@ -66,7 +66,7 @@ export function EpisodePicker({
               }`}
             >
               {s.name_he ?? `עונה ${s.number}`}
-              <span className="ms-1 text-[10px] text-ink-400">({s.episodes_count})</span>
+              <span className="ms-1 text-[0.8rem] text-ink-400">({s.episodes_count})</span>
             </button>
           ))}
         </div>
@@ -107,13 +107,13 @@ export function EpisodePicker({
                 <span className="min-w-0 flex-1">
                   <span className="flex items-center gap-2">
                     <span className="text-xs text-ink-400">פרק {ep.number}</span>
-                    {ep.is_premiere ? <span className="rounded bg-lemon-400/20 px-1.5 text-[10px] text-lemon-300">בכורה</span> : null}
-                    {ep.is_finale ? <span className="rounded bg-red-500/20 px-1.5 text-[10px] text-red-300">סיום עונה</span> : null}
+                    {ep.is_premiere ? <span className="rounded bg-lemon-400/20 px-1.5 text-[0.8rem] text-lemon-300">בכורה</span> : null}
+                    {ep.is_finale ? <span className="rounded bg-red-500/20 px-1.5 text-[0.8rem] text-red-300">סיום עונה</span> : null}
                     {ep.effective_access === "plus" ? <span className="badge-plus">פלוס</span> : <span className="badge-free">חינם</span>}
                   </span>
                   <span className="mt-1 block truncate font-bold">{ep.name_he}</span>
                   {ep.overview ? <span className="mt-0.5 line-clamp-2 block text-xs text-ink-400">{ep.overview}</span> : null}
-                  <span className="mt-1 flex items-center gap-3 text-[11px] text-ink-400">
+                  <span className="mt-1 flex items-center gap-3 text-[0.85rem] text-ink-400">
                     <span>{formatDuration(ep.runtime_sec)}</span>
                     {ep.air_date ? <span>{formatDate(ep.air_date)}</span> : null}
                     {ep.views_count > 0 ? <span>· {ep.views_count} צפיות</span> : null}

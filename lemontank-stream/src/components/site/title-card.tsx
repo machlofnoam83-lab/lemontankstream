@@ -58,7 +58,7 @@ export function TitleCard({ item, size = "md", showProgress = false, rank }: Pro
       <div className="absolute right-2.5 top-2.5 flex flex-col items-end gap-1.5">
         {item.plan_access === "plus" ? <span className="badge-plus">⭐ פלוס</span> : <span className="badge-free">חינם</span>}
         {item.is_original ? (
-          <span className="rounded-full border border-lemon-400/40 bg-black/70 px-2 py-0.5 text-[10px] font-black text-lemon-300 backdrop-blur">
+          <span className="rounded-full border border-lemon-400/40 bg-black/70 px-2 py-0.5 text-[0.8rem] font-black text-lemon-300 backdrop-blur">
             מקורי LT
           </span>
         ) : null}
@@ -80,8 +80,8 @@ export function TitleCard({ item, size = "md", showProgress = false, rank }: Pro
 
       {/* פרטי כותר */}
       <div className="absolute inset-x-0 bottom-0 p-3">
-        <h3 className="line-clamp-2 text-[13.5px] font-black leading-snug text-white drop-shadow">{item.name_he}</h3>
-        <div className="mt-1.5 flex flex-wrap items-center gap-x-1.5 gap-y-1 text-[10.5px] font-semibold text-ink-200">
+        <h3 className="line-clamp-2 text-[0.98rem] font-black leading-snug text-white drop-shadow">{item.name_he}</h3>
+        <div className="mt-1.5 flex flex-wrap items-center gap-x-1.5 gap-y-1 text-[0.82rem] font-semibold text-ink-200">
           {item.year ? <span>{item.year}</span> : null}
           {item.kind === "series" && item.seasons_count > 0 ? <span className="text-ink-400">· {item.seasons_count} עונות</span> : null}
           {item.kind === "movie" && item.runtime_min ? <span className="text-ink-400">· {item.runtime_min} דק'</span> : null}

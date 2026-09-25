@@ -124,7 +124,7 @@ export function SecurityCenter({ canManage }: { canManage: boolean }) {
           <h2 className="text-sm font-bold">🛡️ מרכז הבקרה של האבטחה</h2>
           <div className="flex items-center gap-2">
             <Badge tone={enforce ? "success" : "warn"}>{enforce ? "אכיפה פעילה" : "מצב ניטור (לוג בלבד)"}</Badge>
-            <span className="text-[11px] text-ink-400">שער האבטחה חוסם לפני שהבקשה מגיעה לאתר</span>
+            <span className="text-[0.85rem] text-ink-400">שער האבטחה חוסם לפני שהבקשה מגיעה לאתר</span>
           </div>
         </div>
 
@@ -175,8 +175,8 @@ export function SecurityCenter({ canManage }: { canManage: boolean }) {
           })}
 
           <div className="rounded-xl border border-white/8 bg-white/[0.02] p-3.5">
-            <span className="block text-[13px] font-bold">מדיניות פרוקסי / VPN / ענן</span>
-            <p className="mt-0.5 mb-2 text-[11px] text-ink-400">TOR נחסם תמיד. כאן קובעים מה עושים עם שאר הפרוקסי</p>
+            <span className="block text-[0.95rem] font-bold">מדיניות פרוקסי / VPN / ענן</span>
+            <p className="mt-0.5 mb-2 text-[0.85rem] text-ink-400">TOR נחסם תמיד. כאן קובעים מה עושים עם שאר הפרוקסי</p>
             <select
               className="w-full rounded-lg border border-white/12 bg-ink-900 px-2.5 py-1.5 text-xs"
               value={setting("proxy_policy")}
@@ -191,8 +191,8 @@ export function SecurityCenter({ canManage }: { canManage: boolean }) {
           </div>
 
           <div className="rounded-xl border border-white/8 bg-white/[0.02] p-3.5">
-            <span className="block text-[13px] font-bold">חסימת כלי יירוט (Burp / ZAP)</span>
-            <p className="mt-0.5 mb-2 text-[11px] text-ink-400">כותרת Proxy-Connection, חתימות Burp והתחזות דפדפן</p>
+            <span className="block text-[0.95rem] font-bold">חסימת כלי יירוט (Burp / ZAP)</span>
+            <p className="mt-0.5 mb-2 text-[0.85rem] text-ink-400">כותרת Proxy-Connection, חתימות Burp והתחזות דפדפן</p>
             <select
               className="w-full rounded-lg border border-white/12 bg-ink-900 px-2.5 py-1.5 text-xs"
               value={setting("tool_block")}
@@ -212,7 +212,7 @@ export function SecurityCenter({ canManage }: { canManage: boolean }) {
         <Card className="p-5">
           <div className="mb-3 flex items-center justify-between">
             <h2 className="text-sm font-bold">⛔ כתובות חסומות</h2>
-            <span className="text-[11px] text-ink-400">{data.bans.length} פעילות</span>
+            <span className="text-[0.85rem] text-ink-400">{data.bans.length} פעילות</span>
           </div>
 
           {data.bans.length === 0 ? (
@@ -223,9 +223,9 @@ export function SecurityCenter({ canManage }: { canManage: boolean }) {
                 <li key={ban.id} className="rounded-xl border border-white/8 bg-white/[0.02] p-3">
                   <div className="flex flex-wrap items-center justify-between gap-2">
                     <div className="flex items-center gap-2">
-                      <code dir="ltr" className="rounded-md bg-ink-900 px-2 py-0.5 text-[12.5px] text-red-300">{ban.ip}</code>
+                      <code dir="ltr" className="rounded-md bg-ink-900 px-2 py-0.5 text-[0.92rem] text-red-300">{ban.ip}</code>
                       <Badge tone={ban.severity === "critical" ? "danger" : "warn"}>{CATEGORY_LABELS[ban.category] ?? ban.category}</Badge>
-                      {ban.strikes > 1 && <span className="text-[11px] text-amber-300">החמרה ×{ban.strikes}</span>}
+                      {ban.strikes > 1 && <span className="text-[0.85rem] text-amber-300">החמרה ×{ban.strikes}</span>}
                       {ban.permanent ? <Badge tone="danger">קבוע</Badge> : null}
                     </div>
                     {canManage && (
@@ -234,11 +234,11 @@ export function SecurityCenter({ canManage }: { canManage: boolean }) {
                       </Button>
                     )}
                   </div>
-                  <p className="mt-1.5 text-[12px] text-ink-300">{ban.reason}</p>
-                  <p className="mt-1 text-[11px] text-ink-500" dir="ltr">
+                  <p className="mt-1.5 text-[0.9rem] text-ink-300">{ban.reason}</p>
+                  <p className="mt-1 text-[0.85rem] text-ink-500" dir="ltr">
                     {ban.method ?? "—"} {ban.path ?? ""} · {ban.hits} בקשות נחסמו
                   </p>
-                  <p className="text-[11px] text-ink-500">
+                  <p className="text-[0.85rem] text-ink-500">
                     נחסם: {new Date(ban.created_at).toLocaleString("he-IL")}
                     {ban.expires_at ? ` · משוחרר אוטומטית: ${new Date(ban.expires_at).toLocaleString("he-IL")}` : " · ללא תפוגה"}
                   </p>
@@ -249,7 +249,7 @@ export function SecurityCenter({ canManage }: { canManage: boolean }) {
 
           {canManage && (
             <div className="mt-4 space-y-2 border-t border-white/8 pt-4">
-              <h3 className="text-[13px] font-bold">חסימה ידנית</h3>
+              <h3 className="text-[0.95rem] font-bold">חסימה ידנית</h3>
               <div className="flex flex-wrap gap-2">
                 <Input
                   dir="ltr"
@@ -285,7 +285,7 @@ export function SecurityCenter({ canManage }: { canManage: boolean }) {
                   חסום
                 </Button>
               </div>
-              <p className="text-[11px] text-ink-500">ברירת מחדל: 24 שעות. חסימה חוזרת של אותה כתובת מכפילה את התקופה.</p>
+              <p className="text-[0.85rem] text-ink-500">ברירת מחדל: 24 שעות. חסימה חוזרת של אותה כתובת מכפילה את התקופה.</p>
             </div>
           )}
         </Card>
@@ -294,7 +294,7 @@ export function SecurityCenter({ canManage }: { canManage: boolean }) {
         <div className="space-y-5">
           <Card className="p-5">
             <h2 className="mb-3 text-sm font-bold">🔎 מודיעין איומים</h2>
-            <ul className="space-y-2 text-[12px]">
+            <ul className="space-y-2 text-[0.9rem]">
               <li className="flex items-center justify-between">
                 <span className="text-ink-400">יציאות TOR</span>
                 <b>{data.intel.tor.toLocaleString("he-IL")}</b>
@@ -312,7 +312,7 @@ export function SecurityCenter({ canManage }: { canManage: boolean }) {
                 <b>{data.intel.updatedAt ? new Date(data.intel.updatedAt).toLocaleDateString("he-IL") : "רשימות מובנות"}</b>
               </li>
             </ul>
-            <p className="mt-3 text-[11px] text-ink-500">
+            <p className="mt-3 text-[0.85rem] text-ink-500">
               לרענון הרשימות (דורש אינטרנט בשרת): <code dir="ltr" className="text-lemon-300">node scripts/update-threat-intel.mjs</code>
             </p>
           </Card>
@@ -322,7 +322,7 @@ export function SecurityCenter({ canManage }: { canManage: boolean }) {
             {data.offenders.length === 0 ? (
               <p className="text-xs text-ink-400">לא זוהו תוקפנים.</p>
             ) : (
-              <ul className="space-y-1.5 text-[11.5px]">
+              <ul className="space-y-1.5 text-[0.88rem]">
                 {data.offenders.map((o) => (
                   <li key={o.ip} className="flex items-center justify-between gap-2">
                     <code dir="ltr" className="text-ink-200">{o.ip}</code>
@@ -339,7 +339,7 @@ export function SecurityCenter({ canManage }: { canManage: boolean }) {
             {data.recentBlocks.length === 0 ? (
               <p className="text-xs text-ink-400">אין אירועים.</p>
             ) : (
-              <ul className="max-h-[320px] space-y-1.5 overflow-y-auto pe-1 text-[11px]">
+              <ul className="max-h-[320px] space-y-1.5 overflow-y-auto pe-1 text-[0.85rem]">
                 {data.recentBlocks.map((e, i) => (
                   <li key={`${e.created_at}-${i}`} className="rounded-lg bg-white/[0.03] px-2.5 py-1.5">
                     <div className="flex items-center justify-between gap-2">
@@ -363,7 +363,7 @@ function Stat({ label, value, tone }: { label: string; value: number; tone: "neu
   const color = tone === "danger" ? "text-red-300" : tone === "warn" ? "text-amber-300" : "text-white";
   return (
     <div className="rounded-xl border border-white/8 bg-white/[0.02] p-3">
-      <span className="block text-[11px] text-ink-400">{label}</span>
+      <span className="block text-[0.85rem] text-ink-400">{label}</span>
       <b className={`text-xl ${color}`}>{value.toLocaleString("he-IL")}</b>
     </div>
   );

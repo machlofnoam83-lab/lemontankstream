@@ -56,15 +56,15 @@ export default async function AdminAuditPage({
       <DataTable head={["#", "פעולה", "מבצע", "ישות", "חומרה", "IP", "מתי"]}>
         {result.rows.map((row) => (
           <tr key={row.id} className="hover:bg-white/[0.03]">
-            <td className="px-3 py-2 text-[11px] text-ink-500">{row.id}</td>
-            <td className="px-3 py-2 font-mono text-[11px]" dir="ltr">{row.action}</td>
+            <td className="px-3 py-2 text-[0.85rem] text-ink-500">{row.id}</td>
+            <td className="px-3 py-2 font-mono text-[0.85rem]" dir="ltr">{row.action}</td>
             <td className="px-3 py-2 text-xs" dir="ltr">{row.actor_email ?? "מערכת"}</td>
-            <td className="px-3 py-2 text-[11px] text-ink-400">{row.entity ?? "—"}{row.entity_id ? `#${row.entity_id}` : ""}</td>
+            <td className="px-3 py-2 text-[0.85rem] text-ink-400">{row.entity ?? "—"}{row.entity_id ? `#${row.entity_id}` : ""}</td>
             <td className="px-3 py-2">
               <Badge tone={row.severity === "critical" ? "danger" : row.severity === "warning" ? "warn" : "neutral"}>{row.severity}</Badge>
             </td>
-            <td className="px-3 py-2 font-mono text-[10px] text-ink-500" dir="ltr">{row.ip ?? "—"}</td>
-            <td className="px-3 py-2 text-[11px] text-ink-400">{formatRelative(row.created_at)}</td>
+            <td className="px-3 py-2 font-mono text-[0.8rem] text-ink-500" dir="ltr">{row.ip ?? "—"}</td>
+            <td className="px-3 py-2 text-[0.85rem] text-ink-400">{formatRelative(row.created_at)}</td>
           </tr>
         ))}
       </DataTable>

@@ -36,7 +36,7 @@ export function ContinueWatchingStrip({ items }: { items: Item[] }) {
               </div>
               <div className="p-3">
                 <h3 className="truncate text-sm font-bold">{item.name_he}</h3>
-                <div className="mt-1 flex items-center justify-between text-[11px] text-ink-400">
+                <div className="mt-1 flex items-center justify-between text-[0.85rem] text-ink-400">
                   <span>{item.kind === "movie" ? "סרט" : "סדרה"}</span>
                   {item.percent ? <span>{formatPercent(item.percent)}</span> : null}
                 </div>

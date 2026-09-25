@@ -432,7 +432,7 @@ export function Player({
       {/* חלונית הפרק הבא */}
       {showNextOverlay && nextEpisode && !inCredits ? (
         <div className="absolute bottom-24 left-4 w-64 rounded-xl border border-white/15 bg-ink-900/95 p-3 shadow-2xl backdrop-blur">
-          <div className="text-[11px] text-ink-300">הבא בתור</div>
+          <div className="text-[0.85rem] text-ink-300">הבא בתור</div>
           <div className="mt-1 flex items-center gap-2">
             {nextEpisode.thumb ? (
               // eslint-disable-next-line @next/next/no-img-element
@@ -440,7 +440,7 @@ export function Player({
             ) : null}
             <div className="min-w-0 flex-1">
               <div className="truncate text-xs font-bold">{nextEpisode.label}</div>
-              <div className="text-[10px] text-ink-400">עונה {nextEpisode.season} · פרק {nextEpisode.number}</div>
+              <div className="text-[0.8rem] text-ink-400">עונה {nextEpisode.season} · פרק {nextEpisode.number}</div>
             </div>
           </div>
           {nextEpisode.locked ? (
@@ -556,7 +556,7 @@ export function Player({
                       {s.label}
                     </MenuItem>
                   ))}
-                  {isPlus ? null : <div className="px-3 py-1.5 text-[10px] text-ink-400">איכות 4K זמינה בפלוס ⭐</div>}
+                  {isPlus ? null : <div className="px-3 py-1.5 text-[0.8rem] text-ink-400">איכות 4K זמינה בפלוס ⭐</div>}
                 </Menu>
               ) : null}
             </div>
@@ -612,7 +612,7 @@ export function Player({
 function Menu({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <div className="absolute bottom-full left-0 mb-2 w-40 overflow-hidden rounded-xl border border-white/15 bg-ink-900/97 py-1 shadow-2xl backdrop-blur">
-      <div className="px-3 py-1 text-[10px] font-bold text-ink-400">{title}</div>
+      <div className="px-3 py-1 text-[0.8rem] font-bold text-ink-400">{title}</div>
       {children}
     </div>
   );
@@ -635,12 +635,12 @@ const IconPause = () => (
 );
 const IconSkipBack = () => (
   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
-    <path d="M3 12a9 9 0 1 0 3-6.7M3 4v5h5" /><text x="9" y="16" fontSize="6" fill="currentColor" stroke="none">10</text>
+    <path d="M3 12a9 9 0 1 0 3-6.7M3 4v5h5" /><text x="9" y="16" fontSize="7.5" fontWeight="700" fill="currentColor" stroke="none">10</text>
   </svg>
 );
 const IconSkipFwd = () => (
   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
-    <path d="M21 12a9 9 0 1 1-3-6.7M21 4v5h-5" /><text x="9" y="16" fontSize="6" fill="currentColor" stroke="none">10</text>
+    <path d="M21 12a9 9 0 1 1-3-6.7M21 4v5h-5" /><text x="9" y="16" fontSize="7.5" fontWeight="700" fill="currentColor" stroke="none">10</text>
   </svg>
 );
 const IconVolume = () => (

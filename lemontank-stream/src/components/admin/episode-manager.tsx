@@ -202,7 +202,7 @@ export function EpisodeManager({
                 seasonNumber === s.number ? "border-lemon-400 bg-lemon-400/15 font-bold text-lemon-200" : "border-white/10 hover:bg-white/10"
               }`}
             >
-              {s.name_he ?? `עונה ${s.number}`} <span className="text-[10px] text-ink-400">({s.episodes_count})</span>
+              {s.name_he ?? `עונה ${s.number}`} <span className="text-[0.8rem] text-ink-400">({s.episodes_count})</span>
             </button>
           ))}
         </div>
@@ -253,7 +253,7 @@ export function EpisodeManager({
                     <Badge tone={ep.status === "published" ? "success" : "warn"}>{ep.status === "published" ? "מפורסם" : "טיוטה"}</Badge>
                     {ep.video_url || ep.video_asset_id ? <Badge tone="info">יש וידאו</Badge> : <Badge tone="danger">בלי וידאו</Badge>}
                   </span>
-                  <span className="mt-1 block text-[11px] text-ink-400">
+                  <span className="mt-1 block text-[0.85rem] text-ink-400">
                     {ep.runtime_sec ? formatDuration(ep.runtime_sec) : "אורך לא צוין"}
                     {ep.air_date ? ` · שודר ${ep.air_date}` : ""}
                   </span>
@@ -337,12 +337,12 @@ export function EpisodeManager({
                 }}
               />
             </label>
-            <span className="text-[11px] text-ink-400">או הדבק קישור ישיר (mp4/m3u8) בשדה למטה</span>
+            <span className="text-[0.85rem] text-ink-400">או הדבק קישור ישיר (mp4/m3u8) בשדה למטה</span>
           </div>
 
           {uploadProgress ? (
             <div>
-              <div className="flex justify-between text-[11px] text-ink-300">
+              <div className="flex justify-between text-[0.85rem] text-ink-300">
                 <span className="truncate">{uploadProgress.name}</span>
                 <span>{uploadProgress.percent}%</span>
               </div>
@@ -356,7 +356,7 @@ export function EpisodeManager({
             <Input id="ep-video" value={videoUrl} onChange={(e) => setVideoUrl(e.target.value)} dir="ltr" placeholder="https://cdn.example.com/episode01.mp4" />
           </Field>
 
-          {videoAssetId ? <p className="text-[11px] text-emerald-400">✓ הקובץ שהועלה ישויך לפרק בעת השמירה (נכס #{videoAssetId})</p> : null}
+          {videoAssetId ? <p className="text-[0.85rem] text-emerald-400">✓ הקובץ שהועלה ישויך לפרק בעת השמירה (נכס #{videoAssetId})</p> : null}
         </div>
 
         <MediaUploader
@@ -378,7 +378,7 @@ export function EpisodeManager({
             <Input id="intro-e" type="number" value={introEnd} onChange={(e) => setIntroEnd(e.target.value)} placeholder="75" />
           </Field>
         </div>
-        <p className="text-[11px] text-ink-400">
+        <p className="text-[0.85rem] text-ink-400">
           אם תמלא את זמני הפתיח, יציג הנגן כפתור "דלג על פתיח" בדיוק בזמן.
         </p>
       </Modal>

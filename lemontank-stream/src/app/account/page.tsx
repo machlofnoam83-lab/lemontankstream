@@ -88,8 +88,8 @@ export default async function AccountPage() {
                     {r.title}
                     {r.episode ? <span className="text-ink-400"> · {r.episode}</span> : null}
                   </Link>
-                  <span className="shrink-0 text-[11px] text-ink-400">{Math.round(r.percent * 100)}%</span>
-                  <span className="shrink-0 text-[11px] text-ink-500">{formatRelative(r.updated_at)}</span>
+                  <span className="shrink-0 text-[0.85rem] text-ink-400">{Math.round(r.percent * 100)}%</span>
+                  <span className="shrink-0 text-[0.85rem] text-ink-500">{formatRelative(r.updated_at)}</span>
                 </li>
               ))}
             </ul>
@@ -106,7 +106,7 @@ export default async function AccountPage() {
                 <li key={i} className="rounded-xl bg-white/[0.02] p-3">
                   <div className="font-medium">{n.title}</div>
                   {n.body ? <div className="mt-0.5 text-xs text-ink-400">{n.body}</div> : null}
-                  <div className="mt-1 text-[10px] text-ink-500">{formatRelative(n.created_at)}</div>
+                  <div className="mt-1 text-[0.8rem] text-ink-500">{formatRelative(n.created_at)}</div>
                 </li>
               ))}
             </ul>
@@ -136,7 +136,7 @@ export default async function AccountPage() {
           </div>
           <div>
             <dt className="text-ink-400">IP אחרון</dt>
-            <dd className="font-mono text-[11px]" dir="ltr">{security?.last_login_ip ?? "—"}</dd>
+            <dd className="font-mono text-[0.85rem]" dir="ltr">{security?.last_login_ip ?? "—"}</dd>
           </div>
           <div>
             <dt className="text-ink-400">חשבון נוצר</dt>

@@ -69,7 +69,7 @@ export default async function HomePage() {
             />
             <div className="flex items-center gap-2 text-xs font-semibold text-ink-300">
               <span
-                className="flex h-7 w-7 items-center justify-center rounded-lg bg-white/[0.05] text-[13px] transition-transform duration-300 group-hover:scale-105"
+                className="flex h-7 w-7 items-center justify-center rounded-lg bg-white/[0.05] text-[0.95rem] transition-transform duration-300 group-hover:scale-105"
                 aria-hidden="true"
               >
                 {item.icon}
@@ -89,7 +89,7 @@ export default async function HomePage() {
           />
           <div className="relative z-10 flex flex-col items-start gap-4 md:flex-row md:items-center md:justify-between">
             <div>
-              <span className="mb-2 inline-block rounded-full border border-plus-400/30 bg-plus-500/15 px-3 py-1 text-[11px] font-black text-plus-300">
+              <span className="mb-2 inline-block rounded-full border border-plus-400/30 bg-plus-500/15 px-3 py-1 text-[0.85rem] font-black text-plus-300">
                 ⭐ 7 ימי ניסיון חינם
               </span>
               <h2 className="text-2xl font-black md:text-3xl">
@@ -136,7 +136,7 @@ export default async function HomePage() {
             {top10.map((item, i) => (
               <li key={item.id} className="row-scroll-item relative flex items-end">
                 <span
-                  className="pointer-events-none select-none text-[86px] font-black leading-[0.72] text-transparent [-webkit-text-stroke:2px_rgba(255,255,255,0.22)] md:text-[112px]"
+                  className="pointer-events-none select-none text-[5.5rem] font-black leading-[0.72] text-transparent [-webkit-text-stroke:2px_rgba(255,255,255,0.22)] md:text-[7rem]"
                   aria-hidden="true"
                 >
                   {i + 1}
@@ -188,7 +188,7 @@ export default async function HomePage() {
                     {(plan.features.length ? plan.features : ["גישה לקטלוג לפי המסלול הזה"]).map((feature) => (
                       <li key={feature} className="flex items-start gap-2.5">
                         <span
-                          className={`mt-0.5 flex h-4.5 w-4.5 shrink-0 items-center justify-center rounded-full text-[10px] font-black ${
+                          className={`mt-0.5 flex h-4.5 w-4.5 shrink-0 items-center justify-center rounded-full text-[0.8rem] font-black ${
                             isPlusPlan ? "bg-plus-500/25 text-plus-300" : "bg-emerald-500/20 text-emerald-300"
                           }`}
                           aria-hidden="true"

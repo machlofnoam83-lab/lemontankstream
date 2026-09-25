@@ -150,10 +150,10 @@ export default async function TitlePage({ params }: { params: Promise<{ slug: st
 
           <div className="min-w-0 space-y-4">
             <div className="flex flex-wrap items-center gap-2">
-              <span className="rounded-full bg-white/10 px-3 py-1 text-[11px] font-bold">{title.kind === "movie" ? "סרט" : "סדרה"}</span>
+              <span className="rounded-full bg-white/10 px-3 py-1 text-[0.85rem] font-bold">{title.kind === "movie" ? "סרט" : "סדרה"}</span>
               {title.plan_access === "plus" ? <span className="badge-plus">⭐ פלוס בלבד</span> : <span className="badge-free">זמין בחינם</span>}
-              {title.is_original ? <span className="rounded-full border border-lemon-400/40 px-3 py-1 text-[11px] font-bold text-lemon-300">מקורי LemonTank</span> : null}
-              {title.status !== "published" ? <span className="rounded-full bg-amber-500/20 px-3 py-1 text-[11px] font-bold text-amber-300">טיוטה (לא מפורסם)</span> : null}
+              {title.is_original ? <span className="rounded-full border border-lemon-400/40 px-3 py-1 text-[0.85rem] font-bold text-lemon-300">מקורי LemonTank</span> : null}
+              {title.status !== "published" ? <span className="rounded-full bg-amber-500/20 px-3 py-1 text-[0.85rem] font-bold text-amber-300">טיוטה (לא מפורסם)</span> : null}
             </div>
 
             <h1 className="text-3xl font-black leading-[1.05] tracking-tight drop-shadow-[0_6px_30px_rgba(0,0,0,0.9)] md:text-6xl">{title.name_he}</h1>

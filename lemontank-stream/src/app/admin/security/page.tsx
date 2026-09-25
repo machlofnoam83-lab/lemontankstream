@@ -120,13 +120,13 @@ export default async function AdminSecurityPage() {
             <DataTable head={["סוג", "חומרה", "IP", "פרטים", "מתי"]}>
               {events.map((e) => (
                 <tr key={e.id}>
-                  <td className="px-3 py-2 font-mono text-[11px]" dir="ltr">{e.kind}</td>
+                  <td className="px-3 py-2 font-mono text-[0.85rem]" dir="ltr">{e.kind}</td>
                   <td className="px-3 py-2">
                     <Badge tone={e.severity === "critical" ? "danger" : e.severity === "warning" ? "warn" : "neutral"}>{e.severity}</Badge>
                   </td>
-                  <td className="px-3 py-2 font-mono text-[10px]" dir="ltr">{e.ip ?? "—"}</td>
-                  <td className="px-3 py-2 max-w-xs truncate text-[11px] text-ink-400" title={e.detail ?? ""}>{e.detail ?? "—"}</td>
-                  <td className="px-3 py-2 text-[11px] text-ink-500">{formatRelative(e.created_at)}</td>
+                  <td className="px-3 py-2 font-mono text-[0.8rem]" dir="ltr">{e.ip ?? "—"}</td>
+                  <td className="px-3 py-2 max-w-xs truncate text-[0.85rem] text-ink-400" title={e.detail ?? ""}>{e.detail ?? "—"}</td>
+                  <td className="px-3 py-2 text-[0.85rem] text-ink-500">{formatRelative(e.created_at)}</td>
                 </tr>
               ))}
             </DataTable>
@@ -139,7 +139,7 @@ export default async function AdminSecurityPage() {
             {failedLogins.length === 0 ? (
               <p className="text-xs text-ink-400">אין ניסיונות כושלים.</p>
             ) : (
-              <ul className="space-y-1.5 text-[11px]">
+              <ul className="space-y-1.5 text-[0.85rem]">
                 {failedLogins.slice(0, 15).map((f, i) => (
                   <li key={i} className="flex items-center justify-between gap-2 border-b border-white/5 pb-1.5">
                     <span dir="ltr" className="truncate font-mono text-ink-300">{f.email_norm ?? "—"}</span>
@@ -157,7 +157,7 @@ export default async function AdminSecurityPage() {
             {lockedAccounts.length === 0 ? (
               <p className="text-xs text-ink-400">אין חשבונות נעולים.</p>
             ) : (
-              <ul className="space-y-1.5 text-[11px]">
+              <ul className="space-y-1.5 text-[0.85rem]">
                 {lockedAccounts.map((a) => (
                   <li key={a.id} className="flex items-center justify-between gap-2">
                     <span dir="ltr" className="truncate">{a.email}</span>
@@ -174,7 +174,7 @@ export default async function AdminSecurityPage() {
             {topIps.length === 0 ? (
               <p className="text-xs text-ink-400">אין כתובות חשודות ב-3 הימים האחרונים.</p>
             ) : (
-              <ul className="space-y-1.5 text-[11px]">
+              <ul className="space-y-1.5 text-[0.85rem]">
                 {topIps.map((ip) => (
                   <li key={ip.ip} className="flex items-center justify-between gap-2">
                     <span dir="ltr" className="font-mono text-ink-200">{ip.ip}</span>

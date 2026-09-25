@@ -56,10 +56,10 @@ export function SiteFooter() {
             פלטפורמת סטרימינג ישראלית — סרטים, סדרות ושידורים חיים בעברית. מנוי חינם לכל, ומנוי פלוס לאיכות 4K ולהורדות.
           </p>
           <div className="mt-4 flex flex-wrap gap-2">
-            <span className="rounded-full border border-white/10 bg-white/[0.04] px-2.5 py-1 text-[11px] font-semibold text-ink-300">
+            <span className="rounded-full border border-white/10 bg-white/[0.04] px-2.5 py-1 text-[0.85rem] font-semibold text-ink-300">
               🔒 scrypt + CSP
             </span>
-            <span className="rounded-full border border-white/10 bg-white/[0.04] px-2.5 py-1 text-[11px] font-semibold text-ink-300">
+            <span className="rounded-full border border-white/10 bg-white/[0.04] px-2.5 py-1 text-[0.85rem] font-semibold text-ink-300">
               ⚡ 4K · Dolby
             </span>
           </div>

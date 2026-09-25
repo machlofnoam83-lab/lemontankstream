@@ -56,7 +56,7 @@ export default async function PlansPage() {
         <p className="mx-auto mt-3 max-w-2xl text-sm leading-relaxed text-ink-300 md:text-base">
           מתחילים בחינם, משדרגים כשבא לכם. בלי התחייבות, ביטול בכל רגע בלחיצה.
         </p>
-        <div className="mt-5 flex flex-wrap items-center justify-center gap-2 text-[11px] font-semibold text-ink-300">
+        <div className="mt-5 flex flex-wrap items-center justify-center gap-2 text-[0.85rem] font-semibold text-ink-300">
           {["7 ימי ניסיון חינם", "ביטול בכל רגע", "תשלום מאובטח", "ללא פרסומות בפלוס"].map((chip) => (
             <span key={chip} className="rounded-full border border-white/10 bg-white/[0.04] px-3 py-1.5">
               ✓ {chip}
@@ -84,7 +84,7 @@ export default async function PlansPage() {
               {isPlus ? (
                 <>
                   <div className="pointer-events-none absolute -right-20 -top-24 h-56 w-56 rounded-full bg-plus-500/25 blur-3xl" aria-hidden="true" />
-                  <span className="absolute -top-0.5 right-7 rounded-b-xl bg-gradient-to-b from-plus-500 to-plus-600 px-3.5 py-1.5 text-[11px] font-black text-white shadow-[0_10px_30px_-12px_rgba(139,92,246,1)]">
+                  <span className="absolute -top-0.5 right-7 rounded-b-xl bg-gradient-to-b from-plus-500 to-plus-600 px-3.5 py-1.5 text-[0.85rem] font-black text-white shadow-[0_10px_30px_-12px_rgba(139,92,246,1)]">
                     הפופולרי ביותר
                   </span>
                 </>
@@ -122,7 +122,7 @@ export default async function PlansPage() {
                   return (
                     <li key={item.text} className="flex items-start gap-2.5">
                       <span
-                        className={`mt-0.5 flex h-4.5 w-4.5 shrink-0 items-center justify-center rounded-full text-[10px] font-black ${
+                        className={`mt-0.5 flex h-4.5 w-4.5 shrink-0 items-center justify-center rounded-full text-[0.8rem] font-black ${
                           item.ok
                             ? isPlus
                               ? "bg-plus-500/25 text-plus-300"
@@ -164,7 +164,7 @@ export default async function PlansPage() {
         </h2>
         <div className="mt-4 overflow-x-auto">
           <table className="w-full text-sm">
-            <thead className="bg-white/[0.04] text-[11px] uppercase tracking-wide text-ink-300">
+            <thead className="bg-white/[0.04] text-[0.85rem] uppercase tracking-wide text-ink-300">
               <tr>
                 <th className="px-5 py-3 text-right font-bold">תכונה</th>
                 <th className="px-4 py-3 font-bold">חינם</th>

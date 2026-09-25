@@ -42,7 +42,7 @@ export default async function AccountLayout({ children }: { children: React.Reac
                   </span>
                   <div className="min-w-0">
                     <div className="truncate font-bold">{user.name}</div>
-                    <div className="truncate text-[11px] text-ink-400">{user.email}</div>
+                    <div className="truncate text-[0.85rem] text-ink-400">{user.email}</div>
                   </div>
                 </div>
                 <div className="mt-3 flex items-center justify-between text-xs">

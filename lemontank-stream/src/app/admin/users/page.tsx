@@ -137,9 +137,9 @@ export default async function AdminUsersPage({
                   </Badge>
                 </td>
                 <td className="px-3 py-2 text-xs">{u.twofa_enabled ? "✓" : "—"}</td>
-                <td className="px-3 py-2 text-[11px] text-ink-400">{u.last_login_at ? formatRelative(u.last_login_at) : "טרם התחבר"}</td>
+                <td className="px-3 py-2 text-[0.85rem] text-ink-400">{u.last_login_at ? formatRelative(u.last_login_at) : "טרם התחבר"}</td>
                 <td className="px-3 py-2 text-xs">{u.active_sessions}</td>
-                <td className="px-3 py-2 text-[11px] text-ink-400">{formatRelative(u.created_at)}</td>
+                <td className="px-3 py-2 text-[0.85rem] text-ink-400">{formatRelative(u.created_at)}</td>
                 <td className="px-3 py-2">
                   <UserEditorButton
                     user={{
