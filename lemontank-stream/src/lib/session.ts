@@ -14,10 +14,10 @@ import { all, get, run, tx } from "./db";
 import { randomId, randomToken, sha256, safeEqual, deviceFingerprint } from "./crypto";
 import { clientIp, userAgent, ApiError } from "./http";
 
-export const SESSION_COOKIE = "lt_session";
+export { SESSION_COOKIE, CSRF_COOKIE } from "./cookies";
+import { SESSION_COOKIE, CSRF_COOKIE } from "./cookies";
 export const SESSION_TTL_DAYS = 30;
 export const SESSION_TTL_REMEMBER_DAYS = 90;
-export const CSRF_COOKIE = "lt_csrf";
 
 export type SessionUser = {
   id: number;

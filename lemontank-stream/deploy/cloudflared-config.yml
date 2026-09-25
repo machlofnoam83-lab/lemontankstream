@@ -1,0 +1,51 @@
+# ═══════════════════════════════════════════════════════════════════════════
+#  מנהרת Cloudflare (cloudflared) — הדרך הטובה ביותר להסתיר את השרת
+#
+#  למה זו השיטה: השרת יוצר חיבור יוצא (outbound) אל Cloudflare,
+#  ולכן **אף פורט לא פתוח לאינטרנט** ואין כתובת IPorigin שאפשר לסרוק.
+#  סורק שיסרוק את כל האינטרנט לא ימצא אותך — כי אין מה למצוא.
+#
+#  התקנה:
+#    1. curl -L --output cloudflared.deb https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64.deb
+#       sudo dpkg -i cloudflared.deb
+#    2. cloudflared tunnel login                       # פותח דפדפן ומחבר את הדומיין
+#    3. cloudflared tunnel create lemontank            # יוצר מזהה מנהרה
+#    4. sudo cp cloudflared-config.yml /etc/cloudflared/config.yml  (והחלף <TUNNEL-ID> ו-<domain>)
+#    5. sudo cloudflared service install && sudo systemctl enable --now cloudflared
+#    6. ב-.env.local:  STEALTH_MODE="on"  +  node scripts/stealth.mjs token
+# ═══════════════════════════════════════════════════════════════════════════
+
+tunnel: <TUNNEL-ID>
+credentials-file: /etc/cloudflared/<TUNNEL-ID>.json
+
+# הגנת עומס: בלי לוגים מפורטים מדי, עם retries
+metrics: 127.0.0.1:20241
+no-autoupdate: true
+
+originRequest:
+  connectTimeout: 10s
+  tlsTimeout: 10s
+  keepAliveTimeout: 90s
+  # האתר מאחורי מנהרה = ה-origin מקבל חיבורים מ-127.0.0.1 בלבד
+  httpHostHeader: lemontank.co.il
+  noHappyEyeballs: false
+
+ingress:
+  # ── האתר ────────────────────────────────────────────────────────────────
+  - hostname: lemontank.co.il
+    service: http://127.0.0.1:3000
+    originRequest:
+      # כותרת סודית שה-CDN מזריק — בלעדיה השרת מתעלם מהבקשה (origin lock)
+      # אפשר גם דרך Cloudflare Zero Trust → Access → Service Token
+      httpHostHeader: lemontank.co.il
+  - hostname: www.lemontank.co.il
+    service: http://127.0.0.1:3000
+
+  # ── תעבורה שלא תואמת כלום → נסגרת בשקט (בלי להסגיר שהמנהרה קיימת) ───────
+  - service: http_status:404
+
+# ── הערה על Transform Rule ────────────────────────────────────────────────
+# אחרי שהמנהרה עובדת, הוסף ב-Cloudflare:
+#   Rules → Transform Rules → Modify Request Header → Set static
+#   כותרת: x-lt-origin      ערך: <הסימן שיצר node scripts/stealth.mjs token>
+# ואז השרת יענה *רק* לבקשות שנושאות את הסימן הזה.

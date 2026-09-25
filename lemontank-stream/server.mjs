@@ -63,6 +63,10 @@ const INTERNAL_ORIGIN = `http://127.0.0.1:${INTERNAL_PORT}`;
 process.env.NODE_ENV = DEV ? "development" : "production";
 
 const { createEngine } = await import("./security/engine.mjs");
+const {
+  stealthDecision, decoyPage, stealthRobots, loadStealth, stealthStatus,
+  makeCanary, saveStealth, entryTokenFromRequest,
+} = await import("./security/stealth.mjs");
 const { resolveClientIp, isInternal, isLoopback, normalizeIp, hashIp } = await import("./security/net.mjs");
 const { LIMITS } = await import("./security/patterns.mjs");
 
@@ -80,6 +84,213 @@ const DENY_FILES = new Set([
 ]);
 
 const engine = createEngine({ dbFile: process.env.DATABASE_FILE, appRoot: APP_ROOT, quiet: false });
+let STEALTH = loadStealth();
+
+// תחילית נכסים אקראית — נוצרת פעם אחת ונשמרת, כדי שה-HTML והנכסים יישארו מסונכרנים
+if (STEALTH.enabled === "on" && !STEALTH.assetPrefix) {
+  try {
+    STEALTH = saveStealth({ ...STEALTH, assetPrefix: `_${crypto.randomBytes(4).toString("hex")}`, assetMask: "on" });
+  } catch (err) {
+    console.warn("[stealth] לא ניתן לשמור תחילית נכסים:", err?.message);
+  }
+}
+
+/** החזקת חיבורים "מתים" — מדמה פורט סגור (firewall DROP) בלי לשרוף זיכרון */
+let heldDrops = 0;
+function dropSilently(req, res, holdMs = STEALTH.dropHoldMs ?? 8000) {
+  const socket = req.socket;
+  try {
+    socket.pause?.();
+  } catch { /* ignore */ }
+
+  const finish = () => {
+    heldDrops = Math.max(0, heldDrops - 1);
+    try {
+      socket.destroy();
+    } catch { /* ignore */ }
+  };
+
+  // בהצפה של חיבורים — סוגרים מיד ולא מחזיקים (הגנה מפני ניצול ל-DoS)
+  if (heldDrops >= (STEALTH.maxHeldDrops ?? 300) || holdMs <= 0) {
+    try {
+      socket.destroy();
+    } catch { /* ignore */ }
+    return;
+  }
+  heldDrops++;
+  const timer = setTimeout(finish, holdMs);
+  socket.once("close", () => {
+    clearTimeout(timer);
+    heldDrops = Math.max(0, heldDrops - 1);
+  });
+  void res;
+}
+
+/**
+ * הסוואת נתיבי הבנייה: `/_next/` הוא החתימה הכי גדולה של Next.js.
+ * במצב חמקן מחליפים אותו בתחילית אקראית (למשל `/_a91f3c/`) בשני הכיוונים —
+ * בבקשות נכנסות ובגוף התשובה — כך שהאתר לא מסגיר את הטכנולוגיה,
+ * בזמן שהנכסים עצמם ממשיכים לעבוד בדיוק כמו קודם.
+ */
+const MASK_FROM = "/_next/";
+const maskPrefix = STEALTH.assetPrefix ? `/${STEALTH.assetPrefix}/` : null;
+const MASK_TYPES = /^(text\/html|text\/css|application\/json|text\/x-component|application\/x-component|application\/javascript|text\/javascript)/i;
+
+function maskRequestPath(req) {
+  if (!maskPrefix || !STEALTH.assetMask || STEALTH.assetMask !== "on") return;
+  const url = req.url ?? "/";
+  if (!url.startsWith(maskPrefix)) return;
+  req.url = MASK_FROM + url.slice(maskPrefix.length);
+}
+
+/**
+ * טביעת אצבע של Next.js יושבת גם בכותרת Vary
+ * (`rsc, next-router-state-tree, next-router-prefetch, next-url`).
+ * מנקים אותה לפני שהכותרות יוצאות — אחרת סורק מזהה את הפריימוורק מיד.
+ */
+function installHeaderStealth(res) {
+  if (STEALTH.enabled !== "on" || STEALTH.minimalHeaders !== "on") return;
+  // כל אסימון שמכיל rsc/next — כולל שמות חדשים שיתווספו בעתיד
+  const NOISE = /rsc|next/i;
+  const clean = () => {
+    if (res.headersSent) return;
+    const varying = res.getHeader("vary");
+    if (!varying) return;
+    const kept = String(varying)
+      .split(",")
+      .map((part) => part.trim())
+      .filter((part) => part && !NOISE.test(part));
+    if (kept.length) res.setHeader("vary", kept.join(", "));
+    else res.removeHeader("vary");
+  };
+
+  const originalWriteHead = res.writeHead.bind(res);
+  res.writeHead = function writeHead(statusCode, statusMessage, headers) {
+    clean();
+    return originalWriteHead(statusCode, statusMessage, headers);
+  };
+  if (typeof res.flushHeaders === "function") {
+    const originalFlush = res.flushHeaders.bind(res);
+    res.flushHeaders = function flushHeaders() {
+      clean();
+      return originalFlush();
+    };
+  }
+  const originalEnd = res.end.bind(res);
+  res.end = function end(chunk, encoding, callback) {
+    clean();
+    return originalEnd(chunk, encoding, callback);
+  };
+}
+
+function installHtmlMasking(res) {
+  if (!maskPrefix || STEALTH.assetMask !== "on") return;
+  const originalWrite = res.write.bind(res);
+  const originalEnd = res.end.bind(res);
+  let chunks = [];
+  let buffered = 0;
+  let masking = null; // null = טרם ידוע, true/false לאחר קביעת סוג התוכן
+  const MAX = 4 * 1024 * 1024;
+
+  /**
+   * ההחלטה חייבת להתקבל **לפני** שהכותרות נשלחות — אחרת אי אפשר להסיר
+   * Content-Length (הגוף משתנה). לכן מחברים גם writeHead ו-flushHeaders.
+   */
+  const decide = () => {
+    if (masking !== null) return masking;
+    const type = String(res.getHeader("content-type") ?? "");
+    const encoding = String(res.getHeader("content-encoding") ?? "identity");
+    masking = MASK_TYPES.test(type) && (encoding === "identity" || encoding === "");
+    if (masking && !res.headersSent && res.getHeader("content-length")) {
+      try {
+        res.removeHeader("Content-Length");
+      } catch { /* הכותרות כבר בדרך — ממשיכים בלי הסרה */ }
+    }
+    return masking;
+  };
+  const shouldMask = () => decide();
+
+  const originalWriteHead = res.writeHead.bind(res);
+  res.writeHead = function writeHead(statusCode, statusMessage, headers) {
+    // חתימת הכותרות מגיעה כאן — מחליטים ומסירים Content-Length לפני השליחה
+    if (headers && typeof headers === "object" && !Array.isArray(headers)) {
+      const type = String(headers["Content-Type"] ?? headers["content-type"] ?? res.getHeader("content-type") ?? "");
+      if (type) res.setHeader("content-type", type);
+    }
+    decide();
+    return originalWriteHead(statusCode, statusMessage, headers);
+  };
+
+  if (typeof res.flushHeaders === "function") {
+    const originalFlush = res.flushHeaders.bind(res);
+    res.flushHeaders = function flushHeaders() {
+      decide();
+      return originalFlush();
+    };
+  }
+
+  /** מחזיר את מה שנצבר עד כה אחרי החלפת התחילית, ומאפס את הצבירה */
+  const takeMasked = () => {
+    if (!chunks.length) return null;
+    const all = Buffer.concat(chunks);
+    chunks = [];
+    buffered = 0;
+    return Buffer.from(all.toString("utf8").split(MASK_FROM).join(maskPrefix), "utf8");
+  };
+
+  res.write = function write(chunk, encoding, callback) {
+    if (!shouldMask()) return originalWrite(chunk, encoding, callback);
+    const buf = typeof chunk === "string" ? Buffer.from(chunk, "utf8") : chunk;
+    buffered += buf.length;
+    if (buffered > MAX) {
+      const pre = takeMasked();
+      if (pre) originalWrite(pre);
+      return originalWrite(buf, encoding, callback);
+    }
+    chunks.push(buf);
+    if (typeof encoding === "function") encoding();
+    else if (typeof callback === "function") callback();
+    return true;
+  };
+
+  res.end = function end(chunk, encoding, callback) {
+    if (!shouldMask()) return originalEnd(chunk, encoding, callback);
+    const done = typeof encoding === "function" ? encoding : callback;
+
+    if (chunk && typeof chunk !== "function") {
+      const buf = typeof chunk === "string" ? Buffer.from(chunk, "utf8") : chunk;
+      buffered += buf.length;
+      if (buffered > MAX) {
+        const pre = takeMasked();
+        if (pre) originalWrite(pre);
+        originalWrite(buf);
+        return originalEnd(undefined, undefined, done);
+      }
+      chunks.push(buf);
+    }
+
+    const final = takeMasked();
+    if (final) originalWrite(final);
+    return originalEnd(undefined, undefined, done);
+  };
+}
+
+/** מגיש עמוד שרת סטטי ומשעמע (decoy) — במקום כל דבר שמסגיר אפליקציה */
+function sendDecoy(req, res, config) {
+  const body = Buffer.from(decoyPage(config?.decoyTitle), "utf8");
+  res.statusCode = 200;
+  // פרופיל כותרות של nginx טרי — בלי רמז ל-Next/Node
+  res.setHeader("Content-Type", "text/html");
+  res.setHeader("Content-Length", String(body.length));
+  res.setHeader("Server", "nginx/1.24.0");
+  res.setHeader("Last-Modified", new Date(Date.now() - 86_400_000 * 30).toUTCString());
+  res.setHeader("ETag", `"${body.length.toString(16)}-${(Date.now() / 1000 | 0).toString(16)}"`);
+  res.setHeader("Accept-Ranges", "bytes");
+  res.setHeader("Connection", "keep-alive");
+  res.removeHeader("X-Content-Type-Options");
+  void req;
+  res.end(body);
+}
 
 /* ──────────────────────────────── עזרי בקשה ─────────────────────────────── */
 
@@ -183,6 +394,9 @@ function sanitizeHeaders(info) {
   headers["x-lt-ts"] = ts;
   headers["x-lt-sig"] = signInternal(info.ip, ts, info.fingerprint);
   headers["x-lt-peer"] = info.peerInternal ? "internal" : "external";
+  // מצב חמקן מועבר לאפליקציה (middleware לא יכול לקרוא קבצים) — הכותרת נכתבת
+  // רק כאן, אחרי מחיקת כל כותרות ה-x-lt-* שהגיעו מבחוץ.
+  headers["x-lt-stealth"] = STEALTH.enabled === "on" ? "on" : "off";
   const proto = headers["x-forwarded-proto"];
   headers["x-lt-proto"] = proto === "http" || proto === "https" ? proto : (info.peerInternal ? "http" : "https");
   headers["x-request-id"] = headers["x-request-id"] ?? crypto.randomUUID();
@@ -297,6 +511,56 @@ const upgradeHandler = typeof app.getUpgradeHandler === "function" ? app.getUpgr
 
 function onRequest(req, res) {
   const info = collectRequestInfo(req);
+  info.socketIp = info.socketIp ?? normalizeIp(req.socket?.remoteAddress) ?? null;
+
+  /* 0.001 — מצב חמקן: האם בכלל מגיעים אלינו? */
+  if (STEALTH.enabled === "on") {
+    const decision = stealthDecision(info, { headers: info.headerMap });
+
+    if (decision.action === "drop") {
+      if (decision.canary) {
+        // הקנארי נתפס: מישהו מצא כתובת שהיא לא אמורה להתגלות
+        const canary = decision.canary;
+        canary.hits = (canary.hits ?? 0) + 1;
+        canary.lastHitAt = new Date().toISOString();
+        canary.lastHitIp = info.ip;
+        try {
+          const cfg = loadStealth();
+          const list = (cfg.canaries ?? []).map((c) => (c.path === canary.path ? canary : c));
+          saveStealth({ ...cfg, canaries: list });
+        } catch { /* ignore */ }
+
+        engine.store.event({ kind: "canary_triggered", severity: "critical", ip: info.ip, detail: `canary=${canary.path} path=${info.path}` });
+        engine.ban({ ip: info.ip, category: "honeypot", reason: `נגיעה במלכודת סודית (${canary.label}) — השרת זוהה`, severity: "critical", path: info.path, method: info.method, userAgent: info.userAgent, permanent: true });
+        securityLog("canary", info, { category: "honeypot", reason: "canary_triggered" });
+      } else {
+        engine.store.event({ kind: "stealth_drop", severity: "warning", ip: info.ip, detail: `reason=${decision.reason} path=${info.path}` });
+      }
+      return dropSilently(req, res, STEALTH.dropHoldMs);
+    }
+
+    if (decision.action === "decoy") {
+      engine.store.event({ kind: "stealth_decoy", severity: "warning", ip: info.ip, detail: `reason=${decision.reason} path=${info.path}` });
+      securityLog("blocked", info, { category: "stealth", reason: decision.reason });
+      return sendDecoy(req, res, STEALTH);
+    }
+
+    if (decision.action === "block") {
+      engine.store.event({ kind: "stealth_block", severity: "warning", ip: info.ip, detail: `reason=${decision.reason} path=${info.path}` });
+      return sendBlocked(info, res, { status: 403, reason: "הגישה נדחתה.", category: "stealth" });
+    }
+
+    // robots.txt מותאם: בלי מפת אתר, ובאופציה גם פיתיון לסורקים
+    if (info.path === "/robots.txt") {
+      const bait = STEALTH.robotsBait === "on" ? STEALTH.canaries[0]?.path : null;
+      const body = Buffer.from(stealthRobots(STEALTH, bait), "utf8");
+      res.statusCode = 200;
+      res.setHeader("Content-Type", "text/plain; charset=utf-8");
+      res.setHeader("Content-Length", String(body.length));
+      res.setHeader("Cache-Control", "public, max-age=3600");
+      return res.end(body);
+    }
+  }
 
   // 0 — נתיבי מערכת שאסור לחשוף לעולם
   const lowerPath = info.path.toLowerCase();
@@ -326,7 +590,32 @@ function onRequest(req, res) {
     return sendBlocked(info, res, decision);
   }
 
-  // 2 — העברת בקשה נקייה לאפליקציה
+  /* 1.5 — כניסה עם סימן (?lt_entry=…): מגדירים עוגיית מעבר ומנקים את הכתובת */
+  if (STEALTH.enabled === "on") {
+    const token = entryTokenFromRequest(req.url, undefined);
+    if (token) {
+      const prefix = (process.env.COOKIE_PREFIX ?? "lt").replace(/[^a-z0-9]/gi, "") || "lt";
+      const url = new URL(req.url, "http://localhost");
+      url.searchParams.delete("lt_entry");
+      const secure = (process.env.COOKIE_SECURE ?? "false") === "true" ? "; Secure" : "";
+      res.setHeader(
+        "Set-Cookie",
+        `${prefix}_entry=${token}; Path=/; HttpOnly; SameSite=Lax; Max-Age=2592000${secure}`,
+      );
+      engine.store.event({ kind: "stealth_entry_granted", severity: "info", ip: info.ip, detail: `path=${info.path}` });
+      securityHeaders(res, { Location: `${url.pathname}${url.search}` });
+      res.statusCode = 302;
+      return res.end();
+    }
+  }
+
+  // 2 — העברת בקשה נקייה לאפליקציה (עם הסוואת נתיבי נכסים במצב חמקן)
+  if (STEALTH.enabled === "on") {
+    maskRequestPath(req);
+    installHeaderStealth(res);
+    installHtmlMasking(res);
+  }
+
   info.fingerprint = decision.fingerprint ?? fingerprintOf(info);
   const headers = sanitizeHeaders(info);
   req.headers = headers;
@@ -387,6 +676,11 @@ server.on("listening", () => {
    🧪  מלכודות:           ${settings.honeypot_paths === "on" ? `${settings.honeypot === "ban" ? "פעילות + חסימה" : "פעילות"}` : "כבויות"}
    🔎  מודיעין איומים:    ${engine.stats().intel.torCount} טווחי TOR · ${engine.stats().intel.datacenterCount} טווחי ענן
    📊  חסימות פעילות:     ${engine.stats().bans.active}
+   🥷  מצב חמקן:          ${(() => {
+     const st = stealthStatus();
+     if (st.enabled !== "on") return "כבוי (האתר מזוהה כ-Next.js)";
+     return `פעיל · תגובה=${st.mode} · נעילת מקור=${st.originLock} · סימנים=${st.tokens} · מלכודות=${st.canaries.length} · הסוואת נכסים=${st.assetPrefix ?? "—"}`;
+   })()}
 `);
 });
 

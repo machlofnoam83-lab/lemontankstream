@@ -1,5 +1,7 @@
 "use client";
 
+import { CSRF_COOKIE } from "@/lib/cookies";
+
 /**
  * נגן הווידאו של LemonTank — נגן מותאם אישית עם כל התכונות:
  *   ▶ ניהול מקלדת מלא (רווח, חצים, J/L, 0-9, F, M, K)
@@ -105,7 +107,7 @@ export function Player({
       }
       fetch("/api/progress", {
         method: "POST",
-        headers: { "content-type": "application/json", "x-csrf-token": readCookie("lt_csrf") },
+        headers: { "content-type": "application/json", "x-csrf-token": readCookie(CSRF_COOKIE) },
         body: JSON.stringify(payload),
         keepalive: true,
       }).catch(() => undefined);
@@ -118,7 +120,7 @@ export function Player({
       if (locked) return;
       fetch("/api/analytics", {
         method: "POST",
-        headers: { "content-type": "application/json", "x-csrf-token": readCookie("lt_csrf") },
+        headers: { "content-type": "application/json", "x-csrf-token": readCookie(CSRF_COOKIE) },
         body: JSON.stringify({ kind, title_id: titleId, episode_id: episodeId, meta }),
         keepalive: true,
       }).catch(() => undefined);

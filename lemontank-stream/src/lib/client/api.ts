@@ -1,8 +1,10 @@
 "use client";
 
+import { CSRF_COOKIE } from "@/lib/cookies";
+
 /**
  * לקוח API בצד הדפדפן — מטפל אוטומטית ב-CSRF ובשגיאות בעברית.
- * הטוקן נלקח מעוגיית lt_csrf (double-submit) ונשלח בכותרת x-csrf-token.
+ * הטוקן נלקח מעוגיית ה-CSRF (double-submit) ונשלח בכותרת x-csrf-token.
  */
 
 export class ApiClientError extends Error {
@@ -39,7 +41,7 @@ export async function apiCall<T = unknown>(url: string, options: ApiOptions = {}
   const headers: Record<string, string> = { "x-request-id": crypto.randomUUID() };
 
   if (method !== "GET") {
-    headers["x-csrf-token"] = readCookie("lt_csrf");
+    headers["x-csrf-token"] = readCookie(CSRF_COOKIE);
   }
 
   let payload: BodyInit | undefined;
@@ -106,7 +108,7 @@ export function uploadWithProgress<K = unknown>(
     const xhr = new XMLHttpRequest();
     xhr.open("POST", url, true);
     xhr.withCredentials = true;
-    xhr.setRequestHeader("x-csrf-token", readCookie("lt_csrf"));
+    xhr.setRequestHeader("x-csrf-token", readCookie(CSRF_COOKIE));
     xhr.setRequestHeader("x-request-id", crypto.randomUUID());
 
     xhr.upload.onprogress = (e) => {

@@ -10,9 +10,9 @@
  */
 
 import { NextResponse, type NextRequest } from "next/server";
+import { SESSION_COOKIE, CSRF_COOKIE, ENTRY_COOKIE, ENTRY_QUERY } from "@/lib/cookies";
 // הערה: כתובת ה-IP מגיעה מחתימת השער (server.mjs) — ראו src/lib/security/internal.ts
 
-const SESSION_COOKIE = "lt_session";
 
 /** נתיבים שדורשים התחברות (בדיקה זריזה; האימות המלא בצד השרת) */
 const PROTECTED_PREFIXES = ["/admin", "/account", "/my-list", "/watch", "/notifications"];
@@ -34,10 +34,12 @@ function randomNonce(): string {
   return btoa(String.fromCharCode(...bytes));
 }
 
-function buildCsp(nonce: string, isDev: boolean): string {
+function buildCsp(nonce: string, isDev: boolean, stealth: boolean): string {
   // רשימת המקורות שמורשים להטמיע את האפליקציה ב-iframe (תצוגה מקדימה).
-  // בפרודקשן מומלץ להשאיר רק 'self' — ראו SECURITY.md
-  const frameAncestors = process.env.ALLOW_FRAME_ANCESTORS ?? "'self' https://*.e2b.app https://*.e2b.dev https://*.arena.ai https://*.arena.im https://*.vercel.app";
+  // במצב חמקן: רק 'self' — אחרת רשימת הפלטפורמות מסגירה מי מארח את האתר.
+  const frameAncestors = stealth
+    ? "'self'"
+    : (process.env.ALLOW_FRAME_ANCESTORS ?? "'self' https://*.e2b.app https://*.e2b.dev https://*.arena.ai https://*.arena.im https://*.vercel.app");
 
   const scriptSrc = isDev
     ? `'self' 'nonce-${nonce}' 'strict-dynamic' 'unsafe-eval'`
@@ -66,7 +68,7 @@ function buildCsp(nonce: string, isDev: boolean): string {
     .join("; ");
 }
 
-function applySecurityHeaders(res: NextResponse, csp: string, isDev: boolean): void {
+function applySecurityHeaders(res: NextResponse, csp: string, isDev: boolean, stealth = false): void {
   res.headers.set("Content-Security-Policy", csp);
   res.headers.set("X-Content-Type-Options", "nosniff");
   res.headers.set("Referrer-Policy", "strict-origin-when-cross-origin");
@@ -76,7 +78,17 @@ function applySecurityHeaders(res: NextResponse, csp: string, isDev: boolean): v
   res.headers.set("Cross-Origin-Resource-Policy", "same-origin");
   res.headers.set("X-Permitted-Cross-Domain-Policies", "none");
   res.headers.set("Origin-Agent-Cluster", "?1");
-  res.headers.set("X-Robots-Tag", "index, follow");
+  // במצב חמקן: בלי אינדוקס — האתר לא יופיע בגוגל ובוואי-בק משום מקום
+  res.headers.set("X-Robots-Tag", stealth ? "noindex, nofollow, noarchive, nosnippet" : "index, follow");
+  if (stealth) {
+    // צמצום טביעות: כותרות שהמערכת מזוהה לפיהן (Next/React/Node) לא נשלחות
+    res.headers.delete("X-Nextjs-Prerender");
+    res.headers.delete("X-Matched-Path");
+    res.headers.delete("X-Invoke-Query");
+    res.headers.delete("Vary");
+    res.headers.set("Vary", "Accept-Encoding");
+    res.headers.set("Referrer-Policy", "no-referrer");
+  }
   // HSTS רק מאחורי HTTPS
   if (!isDev && process.env.COOKIE_SECURE !== "false") {
     res.headers.set("Strict-Transport-Security", "max-age=63072000; includeSubDomains; preload");
@@ -87,8 +99,18 @@ function applySecurityHeaders(res: NextResponse, csp: string, isDev: boolean): v
 export async function middleware(req: NextRequest): Promise<NextResponse> {
   const isDev = process.env.NODE_ENV !== "production";
   const nonce = randomNonce();
-  const csp = buildCsp(nonce, isDev);
   const { pathname, search } = req.nextUrl;
+
+  /**
+   * מצב חמקן — שני מקורות: הכותרת שהשער מזריק (מהימן, לא ניתן לזיוף מבחוץ),
+   * או משתנה סביבה כשמריצים בלי השער (next dev).
+   */
+  const stealth =
+    req.headers.get("x-lt-stealth") === "on" ||
+    process.env.STEALTH_MODE === "on" ||
+    process.env.STEALTH_HIDE === "1";
+
+  const csp = buildCsp(nonce, isDev, stealth);
 
   /* ── 1. זיהוי דפוסי תקיפה ──────────────────────────────────────────────── */
   const probe = `${pathname}${search}`;
@@ -116,7 +138,7 @@ export async function middleware(req: NextRequest): Promise<NextResponse> {
         { ok: false, error: { code: "BLOCKED", message: "הבקשה נחסמה על ידי מערכת האבטחה" } },
         { status: 403 },
       );
-      applySecurityHeaders(res, csp, isDev);
+      applySecurityHeaders(res, csp, isDev, stealth);
       ensureCsrfCookie(req, res);
       return res;
     }
@@ -126,11 +148,20 @@ export async function middleware(req: NextRequest): Promise<NextResponse> {
   const hasSession = Boolean(req.cookies.get(SESSION_COOKIE)?.value);
 
   if (!hasSession && PROTECTED_PREFIXES.some((p) => pathname === p || pathname.startsWith(`${p}/`))) {
+    // במצב חמקן לא חושפים את קיום מערכת הניהול: 404 זהה לכל כתובת לא קיימת.
+    if (stealth) {
+      const res = new NextResponse("<!DOCTYPE html><html><head><title>404 Not Found</title></head><body><h1>404 Not Found</h1></body></html>", {
+        status: 404,
+        headers: { "content-type": "text/html; charset=utf-8" },
+      });
+      applySecurityHeaders(res, csp, isDev, true);
+      return res;
+    }
     const url = req.nextUrl.clone();
     url.pathname = "/login";
     url.search = `?next=${encodeURIComponent(pathname + search)}`;
     const res = NextResponse.redirect(url);
-    applySecurityHeaders(res, csp, isDev);
+    applySecurityHeaders(res, csp, isDev, stealth);
     ensureCsrfCookie(req, res);
     return res;
   }
@@ -140,7 +171,7 @@ export async function middleware(req: NextRequest): Promise<NextResponse> {
     url.pathname = "/";
     url.search = "";
     const res = NextResponse.redirect(url);
-    applySecurityHeaders(res, csp, isDev);
+    applySecurityHeaders(res, csp, isDev, stealth);
     ensureCsrfCookie(req, res);
     return res;
   }
@@ -149,6 +180,17 @@ export async function middleware(req: NextRequest): Promise<NextResponse> {
   const requestHeaders = new Headers(req.headers);
   requestHeaders.set("x-nonce", nonce);
   requestHeaders.set("x-pathname", pathname);
+
+  // במצב חמקן: חתימה גנרית של אפליקציה — חזקה, אבל לא מסגירה את הטכנולוגיה
+  if (stealth) {
+    const generic = buildCsp(nonce, isDev, true);
+    requestHeaders.set("x-stealth", "on");
+    const res = NextResponse.next({ request: { headers: requestHeaders } });
+    applySecurityHeaders(res, generic, isDev, true);
+    res.headers.set("Content-Security-Policy", generic);
+    ensureCsrfCookie(req, res);
+    return res;
+  }
 
   const res = NextResponse.next({ request: { headers: requestHeaders } });
   applySecurityHeaders(res, csp, isDev);
@@ -162,11 +204,11 @@ export async function middleware(req: NextRequest): Promise<NextResponse> {
  * לאחר התחברות מוחלף הטוקן בערך חתום (HMAC על מזהה הסשן).
  */
 function ensureCsrfCookie(req: NextRequest, res: NextResponse): void {
-  if (req.cookies.get("lt_csrf")?.value) return;
+  if (req.cookies.get(CSRF_COOKIE)?.value) return;
   const bytes = new Uint8Array(24);
   crypto.getRandomValues(bytes);
   const token = Array.from(bytes, (b) => b.toString(16).padStart(2, "0")).join("");
-  res.cookies.set("lt_csrf", token, {
+  res.cookies.set(CSRF_COOKIE, token, {
     httpOnly: false,
     sameSite: "lax",
     secure: process.env.COOKIE_SECURE === "true",
