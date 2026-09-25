@@ -43,43 +43,84 @@ const SECTIONS: { title: string; items: { href: string; label: string; icon: str
   },
 ];
 
-/** ניווט צד בפאנל הניהול — עם הדגשה של הנתיב הנוכחי */
+const ALL_ITEMS = SECTIONS.flatMap((s) => s.items);
+const isActive = (pathname: string, href: string) =>
+  href === "/admin" ? pathname === "/admin" : pathname === href || pathname.startsWith(`${href}/`);
+
+/** ניווט צד בפאנל הניהול — סקשנים, מצב פעיל מודגש, וגלילה אופקית במובייל */
 export function AdminNav({ role }: { role: string }) {
   const pathname = usePathname();
 
   return (
-    <nav className="hidden w-56 shrink-0 lg:block" aria-label="ניווט פאנל ניהול">
-      <div className="sticky top-20 space-y-4">
-        {SECTIONS.map((section) => (
-          <div key={section.title}>
-            <h2 className="mb-1.5 px-3 text-[11px] font-bold uppercase tracking-wider text-ink-500">{section.title}</h2>
-            <ul className="space-y-0.5">
-              {section.items.map((item) => {
-                const active = pathname === item.href || (item.href !== "/admin" && pathname.startsWith(item.href));
-                return (
-                  <li key={item.href}>
-                    <Link
-                      href={item.href}
-                      aria-current={active ? "page" : undefined}
-                      className={`flex items-center gap-2 rounded-xl px-3 py-2 text-sm transition ${
-                        active ? "bg-lemon-400/15 font-bold text-lemon-200" : "text-ink-300 hover:bg-white/5 hover:text-white"
-                      }`}
-                    >
-                      <span aria-hidden="true">{item.icon}</span>
-                      {item.label}
-                    </Link>
-                  </li>
-                );
-              })}
-            </ul>
-          </div>
-        ))}
+    <>
+      {/* מובייל: רצועת ניווט נגללת */}
+      <nav className="no-scrollbar -mx-4 flex gap-1.5 overflow-x-auto border-b border-white/[0.06] px-4 pb-2.5 lg:hidden" aria-label="ניווט פאנל ניהול (מובייל)">
+        {ALL_ITEMS.map((item) => {
+          const active = isActive(pathname, item.href);
+          return (
+            <Link
+              key={item.href}
+              href={item.href}
+              aria-current={active ? "page" : undefined}
+              className={`flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full px-3.5 py-1.5 text-xs transition ${
+                active
+                  ? "bg-lemon-400/15 font-bold text-lemon-200 ring-1 ring-lemon-400/35"
+                  : "text-ink-300 hover:bg-white/[0.06]"
+              }`}
+            >
+              <span aria-hidden="true">{item.icon}</span>
+              {item.label}
+            </Link>
+          );
+        })}
+      </nav>
 
-        <div className="card-surface rounded-xl p-3 text-[11px] text-ink-400">
-          <p className="font-bold text-ink-200">תפקיד: {role}</p>
-          <p className="mt-1">הרשאות נאכפות בצד השרת בכל בקשה — לא בממשק.</p>
+      {/* דסקטופ: סרגל צד */}
+      <nav className="hidden w-60 shrink-0 lg:block" aria-label="ניווט פאנל ניהול">
+        <div className="sticky top-24 space-y-5">
+          {SECTIONS.map((section) => (
+            <div key={section.title}>
+              <h2 className="mb-2 px-3 text-[10.5px] font-black uppercase tracking-[0.14em] text-ink-500">{section.title}</h2>
+              <ul className="space-y-0.5">
+                {section.items.map((item) => {
+                  const active = isActive(pathname, item.href);
+                  return (
+                    <li key={item.href}>
+                      <Link
+                        href={item.href}
+                        aria-current={active ? "page" : undefined}
+                        className={`group relative flex items-center gap-2.5 rounded-xl px-3 py-2 text-sm transition-all duration-250 [transition-timing-function:var(--ease-cinema)] ${
+                          active
+                            ? "bg-gradient-to-l from-lemon-400/[0.16] to-transparent font-bold text-lemon-200"
+                            : "text-ink-300 hover:bg-white/[0.05] hover:text-white"
+                        }`}
+                      >
+                        {active ? (
+                          <span className="absolute inset-y-1.5 right-0 w-[3px] rounded-full bg-gradient-to-b from-lemon-300 to-lemon-500 shadow-[0_0_14px_1px_rgba(247,194,43,0.7)]" aria-hidden="true" />
+                        ) : null}
+                        <span
+                          className={`flex h-7 w-7 items-center justify-center rounded-lg text-[13px] transition-colors ${
+                            active ? "bg-lemon-400/15" : "bg-white/[0.04] group-hover:bg-white/[0.08]"
+                          }`}
+                          aria-hidden="true"
+                        >
+                          {item.icon}
+                        </span>
+                        <span className="truncate">{item.label}</span>
+                      </Link>
+                    </li>
+                  );
+                })}
+              </ul>
+            </div>
+          ))}
+
+          <div className="card-surface rounded-2xl p-3.5 text-[11px] leading-relaxed text-ink-400">
+            <p className="font-bold text-ink-200">מחובר כ: {role}</p>
+            <p className="mt-1">ההרשאות נאכפות בצד השרת בכל בקשה — לא בממשק.</p>
+          </div>
         </div>
-      </div>
-    </nav>
+      </nav>
+    </>
   );
 }

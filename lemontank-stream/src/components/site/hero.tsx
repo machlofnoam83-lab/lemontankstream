@@ -8,8 +8,9 @@ import { AddToListButton } from "./add-to-list-button";
 type Slide = TitleCardType & { tagline?: string | null; trailer_url?: string | null; logo_url?: string | null };
 
 /**
- * באנר ראשי עם סיבוב אוטומטי, טריילר בשקט בריחוף, ותמיכה מלאה ב-RTL.
- * נגישות: עצירה אוטומטית עם prefers-reduced-motion, כפתורי ניווט עם aria-labels.
+ * במת הבאנר הראשי — תמונה שמתקרבת לאט (Ken Burns), טריילר מושתק,
+ * שכבות כהות לקריאות, וכפתורי פעולה ברורים. RTL מלא.
+ * נגישות: עצירה עם prefers-reduced-motion, כפתורי שקופית עם aria-label.
  */
 export function Hero({ slides, isPlus }: { slides: Slide[]; isPlus: boolean }) {
   const [index, setIndex] = useState(0);
@@ -23,7 +24,7 @@ export function Hero({ slides, isPlus }: { slides: Slide[]; isPlus: boolean }) {
     if (slides.length <= 1) return;
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     if (reduce) return;
-    timer.current = setInterval(() => setIndex((i) => (i + 1) % slides.length), 9000);
+    timer.current = setInterval(() => setIndex((i) => (i + 1) % slides.length), 10000);
     return () => {
       if (timer.current) clearInterval(timer.current);
     };
@@ -42,11 +43,17 @@ export function Hero({ slides, isPlus }: { slides: Slide[]; isPlus: boolean }) {
   const background = current.backdrop_url || current.poster_url;
 
   return (
-    <section className="relative mb-8 overflow-hidden rounded-2xl border border-white/5" aria-label="תוכן מומלץ">
-      <div className="relative min-h-[420px] w-full md:min-h-[520px]">
+    <section className="relative mb-10 overflow-hidden rounded-[24px] border border-white/[0.07] shadow-[0_60px_120px_-60px_rgba(0,0,0,1)]" aria-label="תוכן מומלץ">
+      <div className="relative min-h-[78vw] w-full sm:min-h-[420px] md:min-h-[560px]">
+        {/* רקע */}
         {background ? (
           // eslint-disable-next-line @next/next/no-img-element
-          <img src={background} alt="" className="absolute inset-0 h-full w-full object-cover" />
+          <img
+            src={background}
+            alt=""
+            className="absolute inset-0 h-full w-full animate-ken-burns object-cover"
+            fetchPriority="high"
+          />
         ) : (
           <div className="poster-fallback absolute inset-0" style={{ ["--poster-color" as string]: current.color }} />
         )}
@@ -64,34 +71,56 @@ export function Hero({ slides, isPlus }: { slides: Slide[]; isPlus: boolean }) {
           />
         ) : null}
 
-        <div className="absolute inset-0 bg-gradient-to-l from-ink-950/95 via-ink-950/70 to-transparent" />
-        <div className="absolute inset-0 bg-gradient-to-t from-ink-950 via-transparent to-transparent" />
+        {/* שכבות כהות — מימין (RTL) ולמטה */}
+        <div className="absolute inset-0 bg-gradient-to-l from-ink-950 via-ink-950/75 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-ink-950 via-ink-950/25 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-b from-ink-950/70 via-transparent to-transparent" />
 
-        <div className="relative flex min-h-[420px] flex-col justify-end gap-4 p-5 md:min-h-[520px] md:max-w-3xl md:p-10">
-          <div className="flex flex-wrap items-center gap-2">
-            <span className="rounded-full bg-lemon-400 px-3 py-1 text-[11px] font-black text-ink-900">
-              {current.kind === "movie" ? "סרט" : "סדרה"} חדש/ה בפלטפורמה
+        {/* תוכן */}
+        <div className="relative flex min-h-[78vw] flex-col justify-end gap-4 p-6 sm:min-h-[420px] md:min-h-[560px] md:max-w-3xl md:p-12">
+          <div className="animate-fade-up flex flex-wrap items-center gap-2">
+            <span className="rounded-full bg-gradient-to-b from-lemon-300 to-lemon-400 px-3 py-1 text-[11px] font-black text-ink-950 shadow-[0_8px_24px_-10px_rgba(247,194,43,0.9)]">
+              {current.kind === "movie" ? "🎬 סרט" : "📺 סדרה"} מומלץ
             </span>
-            {current.plan_access === "plus" ? <span className="badge-plus">⭐ פלוס בלבד</span> : <span className="badge-free">זמין בחינם</span>}
-            {current.is_original ? <span className="rounded-full border border-white/20 px-3 py-1 text-[11px] font-bold text-white">מקורי LemonTank</span> : null}
+            {current.plan_access === "plus" ? (
+              <span className="badge-plus">⭐ פלוס בלבד</span>
+            ) : (
+              <span className="badge-free">זמין בחינם</span>
+            )}
+            {current.is_original ? (
+              <span className="rounded-full border border-white/25 bg-white/5 px-3 py-1 text-[11px] font-bold text-white backdrop-blur">
+                מקורי LemonTank
+              </span>
+            ) : null}
           </div>
 
-          <h1 className="text-3xl font-black leading-tight text-white drop-shadow-lg md:text-5xl">{current.name_he}</h1>
-          {current.tagline ? <p className="text-sm text-lemon-200 md:text-base">{current.tagline}</p> : null}
+          <h1 className="animate-fade-up text-4xl font-black leading-[1.05] tracking-tight text-white drop-shadow-[0_6px_30px_rgba(0,0,0,0.9)] sm:text-5xl md:text-6xl">
+            {current.name_he}
+          </h1>
 
-          <p className="line-clamp-3 max-w-2xl text-sm text-ink-200 md:text-base">{current.overview ?? "צפו עכשיו ב-LemonTank Stream"}</p>
+          {current.tagline ? <p className="text-sm font-semibold text-lemon-200 md:text-base">{current.tagline}</p> : null}
 
-          <div className="flex flex-wrap items-center gap-2 text-xs text-ink-300">
+          <div className="flex flex-wrap items-center gap-2.5 text-xs font-semibold text-ink-200 md:text-sm">
             {current.year ? <span>{current.year}</span> : null}
-            <span className="rounded border border-white/20 px-1.5 py-0.5">{current.maturity}</span>
-            {current.kind === "series" ? <span>{current.seasons_count} עונות · {current.episodes_count} פרקים</span> : <span>{current.runtime_min ?? "—"} דק'</span>}
-            {current.rating_imdb ? <span className="text-lemon-300">★ {current.rating_imdb.toFixed(1)}</span> : null}
+            <span className="rounded-md border border-white/25 px-1.5 py-0.5 text-[11px]">{current.maturity}</span>
+            {current.kind === "series" ? (
+              <span>
+                {current.seasons_count} עונות · {current.episodes_count} פרקים
+              </span>
+            ) : (
+              <span>{current.runtime_min ?? "—"} דק'</span>
+            )}
+            {current.rating_imdb ? <span className="font-bold text-lemon-300">★ {current.rating_imdb.toFixed(1)}</span> : null}
           </div>
 
-          <div className="flex flex-wrap items-center gap-2.5">
+          <p className="line-clamp-3 max-w-2xl text-sm leading-relaxed text-ink-200 md:text-base">
+            {current.overview ?? "צפו עכשיו ב-LemonTank Stream"}
+          </p>
+
+          <div className="mt-1 flex flex-wrap items-center gap-2.5">
             <Link
               href={`/watch/${current.slug}`}
-              className="inline-flex items-center gap-2 rounded-xl bg-lemon-400 px-6 py-3 text-sm font-black text-ink-900 shadow-lg transition hover:bg-lemon-300"
+              className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-b from-lemon-300 to-lemon-400 px-7 py-3.5 text-sm font-black text-ink-950 shadow-[0_16px_40px_-14px_rgba(247,194,43,0.95)] transition hover:brightness-105 hover:-translate-y-0.5"
             >
               <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" className="flip-rtl">
                 <path d="M8 5v14l11-7z" />
@@ -100,7 +129,7 @@ export function Hero({ slides, isPlus }: { slides: Slide[]; isPlus: boolean }) {
             </Link>
             <Link
               href={`/title/${current.slug}`}
-              className="inline-flex items-center gap-2 rounded-xl border border-white/20 bg-white/10 px-5 py-3 text-sm font-bold text-white backdrop-blur transition hover:bg-white/20"
+              className="inline-flex items-center gap-2 rounded-xl border border-white/20 bg-white/10 px-6 py-3.5 text-sm font-bold text-white backdrop-blur-md transition hover:bg-white/20"
             >
               פרטים נוספים
             </Link>
@@ -108,7 +137,7 @@ export function Hero({ slides, isPlus }: { slides: Slide[]; isPlus: boolean }) {
             {current.trailer_url ? (
               <button
                 onClick={() => setMuted((m) => !m)}
-                className="rounded-xl border border-white/15 bg-black/40 px-3 py-3 text-sm text-white backdrop-blur hover:bg-black/60"
+                className="rounded-xl border border-white/15 bg-black/40 px-3.5 py-3.5 text-sm text-white backdrop-blur transition hover:bg-black/60"
                 aria-label={muted ? "בטל השתקת טריילר" : "השתק טריילר"}
               >
                 {muted ? "🔇" : "🔊"}
@@ -117,17 +146,45 @@ export function Hero({ slides, isPlus }: { slides: Slide[]; isPlus: boolean }) {
           </div>
         </div>
 
-        {/* מחווני שקופיות */}
+        {/* בורר שקופיות — תמונות ממוזערות */}
         {slides.length > 1 ? (
-          <div className="absolute bottom-4 left-4 flex gap-1.5" role="tablist" aria-label="בחירת תוכן מומלץ">
+          <div className="absolute bottom-5 left-5 hidden items-center gap-2 md:flex" role="tablist" aria-label="בחירת תוכן מומלץ">
+            {slides.map((s, i) => {
+              const thumb = s.backdrop_url || s.poster_url;
+              return (
+                <button
+                  key={s.id}
+                  role="tab"
+                  aria-selected={i === index}
+                  aria-label={s.name_he}
+                  onClick={() => setIndex(i)}
+                  className={`relative h-12 w-20 overflow-hidden rounded-lg border transition-all duration-300 [transition-timing-function:var(--ease-cinema)] ${
+                    i === index
+                      ? "scale-105 border-lemon-400/80 opacity-100 shadow-[0_0_22px_-4px_rgba(247,194,43,0.85)]"
+                      : "border-white/15 opacity-55 hover:opacity-90"
+                  }`}
+                >
+                  {thumb ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={thumb} alt="" className="h-full w-full object-cover" />
+                  ) : (
+                    <span className="block h-full w-full bg-ink-800" />
+                  )}
+                </button>
+              );
+            })}
+          </div>
+        ) : null}
+
+        {/* נקודות למובייל */}
+        {slides.length > 1 ? (
+          <div className="absolute bottom-5 left-1/2 flex -translate-x-1/2 gap-1.5 md:hidden">
             {slides.map((s, i) => (
               <button
                 key={s.id}
-                role="tab"
-                aria-selected={i === index}
                 aria-label={s.name_he}
                 onClick={() => setIndex(i)}
-                className={`h-1.5 rounded-full transition-all ${i === index ? "w-8 bg-lemon-400" : "w-3 bg-white/40 hover:bg-white/70"}`}
+                className={`h-1.5 rounded-full transition-all ${i === index ? "w-7 bg-lemon-400" : "w-2.5 bg-white/40"}`}
               />
             ))}
           </div>

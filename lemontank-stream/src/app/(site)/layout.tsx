@@ -11,7 +11,7 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
     <ToastProvider>
       <div className="flex min-h-dvh flex-col">
         <SiteHeader user={user} />
-        <main id="main" className="mx-auto w-full max-w-7xl flex-1 px-4 py-6">
+        <main id="main" className="mx-auto w-full max-w-[1500px] flex-1 px-4 pb-12 pt-7">
           {children}
         </main>
         <SiteFooter />

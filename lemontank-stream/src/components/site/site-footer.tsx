@@ -2,6 +2,7 @@ import Link from "next/link";
 import { catalogStats } from "@/lib/catalog";
 import { formatNumber } from "@/lib/format";
 
+/** כותרת תחתונה — ניווט, מספרי הקטלוג והשורה המשפטית */
 export function SiteFooter() {
   let stats = { movies: 0, series: 0, episodes: 0, users: 0 };
   try {
@@ -10,59 +11,106 @@ export function SiteFooter() {
     /* המסד עוד לא אותחל */
   }
 
+  const links = [
+    {
+      title: "קטלוג",
+      items: [
+        { href: "/movies", label: "סרטים" },
+        { href: "/series", label: "סדרות" },
+        { href: "/new", label: "נוספו לאחרונה" },
+        { href: "/popular", label: "הנצפים ביותר" },
+        { href: "/genres", label: "ז'אנרים" },
+        { href: "/live", label: "ערוצים בשידור חי" },
+      ],
+    },
+    {
+      title: "החשבון שלי",
+      items: [
+        { href: "/plans", label: "מנויים ומחירים" },
+        { href: "/account", label: "אזור אישי" },
+        { href: "/account/security", label: "אבטחה ואימות דו-שלבי" },
+        { href: "/my-list", label: "הרשימה שלי" },
+        { href: "/support", label: "תמיכה ויצירת קשר" },
+      ],
+    },
+  ];
+
   return (
-    <footer className="mt-16 border-t border-white/5 bg-ink-950/60">
-      <div className="mx-auto grid max-w-7xl gap-8 px-4 py-10 md:grid-cols-4">
-        <div>
-          <div className="flex items-center gap-2 text-lg font-black">
-            <span aria-hidden="true">🍋</span> Lemon<span className="text-lemon-400">Tank</span>
+    <footer className="relative mt-20 border-t border-white/[0.07] bg-gradient-to-b from-ink-950/40 to-black/40">
+      <div className="h-px w-full bg-gradient-to-l from-transparent via-lemon-400/25 to-transparent" aria-hidden="true" />
+
+      <div className="mx-auto grid max-w-[1500px] gap-10 px-4 py-14 md:grid-cols-4">
+        <div className="md:col-span-1">
+          <div className="flex items-center gap-2.5">
+            <span
+              className="flex h-10 w-10 items-center justify-center rounded-xl border border-lemon-400/30 bg-lemon-400/10 text-xl shadow-[0_0_24px_-8px_rgba(247,194,43,0.8)]"
+              aria-hidden="true"
+            >
+              🍋
+            </span>
+            <span className="text-xl font-black tracking-tight">
+              Lemon<span className="text-gradient">Tank</span>
+            </span>
           </div>
-          <p className="mt-2 text-sm text-ink-400">
+          <p className="mt-3 text-sm leading-relaxed text-ink-400">
             פלטפורמת סטרימינג ישראלית — סרטים, סדרות ושידורים חיים בעברית. מנוי חינם לכל, ומנוי פלוס לאיכות 4K ולהורדות.
           </p>
+          <div className="mt-4 flex flex-wrap gap-2">
+            <span className="rounded-full border border-white/10 bg-white/[0.04] px-2.5 py-1 text-[11px] font-semibold text-ink-300">
+              🔒 scrypt + CSP
+            </span>
+            <span className="rounded-full border border-white/10 bg-white/[0.04] px-2.5 py-1 text-[11px] font-semibold text-ink-300">
+              ⚡ 4K · Dolby
+            </span>
+          </div>
         </div>
 
-        <nav aria-label="קטלוג">
-          <h3 className="mb-3 text-sm font-bold text-white">קטלוג</h3>
-          <ul className="space-y-2 text-sm text-ink-400">
-            <li><Link href="/movies" className="hover:text-lemon-300">סרטים</Link></li>
-            <li><Link href="/series" className="hover:text-lemon-300">סדרות</Link></li>
-            <li><Link href="/new" className="hover:text-lemon-300">נוספו לאחרונה</Link></li>
-            <li><Link href="/popular" className="hover:text-lemon-300">הנצפים ביותר</Link></li>
-            <li><Link href="/live" className="hover:text-lemon-300">ערוצים בשידור חי</Link></li>
-          </ul>
-        </nav>
-
-        <nav aria-label="חשבון">
-          <h3 className="mb-3 text-sm font-bold text-white">החשבון שלי</h3>
-          <ul className="space-y-2 text-sm text-ink-400">
-            <li><Link href="/plans" className="hover:text-lemon-300">מנויים ומחירים</Link></li>
-            <li><Link href="/account" className="hover:text-lemon-300">אזור אישי</Link></li>
-            <li><Link href="/account/security" className="hover:text-lemon-300">אבטחה ואימות דו-שלבי</Link></li>
-            <li><Link href="/my-list" className="hover:text-lemon-300">הרשימה שלי</Link></li>
-            <li><Link href="/support" className="hover:text-lemon-300">תמיכה ויצירת קשר</Link></li>
-          </ul>
-        </nav>
+        {links.map((group) => (
+          <nav key={group.title} aria-label={group.title}>
+            <h3 className="mb-4 text-sm font-black tracking-tight text-white">{group.title}</h3>
+            <ul className="space-y-2.5 text-sm text-ink-400">
+              {group.items.map((item) => (
+                <li key={item.href}>
+                  <Link href={item.href} className="inline-block transition-colors hover:text-lemon-300">
+                    {item.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </nav>
+        ))}
 
         <div>
-          <h3 className="mb-3 text-sm font-bold text-white">במספרים</h3>
-          <dl className="space-y-2 text-sm text-ink-400">
-            <div className="flex justify-between"><dt>סרטים</dt><dd className="font-semibold text-lemon-300">{formatNumber(stats.movies)}</dd></div>
-            <div className="flex justify-between"><dt>סדרות</dt><dd className="font-semibold text-lemon-300">{formatNumber(stats.series)}</dd></div>
-            <div className="flex justify-between"><dt>פרקים</dt><dd className="font-semibold text-lemon-300">{formatNumber(stats.episodes)}</dd></div>
-            <div className="flex justify-between"><dt>צופים רשומים</dt><dd className="font-semibold text-lemon-300">{formatNumber(stats.users)}</dd></div>
+          <h3 className="mb-4 text-sm font-black tracking-tight text-white">במספרים</h3>
+          <dl className="space-y-2.5 text-sm">
+            {[
+              { label: "סרטים", value: stats.movies },
+              { label: "סדרות", value: stats.series },
+              { label: "פרקים", value: stats.episodes },
+              { label: "צופים רשומים", value: stats.users },
+            ].map((row) => (
+              <div key={row.label} className="flex items-center justify-between border-b border-white/[0.05] pb-2">
+                <dt className="text-ink-400">{row.label}</dt>
+                <dd className="font-black tabular-nums text-lemon-300">{formatNumber(row.value)}</dd>
+              </div>
+            ))}
           </dl>
         </div>
       </div>
 
-      <div className="border-t border-white/5">
-        <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-2 px-4 py-4 text-xs text-ink-400 sm:flex-row">
+      <div className="border-t border-white/[0.05]">
+        <div className="mx-auto flex max-w-[1500px] flex-col items-center justify-between gap-3 px-4 py-5 text-xs text-ink-400 sm:flex-row">
           <span>© {new Date().getFullYear()} LemonTank Stream — כל הזכויות שמורות.</span>
-          <div className="flex flex-wrap items-center gap-4">
-            <Link href="/legal/terms" className="hover:text-lemon-300">תנאי שימוש</Link>
-            <Link href="/legal/privacy" className="hover:text-lemon-300">מדיניות פרטיות</Link>
-            <Link href="/legal/accessibility" className="hover:text-lemon-300">נגישות</Link>
-            <span className="rounded-full border border-white/10 px-2 py-0.5">🔒 מאובטח ב-scrypt + CSP</span>
+          <div className="flex flex-wrap items-center justify-center gap-5">
+            <Link href="/legal/terms" className="transition-colors hover:text-lemon-300">
+              תנאי שימוש
+            </Link>
+            <Link href="/legal/privacy" className="transition-colors hover:text-lemon-300">
+              מדיניות פרטיות
+            </Link>
+            <Link href="/legal/accessibility" className="transition-colors hover:text-lemon-300">
+              נגישות
+            </Link>
           </div>
         </div>
       </div>

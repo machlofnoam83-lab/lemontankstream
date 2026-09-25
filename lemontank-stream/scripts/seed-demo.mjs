@@ -64,11 +64,11 @@ export function seedDemoContent({ db, insert, daysAgo, genreIds, adminId, userId
   for (const t of titles) {
     const id = insert(
       `INSERT INTO titles(kind, slug, name_he, name_en, overview, year, runtime_min, maturity, plan_access, status,
-         poster_url, backdrop_url, is_featured, trending_score, rating_site, votes_count, views_count,
+         poster_url, backdrop_url, is_featured, trending_score, rating_site, rating_imdb, votes_count, views_count,
          seasons_count, episodes_count, published_at, created_by, created_at)
-       VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`,
+       VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`,
       [t.kind, t.slug, t.he, t.en, t.overview, t.year, t.runtime ?? null, t.maturity, t.plan, "published",
-        t.poster, t.poster, t.featured, 70 + Math.random() * 20, t.rating, 120 + Math.floor(Math.random() * 800),
+        t.poster, t.poster, t.featured, 70 + Math.random() * 20, t.rating, t.rating, 120 + Math.floor(Math.random() * 800),
         Math.floor(300 + Math.random() * 9000), t.kind === "series" ? (t.seasons ?? 1) : 0, 0,
         daysAgo(20), adminId, daysAgo(60)],
     );

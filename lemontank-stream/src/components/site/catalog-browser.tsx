@@ -94,13 +94,48 @@ export function CatalogBrowser({
 
   return (
     <div className="space-y-6">
-      <header className="flex flex-col gap-2">
-        <h1 className="text-2xl font-black md:text-3xl">{title}</h1>
-        <p className="text-sm text-ink-400">{total > 0 ? `נמצאו ${total} כותרים` : "סינון לפי ז'אנר, שנה ומסלול"}</p>
+      <header className="flex flex-wrap items-end justify-between gap-3 px-1">
+        <div>
+          <h1 className="section-heading !text-2xl md:!text-3xl">
+            <span className="section-heading-bar" aria-hidden="true" />
+            {title}
+          </h1>
+          <p className="mt-1.5 text-sm text-ink-400">
+            {total > 0 ? `${total} כותרים בקטלוג` : "סינון לפי ז'אנר, שנה ומסלול"}
+          </p>
+        </div>
+
+        {/* בורר מסלול בכפתורי גלולה — מהיר וברור */}
+        <div className="flex items-center gap-1.5" role="group" aria-label="סינון לפי מסלול">
+          {[
+            { value: "", label: "הכול" },
+            { value: "free", label: "חינם" },
+            { value: "plus", label: "⭐ פלוס" },
+          ].map((option) => {
+            const active = plan === option.value;
+            return (
+              <button
+                key={option.value || "all"}
+                type="button"
+                aria-pressed={active}
+                onClick={() => setPlan(option.value)}
+                className={`rounded-full border px-3.5 py-1.5 text-xs font-bold transition-all duration-300 ${
+                  active
+                    ? option.value === "plus"
+                      ? "border-plus-400/50 bg-plus-500/20 text-plus-300 shadow-[0_0_18px_-6px_rgba(139,92,246,0.9)]"
+                      : "border-lemon-400/50 bg-lemon-400/15 text-lemon-200 shadow-[0_0_18px_-6px_rgba(247,194,43,0.9)]"
+                    : "border-white/12 text-ink-300 hover:border-white/25 hover:text-white"
+                }`}
+              >
+                {option.label}
+              </button>
+            );
+          })}
+        </div>
       </header>
 
       {/* סרגל סינון */}
-      <div className="flex flex-wrap items-center gap-2 rounded-2xl border border-white/10 bg-white/[0.03] p-3">
+      <div className="card-surface flex flex-wrap items-center gap-2 rounded-2xl p-3">
         <Select value={genre} onChange={(e) => setGenre(e.target.value)} aria-label="סינון לפי ז'אנר" className="w-auto min-w-40">
           <option value="">כל הז'אנרים</option>
           {genres.map((g) => (
@@ -109,12 +144,6 @@ export function CatalogBrowser({
               {g.name_he}
             </option>
           ))}
-        </Select>
-
-        <Select value={plan} onChange={(e) => setPlan(e.target.value)} aria-label="סינון לפי מסלול" className="w-auto">
-          <option value="">חינם + פלוס</option>
-          <option value="free">חינם בלבד</option>
-          <option value="plus">פלוס בלבד ⭐</option>
         </Select>
 
         <Select value={sort} onChange={(e) => setSort(e.target.value)} aria-label="מיון" className="w-auto">
