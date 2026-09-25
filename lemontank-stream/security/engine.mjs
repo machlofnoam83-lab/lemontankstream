@@ -395,7 +395,9 @@ export function createEngine({ dbFile, appRoot = process.cwd(), quiet = true, db
       const looksBrowser = Boolean(headers["accept-language"] || headers["sec-fetch-mode"] || headers["accept"]?.includes("text/html"));
       if (claimsBrowser && !headers["accept-language"]) {
         // דפדפן אמיתי תמיד שולח Accept-Language — בלעדיו זה כלי שמתחזה לדפדפן
-        signals.push({ note: "User-Agent של דפדפן בלי Accept-Language (התחזות)", score: headers["sec-fetch-mode"] ? 55 : 80, severity: "warning" });
+        // ניקוד בלבד (מתחת לסף ה"קריטי") — יש דפדפנים ודפדפנים-מוגני-פרטיות
+        // שלא שולחים Accept-Language, ואסור לחסום משתמש אמיתי בגלל זה.
+        signals.push({ note: "User-Agent של דפדפן בלי Accept-Language (התחזות?)", score: headers["sec-fetch-mode"] ? 50 : 70, severity: "warning" });
       } else if (!looksBrowser && !/^(GET|HEAD|OPTIONS)$/.test(req.method) && !/^\/api\//.test(req.path || "")) {
         signals.push({ note: "בקשה ללא כותרות דפדפן", score: 35, severity: "info" });
       }

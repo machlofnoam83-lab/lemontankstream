@@ -175,12 +175,37 @@ export function openStore({ dbFile, appRoot = process.cwd(), quiet = false }) {
   const settingsCache = new Map();
   let settingsLoadedAt = 0;
 
+  /**
+   * מפסק חירום: משתני סביבה ב-.env.local גוברים על ההגדרות שנשמרו בפאנל.
+   * דוגמה — לעצור כל חסימה בלי לגעת במסד:
+   *     SECURITY_MODE="monitor"   (או SECURITY_DISABLE="1")
+   */
+  const ENV_OVERRIDES = {
+    mode: ["SECURITY_MODE", "SECURITY_DISABLE"],
+    autoban: ["SECURITY_AUTOBAN"],
+    tool_block: ["TOOL_BLOCK"],
+    proxy_policy: ["PROXY_POLICY"],
+    tor_ban: ["TOR_BAN"],
+    honeypot: ["HONEYPOT_MODE"],
+    rate_per_minute: ["RATE_PER_MINUTE"],
+  };
+
   function settings() {
     if (Date.now() - settingsLoadedAt < 5_000 && settingsCache.size) return Object.fromEntries(settingsCache);
     const merged = { ...DEFAULT_SETTINGS };
     safe(() => {
       for (const row of stmt("SELECT key, value FROM security_settings").all()) merged[row.key] = row.value;
     });
+
+    for (const [key, envNames] of Object.entries(ENV_OVERRIDES)) {
+      for (const name of envNames) {
+        const value = process.env[name];
+        if (!value) continue;
+        // SECURITY_DISABLE=1 → מצב ניטור; שאר המשתנים מעבירים את הערך כמו שהוא
+        merged[key] = name === "SECURITY_DISABLE" ? (value === "1" || value === "true" ? "monitor" : merged[key]) : String(value).toLowerCase();
+      }
+    }
+
     settingsCache.clear();
     for (const [k, v] of Object.entries(merged)) settingsCache.set(k, String(v));
     settingsLoadedAt = Date.now();
