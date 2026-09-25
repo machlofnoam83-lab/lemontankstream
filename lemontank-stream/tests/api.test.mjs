@@ -86,6 +86,27 @@ class Client {
   }
 }
 
+/** נרשם כמשתמש חינם טרי — כדי שהבדיקות יעבדו גם במערכת נקייה בלי משתמשי דמו */
+async function freshFreeUser() {
+  const c = new Client();
+  await c.raw("/register");
+  const email = `test-${Date.now().toString(36)}-${Math.floor(Math.random() * 1000)}@example.com`;
+  const res = await c.post("/api/auth/register", {
+    name: "בודק בדיקות",
+    email,
+    password: "Test-Pass-2026!Strong",
+    acceptTerms: true,
+  });
+  if (res.body?.ok !== true) return null;
+
+  // חלק מהתצורות יוצרות סשן כבר בהרשמה; אם לא — מתחברים עם אותו חשבון
+  if (!c.csrf() || !c.cookies.get("lt_session")) {
+    const login = await c.login(email, "Test-Pass-2026!Strong");
+    if (login.body?.ok !== true) return null;
+  }
+  return c;
+}
+
 /** מדלג על בדיקה אם השרת לא זמין/לא מזורזע, כדי לא להכשיל CI ריק */
 async function serverReady() {
   try {
@@ -195,7 +216,7 @@ describe("הגנות", () => {
   test("נתיבי ניהול חסומים לאורח", async (t) => {
     if (!ready) return t.skip("אין שרת");
     const anon = new Client();
-    for (const path of ["/admin", "/account", "/my-list", "/watch/the-last-signal"]) {
+    for (const path of ["/admin", "/account", "/my-list", "/watch/any-title"]) {
       const res = await anon.raw(path);
       assert.ok([302, 307, 308].includes(res.status), `${path} החזיר ${res.status}`);
       assert.match(res.headers.get("location") ?? "", /\/login/);
@@ -241,9 +262,8 @@ describe("הגנות", () => {
 describe("הרשאות (RBAC)", () => {
   test("משתמש רגיל לא ניגש ל-API של ניהול", async (t) => {
     if (!ready) return t.skip("אין שרת");
-    const c = new Client();
-    const login = await c.login("yossi@example.com", "Demo-Pass-2026!");
-    if (login.body?.ok !== true) return t.skip(`אין סשן למשתמש הדמו (${login.status})`);
+    const c = await freshFreeUser();
+    if (!c) return t.skip("לא ניתן ליצור משתמש בדיקה (הרשמה סגורה או הגבלת קצב)");
     for (const path of ["/api/users", "/api/admin/stats", "/api/coupons", "/api/settings"]) {
       const res = await c.get(path);
       assert.equal(res.status, 403, `${path} החזיר ${res.status}`);
@@ -262,21 +282,26 @@ describe("הרשאות (RBAC)", () => {
 describe("מנוי ותוכן פלוס", () => {
   test("משתמש חינם מקבל PLAN_REQUIRED על הורדה", async (t) => {
     if (!ready) return t.skip("אין שרת");
-    const c = new Client();
-    const login = await c.login("guest@example.com", "Demo-Pass-2026!");
-    if (login.body?.ok !== true) return t.skip(`אין סשן למשתמש הדמו (${login.status})`);
-    if (login.body.data.user.effective_plan === "plus") return t.skip("המשתמש כבר פלוס");
+    const c = await freshFreeUser();
+    if (!c) return t.skip("לא ניתן ליצור משתמש בדיקה (הרשמה סגורה או הגבלת קצב)");
 
-    const res = await c.post("/api/downloads", { title_id: 1, quality: "720p" });
+    const plusTitles = await c.get("/api/titles?plan=plus&limit=1");
+    const plusId = plusTitles.body?.data?.items?.[0]?.id;
+    if (!plusId) return t.skip("אין כותרי פלוס בקטלוג — הוסף תוכן פלוס כדי לבדוק את הנעילה");
+
+    const res = await c.post("/api/downloads", { title_id: plusId, quality: "720p" });
     assert.equal(res.status, 402);
     assert.equal(res.body.error.code, "PLAN_REQUIRED");
   });
 
-  test("נכס מדיה של תוכן פלוס חסום לאורח", async (t) => {
+  test("מדיה חסומה לאורח (אין גישה לבייטים בלי התחברות)", async (t) => {
     if (!ready) return t.skip("אין שרת");
     const anon = new Client();
+    // במערכת נקייה אין נכסים — בכל מקרה אסור לקבל בייטים: 401 (אין הרשאה) או 404 (לא קיים)
     const res = await anon.get("/api/media/1");
-    assert.equal(res.status, 401);
+    assert.ok([401, 404].includes(res.status), `התקבל ${res.status}`);
+    assert.equal(res.body.ok, false);
+    assert.ok(typeof res.body.error.code === "string");
   });
 });
 

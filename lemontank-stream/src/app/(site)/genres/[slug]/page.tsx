@@ -3,6 +3,7 @@ import { Suspense } from "react";
 import { notFound } from "next/navigation";
 import { CatalogBrowser } from "@/components/site/catalog-browser";
 import { get } from "@/lib/db";
+import { isCatalogEmpty } from "@/lib/catalog";
 
 export const dynamic = "force-dynamic";
 
@@ -19,7 +20,7 @@ export default async function GenrePage({ params }: { params: Promise<{ slug: st
 
   return (
     <Suspense>
-      <CatalogBrowser title={`${genre.icon ?? "🎬"} ${genre.name_he}`} initialGenre={slug} />
+      <CatalogBrowser title={`${genre.icon ?? "🎬"} ${genre.name_he}`} initialGenre={slug} catalogEmpty={isCatalogEmpty()} />
     </Suspense>
   );
 }

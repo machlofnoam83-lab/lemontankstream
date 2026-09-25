@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Badge, Card, DataTable, StatCard } from "@/components/ui/primitives";
 import { all, count, dbStats, get } from "@/lib/db";
-import { catalogStats } from "@/lib/catalog";
+import { catalogStats, isCatalogEmpty } from "@/lib/catalog";
 import { securitySummary } from "@/lib/audit";
 import { formatBytes, formatNumber, formatRelative, formatPrice } from "@/lib/format";
 import { isAdminRole } from "@/lib/rbac";
@@ -17,6 +17,7 @@ export default async function AdminDashboard() {
   if (!isAdminRole(user?.role)) redirect("/?error=forbidden");
 
   const catalog = catalogStats();
+  const catalogEmpty = isCatalogEmpty();
   const db = dbStats();
   const security = securitySummary();
 
@@ -61,6 +62,43 @@ export default async function AdminDashboard() {
           <Link href="/admin/security" className="rounded-xl border border-white/15 px-4 py-2.5 text-sm">בקרת אבטחה</Link>
         </div>
       </header>
+
+      {catalogEmpty ? (
+        <Card className="border-lemon-400/30 p-5">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <h2 className="text-lg font-black">🚀 האתר ריק — 4 צעדים ואתה באוויר</h2>
+              <p className="mt-1 text-sm text-ink-300">
+                אין עדיין כותרים בקטלוג. זה מצב ההתחלה הרצוי: בלי תוכן מובנה, רק מה שאתה מעלה.
+              </p>
+            </div>
+            <Link href="/admin/titles/new" className="rounded-xl bg-lemon-400 px-5 py-2.5 text-sm font-black text-ink-900">
+              הוסף את הכותר הראשון
+            </Link>
+          </div>
+          <ol className="mt-4 grid gap-2 md:grid-cols-2 xl:grid-cols-4">
+            {[
+              { n: 1, t: "הוסף כותר", d: "סרט או סדרה — תמונה, שנה והרשאה (חינם / פלוס).", href: "/admin/titles/new" },
+              { n: 2, t: "העלה וידאו", d: "לסרט: בעמוד הכותר. לסדרה: “ניהול פרקים” → פרק → וידאו.", href: "/admin/titles" },
+              { n: 3, t: "הגדר מחירים", d: "מה כלול בפלוס ומה שונה מהחינם.", href: "/admin/plans" },
+              { n: 4, t: "פרסם", d: "שנה סטטוס מ“טיוטה” ל“מפורסם” — רק אז זה מופיע באתר.", href: "/admin/titles" },
+            ].map((step) => (
+              <li key={step.n}>
+                <Link href={step.href} className="flex h-full gap-3 rounded-2xl border border-white/10 bg-white/[0.03] p-3 transition hover:border-lemon-400/40">
+                  <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-lemon-400 text-xs font-black text-ink-900">{step.n}</span>
+                  <span>
+                    <b className="block text-sm text-ink-100">{step.t}</b>
+                    <span className="mt-0.5 block text-[11px] text-ink-400">{step.d}</span>
+                  </span>
+                </Link>
+              </li>
+            ))}
+          </ol>
+          <p className="mt-3 text-[11px] text-ink-500">
+            טיפ: אפשר לייבא רשימת כותרים שלמה בבת אחת — <Link href="/admin/import" className="text-lemon-300 hover:underline">ייבוא תוכן</Link>.
+          </p>
+        </Card>
+      ) : null}
 
       {/* ── מדדי קטלוג ── */}
       <section aria-labelledby="catalog-stats">

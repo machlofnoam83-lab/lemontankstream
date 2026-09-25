@@ -1,9 +1,13 @@
 import Link from "next/link";
 import { ContentRow } from "@/components/site/content-row";
+import { EmptyCatalog } from "@/components/site/empty-catalog";
 import { Hero } from "@/components/site/hero";
 import { TitleCard } from "@/components/site/title-card";
 import { catalogStats, homeRows, listCatalog, recommendationsFor, type TitleCard as TitleCardType } from "@/lib/catalog";
 import { getCurrentUser } from "@/lib/session";
+import { isStaff } from "@/lib/rbac";
+import { all } from "@/lib/db";
+import { formatPrice } from "@/lib/format";
 import { getSettings } from "@/lib/settings";
 import { formatNumber } from "@/lib/format";
 
@@ -29,9 +33,20 @@ export default async function HomePage() {
   const freeItems = listCatalog({ plan: "free", sort: "trending", limit: 18 }).items;
   const plusItems = listCatalog({ plan: "plus", sort: "trending", limit: 18 }).items;
   const stats = catalogStats();
+  // הקטלוג ריק לגמרי — מציגים מסך "מתחילים מכאן" במקום שורות ריקות
+  const catalogEmpty = stats.movies + stats.series === 0;
+
+  // מחירי המסלולים נטענים מהמסד — כדי שהבית לא יציג מחיר שאינו מעודכן
+  const planRows = all<{ code: string; name_he: string; price_ils: number; features_json: string }>(
+    "SELECT code, name_he, price_ils, features_json FROM plans WHERE is_active = 1 ORDER BY sort_order",
+  );
+  const plansFromDb = planRows.map((row) => ({
+    ...row,
+    features: (JSON.parse(row.features_json || "[]") as string[]).slice(0, 6),
+  }));
 
   // באנר שדרוג למשתמשי חינם
-  const showUpgrade = !isPlus;
+  const showUpgrade = !isPlus && !catalogEmpty;
 
   return (
     <div className="space-y-10">
@@ -71,8 +86,10 @@ export default async function HomePage() {
         </section>
       ) : null}
 
+      {catalogEmpty ? <EmptyCatalog isStaff={isStaff(user?.role)} /> : null}
+
       {/* שורות דינמיות שהאדמין מנהל */}
-      {rows.map((row) => (
+      {!catalogEmpty && rows.map((row) => (
         <ContentRow
           key={row.id}
           title={row.title}
@@ -107,39 +124,40 @@ export default async function HomePage() {
       <ContentRow title="חינם לכולם 🆓" items={freeItems} href="/movies?plan=free" />
       <ContentRow title="פרימיום בפלוס ⭐" items={plusItems} href="/plans" />
 
-      {/* אזור הסבר על המסלולים */}
+      {/* אזור הסבר על המסלולים — נתונים מהמסד (מתעדכן מ-/admin/plans) */}
       <section className="grid gap-4 md:grid-cols-2" aria-label="המסלולים שלנו">
-        <div className="card-surface rounded-2xl p-5">
-          <div className="flex items-center justify-between">
-            <h3 className="text-lg font-black">מסלול חינם</h3>
-            <span className="badge-free">₪0</span>
-          </div>
-          <ul className="mt-3 space-y-1.5 text-sm text-ink-300">
-            <li>✓ כל תוכן החינם — סרטים, סדרות ופרקים</li>
-            <li>✓ איכות עד 720p</li>
-            <li>✓ מסך אחד בכל פעם</li>
-            <li>✓ עם פרסומות קצרות</li>
-          </ul>
-          <Link href="/register" className="mt-4 inline-block rounded-xl border border-white/20 px-5 py-2.5 text-sm font-bold hover:bg-white/10">
-            פתח חשבון חינם
-          </Link>
-        </div>
-        <div className="card-surface rounded-2xl border-plus-500/30 p-5">
-          <div className="flex items-center justify-between">
-            <h3 className="text-lg font-black text-plus-400">מסלול פלוס ⭐</h3>
-            <span className="badge-plus">₪19.90 / חודש</span>
-          </div>
-          <ul className="mt-3 space-y-1.5 text-sm text-ink-300">
-            <li>✓ כל התוכן כולל פרימיום ומקורי LemonTank</li>
-            <li>✓ איכות עד 4K + Dolby</li>
-            <li>✓ 4 מסכים במקביל ו-5 פרופילים</li>
-            <li>✓ הורדות לצפייה בלי אינטרנט</li>
-            <li>✓ ללא פרסומות, גישה מוקדמת לפרקים</li>
-          </ul>
-          <Link href="/plans" className="mt-4 inline-block rounded-xl bg-gradient-to-l from-plus-500 to-plus-600 px-5 py-2.5 text-sm font-black text-white">
-            שדרג לפלוס
-          </Link>
-        </div>
+        {plansFromDb.map((plan) => {
+          const isPlusPlan = plan.code === "plus";
+          return (
+            <div key={plan.code} className={`card-surface rounded-2xl p-5 ${isPlusPlan ? "border-plus-500/30" : ""}`}>
+              <div className="flex items-center justify-between gap-2">
+                <h3 className={`text-lg font-black ${isPlusPlan ? "text-plus-400" : ""}`}>
+                  מסלול {plan.name_he} {isPlusPlan ? "⭐" : ""}
+                </h3>
+                <span className={isPlusPlan ? "badge-plus" : "badge-free"}>
+                  {Number(plan.price_ils) === 0 ? formatPrice(0) : `${formatPrice(Number(plan.price_ils))} / חודש`}
+                </span>
+              </div>
+              <ul className="mt-3 space-y-1.5 text-sm text-ink-300">
+                {plan.features.length ? (
+                  plan.features.map((feature) => <li key={feature}>✓ {feature}</li>)
+                ) : (
+                  <li>✓ גישה לקטלוג לפי המסלול הזה</li>
+                )}
+              </ul>
+              <Link
+                href={isPlusPlan ? "/plans" : "/register"}
+                className={
+                  isPlusPlan
+                    ? "mt-4 inline-block rounded-xl bg-gradient-to-l from-plus-500 to-plus-600 px-5 py-2.5 text-sm font-black text-white"
+                    : "mt-4 inline-block rounded-xl border border-white/20 px-5 py-2.5 text-sm font-bold hover:bg-white/10"
+                }
+              >
+                {isPlusPlan ? "שדרג לפלוס" : "פתח חשבון חינם"}
+              </Link>
+            </div>
+          );
+        })}
       </section>
     </div>
   );

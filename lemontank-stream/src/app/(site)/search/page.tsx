@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
 import { CatalogBrowser } from "@/components/site/catalog-browser";
+import { isCatalogEmpty } from "@/lib/catalog";
 import { SearchBox } from "@/components/site/search-box";
 import { sanitizeText } from "@/lib/validate";
 
@@ -17,7 +18,7 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
         <SearchBox autoFocus />
       </div>
       <Suspense>
-        <CatalogBrowser title={q ? `תוצאות עבור "${q}"` : "חיפוש בקטלוג"} />
+        <CatalogBrowser title={q ? `תוצאות עבור "${q}"` : "חיפוש בקטלוג"} catalogEmpty={isCatalogEmpty()} />
       </Suspense>
     </div>
   );

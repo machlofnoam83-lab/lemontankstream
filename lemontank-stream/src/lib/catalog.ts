@@ -467,6 +467,13 @@ export function watchPayload(titleSlug: string, opts: { includeDrafts?: boolean 
   return { title, seasons, episodes: enriched };
 }
 
+/**
+ * האם באתר אין שום כותר (גם לא טיוטה) — משמש להצגת מסך "מתחילים מכאן"
+ * במקום דפדפן ריק. טיוטות נחשבות תוכן, כי הבעלים כבר עובד עליהן.
+ */
+export const isCatalogEmpty = (): boolean =>
+  count("SELECT COUNT(*) c FROM titles WHERE deleted_at IS NULL") === 0;
+
 export const catalogStats = () => ({
   movies: count("SELECT COUNT(*) c FROM titles WHERE kind='movie' AND status='published' AND deleted_at IS NULL"),
   series: count("SELECT COUNT(*) c FROM titles WHERE kind='series' AND status='published' AND deleted_at IS NULL"),

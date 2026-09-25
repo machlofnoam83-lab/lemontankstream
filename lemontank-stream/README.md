@@ -17,8 +17,11 @@ npm install
 # 2. הפקת סודות + כתיבה ל-.env.local (כולל סיסמת מנהל)
 node scripts/gen-secrets.mjs --write
 
-# 3. יצירת המסד + נתוני דמו (כותרים, פרקים, ערוצי לייב, קופונים, משתמשים)
+# 3. יצירת המסד — מערכת נקייה, בלי תוכן (התוכן הוא שלך)
 node scripts/seed.mjs
+
+#    רוצה לראות קודם איך זה נראה עם תוכן לדוגמה? (אפשר למחוק אחר כך)
+# node scripts/seed.mjs --reset --demo
 
 # 4. הרצה
 npm run dev          # פיתוח → http://localhost:3000
@@ -37,14 +40,30 @@ npm run build && npm run start
 > הסיסמה מודפסת בסוף הרצת `scripts/seed.mjs`. **החלף אותה מיד** בכניסה הראשונה
 > דרך `/account/security`, והפעל 2FA — יש לך הרשאת בעלים מלאה על המערכת.
 
-### 👤 משתמשי דמו (סיסמה לכולם: `Demo-Pass-2026!`)
+### 📥 התוכן הוא שלך
 
-| דוא"ל | מסלול | מה יש לו |
-|---|---|---|
-| `family@example.com` | פלוס | מנוי פעיל, היסטוריית צפייה, פרופילים |
-| `noa@example.com` | פלוס | מנוי פעיל, פרופיל ילדים |
-| `yossi@example.com` | חינם | — טוב לבדיקת נעילת תוכן פלוס |
-| `guest@example.com` | חינם | חשבון "נקי" לבדיקות |
+ההתקנה מגיעה **ריקה מתוכן** בכוונה: אין סרטים, סדרות או ערוצים מובנים — כל מה שיופיע
+באתר הוא מה שתוסיף בפאנל:
+
+| מה מוסיפים | איפה |
+|---|---|
+| סרט | `/admin/titles/new` — שם, שנה, תמונה, וידאו, ובחירה: **חינם** או **פלוס** |
+| סדרה | `/admin/titles/new` → ואז **“ניהול פרקים”** להעלאת עונות, פרקים ווידאו |
+| ערוץ שידור חי | `/admin/live` — כתובת HLS/MP4, לוגו, קטגוריה והרשאה |
+| רשימה שלמה בבת אחת | `/admin/import` — העלאת JSON |
+
+רק כותר בסטטוס **“מפורסם”** מופיע באתר (טיוטות נשמרות בפאנל עד שתסיים להכין אותן).
+
+#### נתוני דוגמה (אופציונלי)
+
+```bash
+node scripts/seed.mjs --reset --demo   # 6 כותרים, ~20 פרקים, ערוצי לייב, קופונים ומשתמשי דמו
+node scripts/clear-content.mjs --yes   # ואם תרצה להתחיל מאפס — פקודה אחת
+```
+
+עם נתוני הדמו נטענים גם משתמשים לדוגמה (סיסמה לכולם `Demo-Pass-2026!`):
+`family@example.com` ו-`noa@example.com` (פלוס), `yossi@example.com` ו-`guest@example.com` (חינם —
+נוחים לבדיקת נעילת תוכן פלוס). למחיקתם: `node scripts/clear-content.mjs --yes --users`.
 
 ---
 
@@ -121,14 +140,15 @@ npm run build && npm run start
 ## 🧪 בדיקות
 
 ```bash
-node scripts/seed.mjs          # הבדיקות דורשות מסד מזורזע
+node scripts/seed.mjs          # גם מערכת נקייה מספיקה — הבדיקות יוצרות לעצמן משתמש בדיקה
 npm run build && npm run start # או npm run dev
-npm test                       # 15 בדיקות אינטגרציה מול ה-API
+npm test                       # בדיקות אינטגרציה מול ה-API
 ```
 
 הבדיקות מכסות: חוזי API, כותרות אבטחה ו-CSP, דחיית CSRF, חסימת path traversal,
 RBAC (משתמש רגיל מול מנהל), נעילת תוכן פלוס, וחוזה התשובה האחיד
-`{ok:true,data}` / `{ok:false,error{code,message}}`.
+`{ok:true,data}` / `{ok:false,error{code,message}}`. הן יוצרות משתמש בדיקה בעצמן,
+ולכן עובדות גם על התקנה נקייה (בדיקות שדורשות מנהל ידולגו אם אין משתמש מזורזע).
 
 ```bash
 npm run typecheck              # TypeScript strict — 0 שגיאות
@@ -147,7 +167,8 @@ test $TEST_BASE_URL || TEST_BASE_URL=http://localhost:3000 npm test
 | `npm run typecheck` | בדיקת טיפוסים (strict, 0 שגיאות) |
 | `npm test` | בדיקות אינטגרציה |
 | `node scripts/gen-secrets.mjs [--write]` | הפקת סודות ל-`.env.local` |
-| `node scripts/seed.mjs [--reset]` | זריעת מסד + נתוני דמו |
+| `node scripts/seed.mjs [--reset] [--demo]` | התקנה נקייה (ברירת מחדל) או עם נתוני דמו |
+| `node scripts/clear-content.mjs [--yes]` | מחיקת כל התוכן (יבש כברירת מחדל; `--users` גם משתמשים) |
 | `psql "$DATABASE_URL" -f sql/schema.postgres.sql` | יצירת הסכימה ב-Postgres |
 
 ---

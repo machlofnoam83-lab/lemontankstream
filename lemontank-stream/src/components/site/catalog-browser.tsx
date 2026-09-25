@@ -30,12 +30,15 @@ export function CatalogBrowser({
   initialGenre,
   title,
   defaultSort = "trending",
+  catalogEmpty = false,
 }: {
   kind?: "movie" | "series";
   initialPlan?: "free" | "plus";
   initialGenre?: string;
   title: string;
   defaultSort?: string;
+  /** הקטלוג ריק לגמרי (לא סינון שלא מצא כלום) — מציגים הסבר אחר */
+  catalogEmpty?: boolean;
 }) {
   const searchParams = useSearchParams();
   const [genres, setGenres] = useState<Genre[]>([]);
@@ -153,12 +156,21 @@ export function CatalogBrowser({
           <SkeletonRow />
         </div>
       ) : items.length === 0 ? (
-        <EmptyState
-          title="לא נמצאו כותרים"
-          description="נסה לשנות את הסינון או לחפש משהו אחר."
-          icon="🔍"
-          action={<Link href="/" className="rounded-xl bg-lemon-400 px-4 py-2 text-sm font-bold text-ink-900">חזרה לעמוד הבית</Link>}
-        />
+        catalogEmpty ? (
+          <EmptyState
+            title="הקטלוג שלנו בהקמה 🍿"
+            description="עוד לא הועלו כותרים. פתחו חשבון חינם ותהיו הראשונים לדעת כשהתוכן עולה."
+            icon="🎬"
+            action={<Link href="/register" className="rounded-xl bg-lemon-400 px-4 py-2 text-sm font-bold text-ink-900">פתחו חשבון חינם</Link>}
+          />
+        ) : (
+          <EmptyState
+            title="לא נמצאו כותרים"
+            description="נסה לשנות את הסינון או לחפש משהו אחר."
+            icon="🔍"
+            action={<Link href="/" className="rounded-xl bg-lemon-400 px-4 py-2 text-sm font-bold text-ink-900">חזרה לעמוד הבית</Link>}
+          />
+        )
       ) : (
         <>
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
