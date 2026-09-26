@@ -1,0 +1,410 @@
+@import "tailwindcss";
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LemonTank Stream — מערכת עיצוב קולנועית (cinematic dark, RTL-first)
+   עקרונות: שחור עמוק, תוכן במרכז, זכוכית מדודה, זוהר לימוני כתאורת במה.
+   נגישות: ניגודיות AA, focus גלוי, כיבוד prefers-reduced-motion.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+@theme {
+  /* לימון — צבע המותג, כתאורת במה */
+  --color-lemon-50: #fffdf2;
+  --color-lemon-100: #fff8d6;
+  --color-lemon-200: #ffeda8;
+  --color-lemon-300: #ffdd6b;
+  --color-lemon-400: #f7c22b;
+  --color-lemon-500: #e3a600;
+  --color-lemon-600: #b88200;
+  --color-lemon-700: #8a6000;
+
+  /* שחורים קולנועיים — ההבדל בין הרקע לבמה */
+  --color-ink-950: #050508;
+  --color-ink-900: #0a0a10;
+  --color-ink-850: #101018;
+  --color-ink-800: #17171f;
+  --color-ink-700: #21212b;
+  --color-ink-600: #2e2e3a;
+  --color-ink-500: #4a4a58;
+  --color-ink-400: #6e6e80;
+  --color-ink-300: #9c9cae;
+  --color-ink-200: #cbcbd8;
+  --color-ink-100: #e7e7ef;
+
+  /* פלוס — סגול פרימיום */
+  --color-plus-200: #ded0ff;
+  --color-plus-300: #cbb4ff;
+  --color-plus-400: #b388ff;
+  --color-plus-500: #8b5cf6;
+  --color-plus-600: #6d28d9;
+
+  --color-free-400: #4ade80;
+  --color-free-500: #22c55e;
+
+  --font-sans: "Segoe UI", "Heebo", "Assistant", "Rubik", "Noto Sans Hebrew", system-ui, -apple-system, "Arial Hebrew", Arial, sans-serif;
+
+  --radius-card: 18px;
+  --radius-pill: 999px;
+
+  /* צללים קולנועיים */
+  --shadow-glow: 0 12px 44px -14px rgb(247 194 43 / 0.5);
+  --shadow-poster: 0 26px 60px -18px rgb(0 0 0 / 0.85), 0 2px 10px -2px rgb(0 0 0 / 0.6);
+  --shadow-panel: 0 1px 0 0 rgb(255 255 255 / 0.05) inset, 0 30px 80px -40px rgb(0 0 0 / 0.9);
+
+  /* תנועה */
+  --ease-cinema: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* ── טיפוגרפיה קריאה: סקאלת גדלים מוגדלת ───────────────────────────────────
+   הקריטריון: קטן מדי = לא קריא. לכן כל הדרגות גדלות,
+   והרצפה עולה במיוחד (xs 12→14px, sm 14→16px) — כדי שכל תווית בממשק תיקרא.
+   הגדלים ב-rem, ולכן מכבדים גם הגדלת טקסט בדפדפן ובמערכת ההפעלה. */
+@theme {
+  --text-xs: 0.875rem;              /* 12px → 14px  · תוויות, תגיות, מטא */
+  --text-xs--line-height: 1.45;
+  --text-sm: 1rem;                  /* 14px → 16px  · גוף טקסט משני */
+  --text-sm--line-height: 1.5;
+  --text-base: 1.0625rem;           /* 16px → 17px  · גוף טקסט ראשי */
+  --text-base--line-height: 1.6;
+  --text-lg: 1.1875rem;             /* 18px → 19px */
+  --text-lg--line-height: 1.5;
+  --text-xl: 1.3125rem;             /* 20px → 21px */
+  --text-xl--line-height: 1.45;
+  --text-2xl: 1.5625rem;            /* 24px → 25px */
+  --text-2xl--line-height: 1.35;
+  --text-3xl: 1.9375rem;            /* 30px → 31px */
+  --text-3xl--line-height: 1.25;
+  --text-4xl: 2.375rem;             /* 36px → 38px */
+  --text-4xl--line-height: 1.2;
+  --text-5xl: 3.125rem;             /* 48px → 50px */
+  --text-5xl--line-height: 1.1;
+  --text-6xl: 3.875rem;             /* 60px → 62px */
+  --text-6xl--line-height: 1.05;
+  --text-7xl: 4.625rem;             /* 72px → 74px */
+  --text-7xl--line-height: 1;
+}
+
+/* ─────────────────────────────── בסיס ───────────────────────────────────── */
+
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+html {
+  color-scheme: dark;
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  background-color: var(--color-ink-950);
+  background-image:
+    radial-gradient(1100px 620px at 100% -12%, rgb(247 194 43 / 0.10), transparent 62%),
+    radial-gradient(900px 520px at 0% -6%, rgb(139 92 246 / 0.11), transparent 58%),
+    radial-gradient(1400px 900px at 50% 120%, rgb(247 194 43 / 0.04), transparent 60%);
+  background-attachment: fixed;
+  color: var(--color-ink-100);
+  font-family: var(--font-sans);
+  min-height: 100dvh;
+  overflow-x: hidden;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* שכבת גריין עדינה — נותנת תחושת "הקרנה" ולא מסך שטוח */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.035;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* ── טיפוגרפיה: כותרות קולנועיות ── */
+h1, h2, h3 {
+  letter-spacing: -0.02em;
+  text-wrap: balance;
+}
+h1 { letter-spacing: -0.035em; }
+
+/* ── פס גלילה קולנועי ── */
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+  background: rgb(255 255 255 / 0.12);
+  border-radius: 999px;
+  border: 3px solid transparent;
+  background-clip: content-box;
+}
+::-webkit-scrollbar-thumb:hover { background: var(--color-lemon-600); background-clip: content-box; }
+
+::selection { background: var(--color-lemon-400); color: #0a0a10; }
+
+/* מיקוד נגיש — חיוני לניווט מקלדת */
+:focus-visible {
+  outline: 2px solid var(--color-lemon-400);
+  outline-offset: 2px;
+  border-radius: 8px;
+}
+
+/* ─────────────────────── רכיבים בשימוש חוזר ────────────────────────────── */
+
+/* משטח זכוכית — הכרטיס הבסיסי של המערכת */
+@utility card-surface {
+  background: linear-gradient(180deg, rgb(255 255 255 / 0.055), rgb(255 255 255 / 0.015));
+  border: 1px solid rgb(255 255 255 / 0.08);
+  backdrop-filter: blur(14px) saturate(140%);
+  box-shadow: var(--shadow-panel);
+}
+
+/* משטח כהה וכבד — לפאנל הניהול ולטבלאות */
+@utility panel-ink {
+  background: linear-gradient(180deg, rgb(23 23 31 / 0.9), rgb(10 10 16 / 0.85));
+  border: 1px solid rgb(255 255 255 / 0.07);
+  box-shadow: 0 1px 0 0 rgb(255 255 255 / 0.04) inset;
+}
+
+@utility btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border-radius: 12px;
+  background: linear-gradient(180deg, var(--color-lemon-300), var(--color-lemon-400));
+  color: #14141b;
+  font-weight: 800;
+  padding: 0.65rem 1.2rem;
+  transition: transform 0.25s var(--ease-cinema), box-shadow 0.25s var(--ease-cinema), filter 0.2s ease;
+  box-shadow: var(--shadow-glow);
+}
+@utility btn-primary-hover {
+  transform: translateY(-2px);
+  filter: brightness(1.06);
+}
+
+@utility btn-ghost {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border-radius: 12px;
+  background: rgb(255 255 255 / 0.07);
+  color: #fff;
+  padding: 0.65rem 1.2rem;
+  border: 1px solid rgb(255 255 255 / 0.14);
+  backdrop-filter: blur(10px);
+  transition: background 0.2s ease, border-color 0.2s ease, transform 0.25s var(--ease-cinema);
+}
+
+@utility badge-plus {
+  background: linear-gradient(135deg, #8b5cf6, #6d28d9);
+  color: #fff;
+  border-radius: 999px;
+  font-size: 0.875rem;
+  font-weight: 800;
+  padding: 0.2rem 0.65rem;
+  letter-spacing: 0.01em;
+  box-shadow: 0 4px 14px -4px rgb(139 92 246 / 0.7);
+  white-space: nowrap;
+}
+
+@utility badge-free {
+  background: rgb(34 197 94 / 0.16);
+  color: #6ee7a0;
+  border: 1px solid rgb(34 197 94 / 0.4);
+  border-radius: 999px;
+  font-size: 0.875rem;
+  font-weight: 800;
+  padding: 0.2rem 0.65rem;
+  white-space: nowrap;
+}
+
+/* תג איכות/מטא על כרטיסים */
+@utility chip-meta {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  border-radius: 999px;
+  border: 1px solid rgb(255 255 255 / 0.18);
+  background: rgb(0 0 0 / 0.45);
+  backdrop-filter: blur(6px);
+  padding: 0.15rem 0.5rem;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #fff;
+  white-space: nowrap;
+}
+
+/* פוסטר ללא תמונה */
+@utility poster-fallback {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background:
+    radial-gradient(120% 90% at 50% 0%, color-mix(in srgb, var(--poster-color, #f7c22b) 40%, transparent) 0%, transparent 70%),
+    linear-gradient(160deg, color-mix(in srgb, var(--poster-color, #f7c22b) 30%, #0a0a10) 0%, #050508 90%);
+  color: rgb(255 255 255 / 0.94);
+  text-align: center;
+  padding: 0.9rem;
+  font-weight: 900;
+  line-height: 1.25;
+  letter-spacing: -0.01em;
+}
+
+/* ── כרטיס כותר: פוסטר שמתעורר בריחוף ── */
+@utility poster-shell {
+  position: relative;
+  overflow: hidden;
+  border-radius: 16px;
+  background: var(--color-ink-850);
+  border: 1px solid rgb(255 255 255 / 0.07);
+  box-shadow: 0 10px 30px -18px rgb(0 0 0 / 0.9);
+  transition: transform 0.4s var(--ease-cinema), box-shadow 0.4s var(--ease-cinema), border-color 0.3s ease;
+}
+@utility poster-shell-hover {
+  transform: translateY(-6px) scale(1.02);
+  border-color: rgb(247 194 43 / 0.45);
+  box-shadow: var(--shadow-poster), 0 0 0 1px rgb(247 194 43 / 0.25);
+}
+
+/* ── שורת גלילה אופקית עם קצוות דהויים ── */
+@utility row-scroll {
+  display: flex;
+  gap: 1rem;
+  overflow-x: auto;
+  scroll-snap-type: x proximity;
+  scrollbar-width: none;
+  padding: 0.5rem 0.25rem 1rem;
+}
+@utility row-scroll-item {
+  scroll-snap-align: start;
+  flex: 0 0 auto;
+}
+
+/* ── כותרת סקשן עם פס לימוני ── */
+@utility section-heading {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  font-size: 1.35rem;
+  font-weight: 900;
+  letter-spacing: -0.02em;
+}
+@utility section-heading-bar {
+  content: "";
+  display: inline-block;
+  width: 4px;
+  height: 1.15em;
+  border-radius: 999px;
+  background: linear-gradient(180deg, var(--color-lemon-300), var(--color-lemon-600));
+  box-shadow: 0 0 16px 1px rgb(247 194 43 / 0.55);
+}
+
+/* ── אנימציות ── */
+@keyframes lt-fade-up {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@utility animate-fade-up {
+  animation: lt-fade-up 0.6s var(--ease-cinema) both;
+}
+
+@keyframes lt-ken-burns {
+  from { transform: scale(1.04) translate3d(0, 0, 0); }
+  to { transform: scale(1.12) translate3d(-1%, -1%, 0); }
+}
+@utility animate-ken-burns {
+  animation: lt-ken-burns 22s ease-in-out infinite alternate;
+}
+
+@keyframes lt-pulse-ring {
+  0% { box-shadow: 0 0 0 0 rgb(247 194 43 / 0.5); }
+  70% { box-shadow: 0 0 0 16px rgb(247 194 43 / 0); }
+  100% { box-shadow: 0 0 0 0 rgb(247 194 43 / 0); }
+}
+@utility animate-ring {
+  animation: lt-pulse-ring 2.2s infinite;
+}
+
+@keyframes lt-shimmer {
+  100% { transform: translateX(-100%); }
+}
+@utility skeleton {
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(180deg, var(--color-ink-800), var(--color-ink-850));
+  border: 1px solid rgb(255 255 255 / 0.05);
+}
+@utility skeleton-shine {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent, rgb(255 255 255 / 0.07), transparent);
+  animation: lt-shimmer 1.7s infinite;
+}
+
+@keyframes lt-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@utility animate-fade-in {
+  animation: lt-fade-in 0.5s ease both;
+}
+
+/* ── נגן וידאו ── */
+@utility player-wrap {
+  position: relative;
+  width: 100%;
+  background: #000;
+  border-radius: 18px;
+  overflow: hidden;
+  aspect-ratio: 16 / 9;
+  box-shadow: 0 40px 100px -50px rgb(0 0 0 / 1), 0 0 0 1px rgb(255 255 255 / 0.06);
+}
+
+/* ── טבלאות ניהול ── */
+@utility admin-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 1rem;
+}
+
+@utility text-gradient {
+  background: linear-gradient(135deg, #ffdd6b, #f7c22b 42%, #b388ff);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+@utility no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+@utility no-scrollbar-hide {
+  display: none;
+}
+
+/* מסגרת זוהרת לפריט פעיל */
+@utility ring-glow {
+  box-shadow: 0 0 0 1px rgb(247 194 43 / 0.4), 0 0 24px -6px rgb(247 194 43 / 0.45);
+}
+
+/* תמיכה ב-RTL: היפוך חצים */
+[dir="rtl"] .flip-rtl { transform: scaleX(-1); }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* הדפסה — כרטיסי מנוי/קבלות */
+@media print {
+  body { background: #fff; color: #000; }
+  body::before { display: none; }
+  .no-print { display: none !important; }
+}

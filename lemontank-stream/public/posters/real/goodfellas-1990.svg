@@ -1,0 +1,52 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="600" height="900" viewBox="0 0 600 900" role="img" aria-label="החבר׳ה הטובים">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0.7" y2="1">
+      <stop offset="0%" stop-color="#070d24"/>
+      <stop offset="55%" stop-color="#050508"/>
+      <stop offset="100%" stop-color="#000000"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="50%" cy="42%" r="55%">
+      <stop offset="0%" stop-color="#7aa2ff" stop-opacity="0.55"/>
+      <stop offset="100%" stop-color="#7aa2ff" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="beam" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#7aa2ff" stop-opacity="0.9"/>
+      <stop offset="100%" stop-color="#cddcff" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="fade" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="45%" stop-color="#000" stop-opacity="0"/>
+      <stop offset="100%" stop-color="#000" stop-opacity="0.92"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="600" height="900" fill="url(#bg)"/>
+  <g>
+      <circle cx="361" cy="317" r="168" fill="none" stroke="#7aa2ff" stroke-width="2.7" opacity="0.26"/>
+      <circle cx="251" cy="284" r="246" fill="none" stroke="#7aa2ff" stroke-width="1.8" opacity="0.21"/>
+      <circle cx="215" cy="320" r="324" fill="none" stroke="#7aa2ff" stroke-width="1.4" opacity="0.16"/>
+      <circle cx="256" cy="285" r="402" fill="none" stroke="#7aa2ff" stroke-width="1.8" opacity="0.12"/>
+      <circle cx="216" cy="320" r="480" fill="none" stroke="#7aa2ff" stroke-width="1.4" opacity="0.08"/>
+  </g>
+  <rect width="600" height="900" fill="url(#fade)"/>
+
+  <!-- תג עליון -->
+  <g font-family="Heebo, Assistant, Arial, sans-serif" direction="rtl">
+    <rect x="416" y="34" width="176" height="34" rx="17" fill="#7aa2ff" opacity="0.92"/>
+    <text x="491" y="57" text-anchor="middle" font-size="17" font-weight="800" fill="#0a0a10">סרט · פלוס</text>
+    <text x="34" y="58" font-size="16" font-weight="700" fill="#cddcff" opacity="0.9" direction="ltr" text-anchor="start">LEMONTANK</text>
+  </g>
+
+  <!-- כותרת -->
+  <g font-family="Heebo, Assistant, Rubik, Arial, sans-serif">
+    <text x="300" y="700" text-anchor="middle" direction="rtl" font-size="64" font-weight="900" fill="#ffffff" letter-spacing="-1.5">החבר׳ה הטובים</text>
+  </g>
+
+  <!-- מטא -->
+  <g font-family="Heebo, Assistant, Arial, sans-serif" direction="rtl">
+    <line x1="150" y1="738" x2="450" y2="738" stroke="#7aa2ff" stroke-width="2" opacity="0.65"/>
+    <text x="300" y="768" text-anchor="middle" font-size="23" font-weight="700" fill="#cddcff" opacity="0.95">1990 · 145 דק׳ · ★ 8.7</text>
+    <text x="300" y="800" text-anchor="middle" font-size="17" font-weight="600" fill="#ffffff" opacity="0.62" direction="ltr">Goodfellas</text>
+  </g>
+
+  <rect x="0.5" y="0.5" width="599" height="899" fill="none" stroke="#ffffff" stroke-opacity="0.09"/>
+</svg>

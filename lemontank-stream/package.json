@@ -1,0 +1,33 @@
+{
+  "name": "lemontank-stream",
+  "version": "1.0.0",
+  "private": true,
+  "description": "LemonTank Stream - Hebrew movie & series streaming platform (Free / Plus)",
+  "scripts": {
+    "dev": "node server.mjs --dev",
+    "build": "next build",
+    "start": "node server.mjs",
+    "typecheck": "tsc --noEmit",
+    "test": "node scripts/test-prep.mjs && node --test tests/*.test.mjs",
+    "start:next": "next start -H 0.0.0.0 -p 3000",
+    "security": "node scripts/security.mjs",
+    "security:status": "node scripts/security.mjs status"
+  },
+  "dependencies": {
+    "next": "^15.5.26",
+    "react": "19.1.0",
+    "react-dom": "19.1.0",
+    "zod": "^3.24.1"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4.1.13",
+    "@types/node": "^22.10.5",
+    "@types/react": "^19.0.7",
+    "@types/react-dom": "^19.0.3",
+    "tailwindcss": "^4.1.13",
+    "typescript": "^5.7.3"
+  },
+  "engines": {
+    "node": ">=20.9.0"
+  }
+}
