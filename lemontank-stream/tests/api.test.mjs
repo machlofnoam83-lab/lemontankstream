@@ -10,6 +10,7 @@
  */
 
 import { test, before, describe } from "node:test";
+import { suiteIp } from "./helpers/suite-ip.mjs";
 import assert from "node:assert/strict";
 import { restoreSession, saveSecret, saveSession, savedSecret, totpCode } from "./helpers/admin-login.mjs";
 
@@ -18,6 +19,9 @@ const ADMIN_EMAIL = process.env.SEED_ADMIN_EMAIL ?? "admin@lemontank.local";
 const ADMIN_PASSWORD = process.env.SEED_ADMIN_PASSWORD ?? "ChangeMe-Admin-2026!";
 
 /** לקוח קטן עם עוגיות — כמו דפדפן, בלי תלויות */
+/** כתובת המבקר של החבילה הזו — נפרדת מכסת הרשמה לכל חבילה */
+const SUITE_IP = suiteIp("api-suite");
+
 class Client {
   constructor() {
     this.cookies = new Map();
@@ -41,7 +45,7 @@ class Client {
   }
 
   async raw(path, options = {}) {
-    const headers = { ...(options.headers ?? {}) };
+    const headers = { ...(options.headers ?? {}), "x-forwarded-for": SUITE_IP };
     if (this.cookies.size) headers.cookie = this.cookieHeader();
     if (options.method && options.method !== "GET" && options.method !== "HEAD") {
       headers["x-csrf-token"] = options.csrf ?? this.csrf();
@@ -338,13 +342,35 @@ describe("מנוי ותוכן פלוס", () => {
     const c = await freshFreeUser();
     if (!c) return t.skip("לא ניתן ליצור משתמש בדיקה (הרשמה סגורה או הגבלת קצב)");
 
-    const plusTitles = await c.get("/api/titles?plan=plus&limit=1");
-    const plusId = plusTitles.body?.data?.items?.[0]?.id;
-    if (!plusId) return t.skip("אין כותרי פלוס בקטלוג — הוסף תוכן פלוס כדי לבדוק את הנעילה");
+    // הקטלוג נשלח ריק (רק הבעלים מוסיף תוכן), ולכן אם אין כותר פלוס —
+    // יוצרים אחד זמני עם הרשאת מנהל, בודקים את הנעילה, ומוחקים.
+    let plusId = (await c.get("/api/titles?plan=plus&limit=1")).body?.data?.items?.[0]?.id ?? null;
+    let tempTitle = null;
+    if (!plusId) {
+      if (!authOk) return t.skip("אין סשן מנהל ליצירת כותר פלוס זמני");
+      const created = await admin.post("/api/titles", {
+        kind: "movie",
+        name_he: "🧪 בדיקה — כותר פלוס אוטומטי",
+        slug: `zz-test-plus-${Date.now().toString(36)}`,
+        year: 2026,
+        maturity: "12+",
+        color: "#f5b301",
+        plan_access: "plus",
+        status: "published",
+        is_downloadable: true,
+      });
+      tempTitle = created.body?.data?.title ?? created.body?.data ?? null;
+      plusId = tempTitle?.id ?? null;
+      assert.ok(plusId, `יצירת כותר פלוס נכשלה: ${JSON.stringify(created.body).slice(0, 200)}`);
+    }
 
-    const res = await c.post("/api/downloads", { title_id: plusId, quality: "720p" });
-    assert.equal(res.status, 402);
-    assert.equal(res.body.error.code, "PLAN_REQUIRED");
+    try {
+      const res = await c.post("/api/downloads", { title_id: plusId, quality: "720p" });
+      assert.equal(res.status, 402, JSON.stringify(res.body).slice(0, 200));
+      assert.equal(res.body.error.code, "PLAN_REQUIRED");
+    } finally {
+      if (tempTitle?.id) await admin.delete(`/api/titles/${tempTitle.id}`);
+    }
   });
 
   test("מדיה חסומה לאורח (אין גישה לבייטים בלי התחברות)", async (t) => {

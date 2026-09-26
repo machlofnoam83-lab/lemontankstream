@@ -8,15 +8,20 @@
  * דורש שרת רץ (`npm run start`) ומסד מזורזע. אם השרת למטה — הבדיקות מדלגות.
  */
 
-import { test, before, describe } from "node:test";
+import { test, before, after, describe } from "node:test";
+import { suiteIp } from "./helpers/suite-ip.mjs";
 import assert from "node:assert/strict";
 import { restoreSession, saveSecret, saveSession, savedSecret, stepUp, totpCode } from "./helpers/admin-login.mjs";
+import { ensureTestTitle, leftoverTestTitles, removeTestTitle } from "./helpers/test-catalog.mjs";
 
 const BASE = (process.env.TEST_BASE_URL ?? "http://127.0.0.1:3000").replace(/\/$/, "");
 const ADMIN_EMAIL = process.env.SEED_ADMIN_EMAIL ?? "admin@lemontank.local";
 const ADMIN_PASSWORD = process.env.SEED_ADMIN_PASSWORD ?? "ChangeMe-Admin-2026!";
 
 /** לקוח קטן עם עוגיות — כמו דפדפן, בלי תלויות */
+/** כתובת המבקר של החבילה הזו — נפרדת מכסת הרשמה לכל חבילה */
+const SUITE_IP = suiteIp("features-suite");
+
 class Client {
   constructor() {
     this.cookies = new Map();
@@ -40,7 +45,7 @@ class Client {
   }
 
   async raw(path, options = {}) {
-    const headers = { ...(options.headers ?? {}) };
+    const headers = { ...(options.headers ?? {}), "x-forwarded-for": SUITE_IP };
     if (this.cookies.size) headers.cookie = this.cookieHeader();
     if (options.method && options.method !== "GET" && options.method !== "HEAD") {
       headers["x-csrf-token"] = options.csrf ?? this.csrf();
@@ -157,6 +162,8 @@ async function serverReady() {
 
 let ready = false;
 let admin = null;
+/** כותר הבדיקה — הקטלוג ריק בכוונה, ולכן נוצר כאן ומוסר בסוף */
+let testTitle = null;
 
 before(async () => {
   ready = await serverReady();
@@ -184,6 +191,22 @@ before(async () => {
   // פעולות רגישות (מפתחות API, מחיקות, ייצוא) דורשות אימות מחדש בתוך חלון קצר.
   const stepped = await stepUp(admin, ADMIN_PASSWORD);
   if (!stepped.ok) console.error(`\n⚠️  אימות מחדש נכשל (${stepped.status}) — פעולות רגישות עלולות להיחסם\n`);
+
+  // הקטלוג ריק (האתר נשלח ריק בכוונה) — יוצרים כותר בדיקה מוסר-עצמו.
+  // קודם מנקים שאריות מריצה קודמת שנכשלה, כדי שלא יצטבר תוכן.
+  for (const leftover of await leftoverTestTitles(admin)) await removeTestTitle(admin, leftover.id);
+  try {
+    testTitle = await ensureTestTitle(admin);
+    if (testTitle.created) console.log("ℹ️  נוצר כותר בדיקה זמני (הקטלוג היה ריק)");
+  } catch (error) {
+    console.error(`⚠️  לא ניתן ליצור כותר בדיקה: ${error?.message ?? error}`);
+  }
+});
+
+after(async () => {
+  if (!ready || !admin || !testTitle?.created) return;
+  const removed = await removeTestTitle(admin, testTitle.id);
+  if (!removed) console.error(`ℹ️  כותר הבדיקה #${testTitle.id} לא הוסר — אפשר למחוק ידנית מ-/admin/titles`);
 });
 
 /**
@@ -256,9 +279,8 @@ describe("צפייה משותפת", () => {
   let title = null;
 
   maybe("פותחים חדר — מקבלים קוד הצטרפות", async () => {
-    const list = await admin.get("/api/titles?limit=1");
-    title = list.body?.data?.items?.[0] ?? list.body?.data?.titles?.[0];
-    assert.ok(title, "יש כותר זמין");
+    title = testTitle?.item ?? null;
+    assert.ok(title?.id, "יש כותר זמין (נוצר אוטומטית כשהקטלוג ריק)");
 
     const res = await admin.post("/api/parties", { title_id: title.id });
     assert.equal(res.status, 200);

@@ -60,6 +60,31 @@ const TRUST_PROXY = process.env.TRUST_PROXY ?? "true";
 const TRUSTED_PROXY_CIDRS = (process.env.TRUSTED_PROXY_CIDRS ?? "").split(",").map((s) => s.trim()).filter(Boolean);
 const INTERNAL_ORIGIN = `http://127.0.0.1:${INTERNAL_PORT}`;
 
+/**
+ * הרשאות קבצים מצומצמות: המסד מכיל מיילים, Hash סיסמאות והיסטוריית צפייה.
+ * ברירת המחדל של המערכת (0644) מאפשרת לכל משתמש במכונה לקרוא אותו, ולכן
+ * מצמצמים ל-0600 (הבעלים בלבד) ולכיוון 0700 לתיקיית הנתונים. כשל כאן לא
+ * מפיל את האתר — רק נרשם, כי הפעולה היא best-effort.
+ */
+function tightenDataPerms() {
+  const dir = process.env.DATA_DIR ?? path.join(APP_ROOT, "data");
+  const files = ["lemontank.db", "lemontank.db-wal", "lemontank.db-shm", "lemontank.db-journal"];
+  try {
+    if (fs.existsSync(dir)) fs.chmodSync(dir, 0o700);
+  } catch (error) {
+    console.warn(`[security] לא הצלחתי להצר הרשאות תיקייה: ${error?.message ?? error}`);
+  }
+  for (const name of files) {
+    const file = path.join(dir, name);
+    try {
+      if (fs.existsSync(file)) fs.chmodSync(file, 0o600);
+    } catch (error) {
+      console.warn(`[security] לא הצלחתי להצר הרשאות ${name}: ${error?.message ?? error}`);
+    }
+  }
+}
+tightenDataPerms();
+
 process.env.NODE_ENV = DEV ? "development" : "production";
 
 const { createEngine } = await import("./security/engine.mjs");

@@ -14,7 +14,7 @@ type FortressReport = {
   migrations: number;
 };
 
-type ChainReport = { ok: boolean; checked: number; broken: { id: number; seq: number | null; reason: string }[]; legacyRows: number; head: { seq: number; entryHash: string | null } };
+type ChainReport = { ok: boolean; checked: number; broken: { id: number; seq: number | null; reason: string }[]; legacyRows: number; head: { seq: number | null; entryHash: string | null } };
 
 export type FortressData = {
   report: FortressReport;
@@ -207,7 +207,7 @@ export function FortressDashboard({ initial, canManage }: { initial: FortressDat
           כל רשומה נושאת את ה-Hash של קודמתה. אם מישהו מוחק או משנה רשומה בדיעבד — השרשרת נשברת וזה מתגלה כאן.
         </p>
         <div className="mt-3 rounded-xl bg-black/40 p-3 font-mono text-[0.8rem] text-ink-300">
-          <div>ראש השרשרת: #{auditChain.head.seq}</div>
+          <div>ראש השרשרת: #{auditChain.head.seq ?? "—"}</div>
           <div className="truncate">חתימה: {auditChain.head.entryHash ?? "—"}</div>
         </div>
         {!auditChain.ok && (

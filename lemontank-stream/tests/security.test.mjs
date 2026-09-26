@@ -128,7 +128,14 @@ t("זיוף כותרות IP לא עוקף את המערכת", async () => {
 
 t("גלישה לגיטימית לא נחסמת", async () => {
   const ip = makeIp();
-  const pages = ["/", "/movies", "/series", "/plans", "/genres", "/search?q=%D7%94%D7%A1%D7%A0%D7%93%D7%A7", "/title/the-godfather-1972"];
+  const pages = ["/", "/movies", "/series", "/plans", "/genres", "/login", "/register"];
+
+  // דף כותר נבדק רק אם יש כותר בקטלוג: האתר נשלח עם קטלוג ריק בכוונה
+  // (רק הבעלים מוסיף תוכן), ולכן אין slug קבוע שאפשר להניח עליו.
+  const list = await probe("/api/titles?limit=1", { ip });
+  const slug = list.body?.data?.items?.[0]?.slug ?? null;
+  if (slug) pages.push(`/title/${slug}`);
+
   for (const page of pages) {
     const res = await probe(page, { ip });
     assert.equal(res.status, 200, `${page} → ${res.status}`);

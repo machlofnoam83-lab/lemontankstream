@@ -36,6 +36,9 @@ export const RATE_RULES = {
   // מדד חוזק סיסמה: נדיב מספיק להקלדה, צר מספיק כדי שלא ישמש לבדיקת
   // סיסמאות בכמות — כל בקשה עולה לשרת בדיקת Hash וקריאת רשת.
   passwordCheck: { name: "password_check", limit: 30, windowSec: 60 },
+  // מימוש קוד גיפט קארד: קודים אקראיים בני 100 ביט, אבל ניחוש עדיין
+  // התקיפה היחידה שמעניינת כאן — דלי צר, וכל חריגה נרשמת כאירוע אבטחה.
+  redeem: { name: "giftcard_redeem", limit: 6, windowSec: 600 },
 } as const satisfies Record<string, RateRule>;
 
 export type RateRuleName = keyof typeof RATE_RULES;

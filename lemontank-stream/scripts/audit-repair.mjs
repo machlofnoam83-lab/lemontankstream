@@ -130,16 +130,32 @@ if (!targets.length) {
 // הרשומה הקודמת לנקודת ההתחלה = **האחרונה** שלפניה (הרשומות ממוינות לפי seq)
 let previousHash = rows.filter((row) => row.seq < from).at(-1)?.entry_hash ?? GENESIS;
 let changed = 0;
+let lastSeq = rows.filter((row) => row.seq < from).at(-1)?.seq ?? from - 1;
 db.exec("BEGIN IMMEDIATE");
 try {
-  const update = db.prepare("UPDATE audit_log SET prev_hash = ?, entry_hash = ? WHERE id = ?");
+  // סגירת חורים: אם נמחקה רשומה (או שהיומן נקטע), רצף seq מדווח על "רצף לא
+  // תקין" לתמיד. חתימה מחדש היא תיקון מכוון — ולכן היא גם ממספרת מחדש
+  // ברצף, ואז החתימה מחושבת על המספור החדש. הכל גלוי כאירוע אבטחה.
+  const update = db.prepare("UPDATE audit_log SET seq = ?, prev_hash = ?, entry_hash = ? WHERE id = ?");
   for (const row of targets) {
-    const entry_hash = hashOf({ ...row, prev_hash: previousHash });
-    if (entry_hash !== row.entry_hash || previousHash !== row.prev_hash) {
-      update.run(previousHash, entry_hash, row.id);
+    const seq = lastSeq + 1;
+    const entry_hash = hashOf({ ...row, seq, prev_hash: previousHash });
+    if (entry_hash !== row.entry_hash || previousHash !== row.prev_hash || seq !== row.seq) {
+      update.run(seq, previousHash, entry_hash, row.id);
       changed += 1;
     }
     previousHash = entry_hash;
+    lastSeq = seq;
+  }
+  // העוגן חייב לזוז עם הראש החדש — אחרת "תיקון" היה נראה כמו חיתוך זנב.
+  const newHead = db
+    .prepare("SELECT seq, entry_hash FROM audit_log WHERE seq IS NOT NULL ORDER BY seq DESC LIMIT 1")
+    .get();
+  if (newHead) {
+    db.prepare(
+      `INSERT INTO audit_anchor(id, seq, entry_hash, updated_at) VALUES(1, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now'))
+       ON CONFLICT(id) DO UPDATE SET seq = excluded.seq, entry_hash = excluded.entry_hash, updated_at = excluded.updated_at`,
+    ).run(newHead.seq, newHead.entry_hash);
   }
   db.prepare("INSERT INTO security_events(kind, severity, detail) VALUES(?,?,?)").run(
     "audit_resign",
@@ -155,6 +171,6 @@ try {
 }
 
 console.log("");
-console.log(`✅ חתימה מחדש הושלמה: ${changed} רשומות עודכנו מ-seq ${from}`);
+console.log(`✅ חתימה מחדש הושלמה: ${changed} רשומות עודכנו מ-seq ${from} (מספור רצוף, בלי חורים)`);
 console.log("📝 נרשם אירוע אבטחה audit_resign (critical) — התיקון גלוי, לא מוסתר");
 db.close();

@@ -34,7 +34,8 @@ export type AuditAction =
   | "live.create" | "live.update" | "live.delete"
   | "person.create" | "person.update" | "person.delete"
   | "party.create" | "party.end" | "newsletter.subscribe" | "newsletter.broadcast"
-  | "api_key.create" | "api_key.revoke" | "badge.award" | "flag.update";
+  | "api_key.create" | "api_key.revoke" | "badge.award" | "flag.update"
+  | "giftcard.create" | "giftcard.revoke" | "giftcard.redeem" | "giftcard.decide";
 
 export type AuditSeverity = "info" | "warning" | "critical";
 
@@ -150,6 +151,13 @@ export function writeAudit(input: AuditInput, ctx: AuditContext = {}): void {
           createdAt,
         ],
       );
+
+      // העוגן זז יחד עם הראש — באותה טרנזקציה, כך שאין חלון שבו יומן לא מעוגן.
+      run(
+        `INSERT INTO audit_anchor(id, seq, entry_hash, updated_at) VALUES(1, ?, ?, ?)
+         ON CONFLICT(id) DO UPDATE SET seq = excluded.seq, entry_hash = excluded.entry_hash, updated_at = excluded.updated_at`,
+        [seq, entryHash, createdAt],
+      );
     });
   } catch (err) {
     console.error("[audit] failed to write", err);
@@ -160,7 +168,8 @@ export type ChainVerification = {
   ok: boolean;
   checked: number;
   broken: { id: number; seq: number | null; reason: string }[];
-  head: { seq: number; entryHash: string | null };
+  /** ראש היומן בפועל (null אם היומן ריק) */
+  head: { seq: number | null; entryHash: string | null };
   legacyRows: number;
   verifiedAt: string;
 };
@@ -218,7 +227,41 @@ export function verifyAuditChain(limit = 5000): ChainVerification {
     expectedSeq += 1;
   }
 
-  const head = chainHead();
+  // ── מול העוגן ─────────────────────────────────────────────────────────────
+  // זה מה שתופס "מחיקת זנב": הרשומות שהיו שם נעלמו, אבל העוגן זוכר אותן.
+  //
+  // חשוב: הראש והעוגן נקראים ב**שאילתה אחת**. שתי קריאות נפרדות נותנות שני
+  // snapshots — ובין שתיהן בקשה אחרת יכולה לרשום רשומה חדשה, ואז נוצרת
+  // התראת שווא של "חתוך זנב". שאילתה אחת = תמונת מצב אחת.
+  const snapshotState = get<{
+    headSeq: number | null;
+    headHash: string | null;
+    anchorSeq: number | null;
+    anchorHash: string | null;
+  }>(
+    `SELECT (SELECT seq        FROM audit_log    WHERE seq IS NOT NULL ORDER BY seq DESC LIMIT 1) AS headSeq,
+            (SELECT entry_hash FROM audit_log    WHERE seq IS NOT NULL ORDER BY seq DESC LIMIT 1) AS headHash,
+            (SELECT seq        FROM audit_anchor WHERE id = 1)                                  AS anchorSeq,
+            (SELECT entry_hash FROM audit_anchor WHERE id = 1)                                  AS anchorHash`,
+  );
+  const head: { seq: number | null; entry_hash: string | null } = {
+    seq: snapshotState?.headSeq ?? null,
+    entry_hash: snapshotState?.headHash ?? null,
+  };
+
+  if (snapshotState?.anchorSeq != null) {
+    const anchorSeq = Number(snapshotState.anchorSeq);
+    if (anchorSeq > Number(head.seq ?? 0)) {
+      broken.push({
+        id: 0,
+        seq: null,
+        reason: `חסרות רשומות מסוף היומן (העוגן ברשומה ${anchorSeq}, האחרונה בפועל ${head.seq ?? 0})`,
+      });
+    } else if (anchorSeq === Number(head.seq ?? 0) && snapshotState.anchorHash !== head.entry_hash) {
+      broken.push({ id: 0, seq: anchorSeq, reason: "רשומת הראש שונתה (לא תואמת לעוגן)" });
+    }
+  }
+
   return {
     ok: broken.length === 0,
     checked: rows.length,
@@ -230,6 +273,35 @@ export function verifyAuditChain(limit = 5000): ChainVerification {
 }
 
 /** רישום אירוע אבטחה (משמש גם את ה-rate limiter ואת מנוע הזיהוי) */
+/**
+ * אירועים חריגים יוצאים גם **מחוץ לאתר** (דיסקורד/Webhook/מייל).
+ *
+ * למה: תוקף שנכנס לחשבון יכול להשתיק התראות פנימיות, ואז איש לא ידע.
+ * התראה שיוצאת לשרת חיצוני ממשיכה להגיע גם כשהאתר עצמו כבר נשלט.
+ * (לא חוסם — הפעולה ממשיכה גם אם השליחה נכשלת.)
+ */
+function mirrorToOutbound(input: {
+  kind: string;
+  severity: "info" | "warning" | "critical";
+  detail?: string | null;
+  userId?: number | null;
+}): void {
+  // רעש רקע לא יוצא החוצה — רק מה שבאמת דורש תשומת לב אנושית
+  const NOISY = /^(rate_limit_exceeded|csrf_failed|login_failed|permission_denied)$/;
+  if (NOISY.test(input.kind)) return;
+  if (input.severity === "info") return;
+
+  void import("./notify-out").then(({ notifyOutbound }) =>
+    notifyOutbound({
+      kind: "security",
+      severity: input.severity,
+      title: `אירוע אבטחה: ${input.kind}`,
+      body: `${input.detail ?? "אין פירוט"}${input.userId ? `\nמשתמש: #${input.userId}` : ""}`,
+      link: "/admin/security",
+    }),
+  );
+}
+
 export async function logSecurityEvent(input: {
   kind: string;
   severity?: AuditSeverity;
@@ -237,14 +309,16 @@ export async function logSecurityEvent(input: {
   userId?: number | null;
   detail?: string;
 }): Promise<void> {
+  const severity = input.severity ?? "warning";
   try {
     run("INSERT INTO security_events(kind, severity, ip, user_id, detail) VALUES(?,?,?,?,?)", [
       input.kind,
-      input.severity ?? "warning",
+      severity,
       input.ip ?? null,
       input.userId ?? null,
       input.detail?.slice(0, 2000) ?? null,
     ]);
+    mirrorToOutbound({ kind: input.kind, severity, detail: input.detail, userId: input.userId });
   } catch (err) {
     console.error("[security] failed to log", err);
   }

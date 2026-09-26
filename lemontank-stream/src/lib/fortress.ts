@@ -230,6 +230,10 @@ export const CRITICAL_ACTIONS = new Set([
   "title.delete",
   "payment.refund",
   "admin.export",
+  // כסף: הנפקת כרטיסים ואישור תשלומים דורשים אימות מחדש
+  "giftcard.create",
+  "giftcard.revoke",
+  "giftcard.decide",
 ]);
 
 export function requireStepUp(user: SessionUser | null | undefined, sessionId: string | undefined, action: string): void {

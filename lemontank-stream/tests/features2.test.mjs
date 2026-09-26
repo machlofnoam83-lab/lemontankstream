@@ -10,14 +10,19 @@
  * דורש שרת רץ (`npm run start`). אם השרת למטה — הבדיקות מדלגות.
  */
 
-import { test, before, describe } from "node:test";
+import { test, before, after, describe } from "node:test";
+import { suiteIp } from "./helpers/suite-ip.mjs";
 import assert from "node:assert/strict";
 import { restoreSession, saveSecret, saveSession, savedSecret, stepUp, totpCode } from "./helpers/admin-login.mjs";
+import { ensureTestTitle, leftoverTestTitles, removeTestTitle } from "./helpers/test-catalog.mjs";
 import { readFileSync, writeFileSync } from "node:fs";
 
 const BASE = (process.env.TEST_BASE_URL ?? "http://127.0.0.1:3000").replace(/\/$/, "");
 const ADMIN_EMAIL = process.env.SEED_ADMIN_EMAIL ?? "admin@lemontank.local";
 const ADMIN_PASSWORD = process.env.SEED_ADMIN_PASSWORD ?? "ChangeMe-Admin-2026!";
+
+/** כתובת המבקר של החבילה הזו — נפרדת מכסת הרשמה לכל חבילה */
+const SUITE_IP = suiteIp("features2-suite");
 
 class Client {
   constructor() {
@@ -42,7 +47,7 @@ class Client {
   }
 
   async raw(path, options = {}) {
-    const headers = { ...(options.headers ?? {}) };
+    const headers = { ...(options.headers ?? {}), "x-forwarded-for": SUITE_IP };
     if (this.cookies.size) headers.cookie = this.cookieHeader();
     if (options.method && options.method !== "GET" && options.method !== "HEAD") {
       headers["x-csrf-token"] = options.csrf ?? this.csrf();
@@ -236,6 +241,8 @@ async function cleanupTestDevices(client) {
 
 let ready = false;
 let admin = null;
+/** כותר בדיקה — נוצר כשהקטלוג ריק, ומוסר בסוף הריצה */
+let testTitle = null;
 
 before(async () => {
   ready = await serverReady();
@@ -263,6 +270,15 @@ before(async () => {
   // אימות מחדש — נדרש לפעולות רגישות (מחיקות ניהוליות וכדומה)
   const stepped = await stepUp(admin, ADMIN_PASSWORD);
   if (!stepped.ok) console.error(`\n⚠️  אימות מחדש נכשל (${stepped.status})\n`);
+
+  // הקטלוג ריק בכוונה — כותר בדיקה זמני לבדיקות תוכן/הורדות
+  for (const leftover of await leftoverTestTitles(admin)) await removeTestTitle(admin, leftover.id);
+  try {
+    testTitle = await ensureTestTitle(admin);
+    if (testTitle.created) console.log("ℹ️  נוצר כותר בדיקה זמני (הקטלוג היה ריק)");
+  } catch (error) {
+    console.error(`⚠️  לא ניתן ליצור כותר בדיקה: ${error?.message ?? error}`);
+  }
 
   await cleanupTestProfiles(admin);
   await cleanupTestRequests(admin);
@@ -640,7 +656,9 @@ describe("הורדות ומכשירים", () => {
   test("מדיניות הורדה מדווחת בבירור לכותר חסום", async (t) => {
     if (!ready) return t.skip("אין שרת");
     if (!admin) return t.skip("אין סשן מנהל");
-    const res = await admin.get("/api/downloads?title_id=1");
+    // כותר בדיקה במקום id קשיח — הקטלוג יכול להיות ריק
+    const titleId = testTitle?.id ?? 1;
+    const res = await admin.get(`/api/downloads?title_id=${titleId}`);
     assert.equal(res.status, 200, JSON.stringify(res.body));
     assert.equal(typeof res.body.data.allowed, "boolean");
     assert.ok("reason" in res.body.data);
@@ -810,4 +828,10 @@ describe("השנה שלי ותובנות", () => {
     const anon = new Client();
     assert.ok([401, 403].includes((await anon.get("/api/admin/insights")).status));
   });
+});
+
+after(async () => {
+  if (!ready || !admin || !testTitle?.created) return;
+  const removed = await removeTestTitle(admin, testTitle.id);
+  if (!removed) console.error(`ℹ️  כותר הבדיקה #${testTitle.id} לא הוסר — אפשר למחוק ידנית מ-/admin/titles`);
 });

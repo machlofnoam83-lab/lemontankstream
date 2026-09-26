@@ -31,6 +31,7 @@ const SECTIONS: { title: string; items: { href: string; label: string; icon: str
       { href: "/admin/plans", label: "מסלולי מנוי", icon: "💳" },
       { href: "/admin/coupons", label: "קופונים", icon: "🏷️" },
       { href: "/admin/subscriptions", label: "מנויים ותשלומים", icon: "🧾" },
+      { href: "/admin/giftcards", label: "גיפט קארד ותשלומים", icon: "🎁" },
       { href: "/admin/newsletter", label: "רשימת תפוצה", icon: "📬" },
     ],
   },

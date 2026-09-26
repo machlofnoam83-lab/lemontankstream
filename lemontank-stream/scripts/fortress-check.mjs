@@ -36,29 +36,14 @@ const verbose = process.argv.includes("--verbose");
  * עובדים על העתק זמני, מזייפים בו רשומה, ובודקים שהאימות נכשל.
  */
 if (process.argv.includes("--tamper")) {
-  const tmp = path.join(os.tmpdir(), `lt-tamper-${Date.now()}.db`);
-  fs.copyFileSync(DB_FILE, tmp);
-  const copy = new DatabaseSync(tmp);
-  const row = copy
-    .prepare("SELECT id, after_json FROM audit_log WHERE entry_hash IS NOT NULL AND seq IS NOT NULL ORDER BY seq DESC LIMIT 1")
-    .get();
-  if (!row) {
-    console.error("❌ אין רשומות משורשרות לזייף — הרץ קודם פעולה שתירשם ביומן.");
-    copy.close();
-    fs.unlinkSync(tmp);
-    process.exit(2);
-  }
-  copy.prepare("UPDATE audit_log SET after_json = ? WHERE id = ?").run('{"tampered":true}', row.id);
-  copy.close();
-
-  const check = new DatabaseSync(tmp);
-  const rows = check
-    .prepare(
-      `SELECT id, seq, prev_hash, entry_hash, action, actor_id, entity, entity_id, severity, after_json, created_at
-       FROM audit_log WHERE seq IS NOT NULL ORDER BY seq ASC LIMIT 2000`,
-    )
-    .all();
-  const hash = (parts) =>
+  /**
+   * הוכחת גלאי: לא נוגעים במסד האמיתי — מעתיקים אותו, ומבצעים בו שני זיופים
+   * שהתוקף הסביר היה מבצע:
+   *   א. עריכת רשומה קיימת (לשנות אחר כך מה שנרשם).
+   *   ב. מחיקת הרשומות האחרונות (לחתוך את הזנב כדי שהחדירה לא תירשם).
+   * בשני המקרים האימות חייב להיכשל — אחרת "שרשרת מאומתת" היא סיסמה ריקה.
+   */
+  const sha = (parts) =>
     crypto
       .createHash("sha256")
       .update(
@@ -66,18 +51,84 @@ if (process.argv.includes("--tamper")) {
           parts.severity, parts.created_at, parts.after_json ?? ""].join("\u0001"),
       )
       .digest("hex");
-  let previous = "0".repeat(64);
-  let broken = 0;
-  for (const entry of rows) {
-    if (hash({ ...entry, prev_hash: entry.prev_hash ?? "0".repeat(64) }) !== entry.entry_hash) broken += 1;
-    if ((entry.prev_hash ?? "0".repeat(64)) !== previous) broken += 1;
-    previous = entry.entry_hash ?? previous;
-  }
-  check.close();
-  fs.unlinkSync(tmp);
 
-  console.log(broken > 0 ? `✅ הגלאי עובד: זיוף הרשומה ${row.id} זוהה (${broken} חריגות בשרשרת)` : `❌ הגלאי לא זיהה זיוף של רשומה ${row.id}`);
-  process.exit(broken > 0 ? 0 : 1);
+  const GENESIS = "0".repeat(64);
+
+  /**
+   * העתקה של מסד ב-WAL חייבת לכלול גם את קובצי ה-WAL/שרד, אחרת ההעתק מייצג
+   * מצב ישן — והבדיקה "עוברת" על מסד שלא באמת נבדק.
+   */
+  const copyDb = (target) => {
+    for (const suffix of ["", "-wal", "-shm"]) {
+      const source = `${DB_FILE}${suffix}`;
+      if (fs.existsSync(source)) fs.copyFileSync(source, `${target}${suffix}`);
+    }
+  };
+
+  const attack = (label, mutate) => {
+    const tmp = path.join(os.tmpdir(), `lt-tamper-${Date.now()}-${Math.random().toString(36).slice(2, 7)}.db`);
+    copyDb(tmp);
+    const copy = new DatabaseSync(tmp);
+    const anchor = copy.prepare("SELECT seq, entry_hash FROM audit_anchor WHERE id = 1").get();
+    const detail = mutate(copy);
+    copy.close();
+
+    const check = new DatabaseSync(tmp);
+    const rows = check
+      .prepare(
+        `SELECT id, seq, prev_hash, entry_hash, action, actor_id, entity, entity_id, severity, after_json, created_at
+         FROM audit_log WHERE seq IS NOT NULL ORDER BY seq ASC LIMIT 20000`,
+      )
+      .all();
+    const anchorAfter = check.prepare("SELECT seq, entry_hash FROM audit_anchor WHERE id = 1").get();
+    check.close();
+    for (const suffix of ["", "-wal", "-shm"]) {
+      const file = `${tmp}${suffix}`;
+      if (fs.existsSync(file)) fs.unlinkSync(file);
+    }
+
+    let broken = 0;
+    let previous = GENESIS;
+    let expected = rows.length ? Number(rows[0].seq) : 1;
+    for (const entry of rows) {
+      if (Number(entry.seq) !== expected) broken += 1;
+      if ((entry.prev_hash ?? GENESIS) !== previous) broken += 1;
+      if (sha({ ...entry, prev_hash: entry.prev_hash ?? GENESIS }) !== entry.entry_hash) broken += 1;
+      previous = entry.entry_hash ?? previous;
+      expected += 1;
+    }
+    // בדיקת העוגן — זו שתופסת חיתוך זנב
+    const headSeq = rows.length ? Number(rows.at(-1).seq) : 0;
+    const headHash = rows.length ? rows.at(-1).entry_hash : null;
+    if (anchorAfter?.seq != null && Number(anchorAfter.seq) > headSeq) broken += 1;
+    else if (anchorAfter?.seq != null && Number(anchorAfter.seq) === headSeq && anchorAfter.entry_hash !== headHash) broken += 1;
+
+    const caught = broken > 0;
+    console.log(
+      caught
+        ? `✅ הגלאי עובד: ${label} — זוהה (${broken} חריגות; עוגן seq=${anchor?.seq ?? "?"})`
+        : `❌ הגלאי לא זיהה: ${label} (${detail})`,
+    );
+    return caught;
+  };
+
+  const editCaught = attack("עריכת רשומה קיימת", (copy) => {
+    const row = copy
+      .prepare("SELECT id FROM audit_log WHERE entry_hash IS NOT NULL AND seq IS NOT NULL ORDER BY seq DESC LIMIT 1")
+      .get();
+    if (!row) return "אין רשומות משורשרות";
+    copy.prepare("UPDATE audit_log SET after_json = ? WHERE id = ?").run('{"tampered":true}', row.id);
+    return `שונה after_json של רשומה ${row.id}`;
+  });
+
+  const truncateCaught = attack("מחיקת 3 הרשומות האחרונות", (copy) => {
+    const removed = copy
+      .prepare("DELETE FROM audit_log WHERE id IN (SELECT id FROM audit_log WHERE seq IS NOT NULL ORDER BY seq DESC LIMIT 3)")
+      .run();
+    return `נמחקו ${removed.changes ?? 0} רשומות`;
+  });
+
+  process.exit(editCaught && truncateCaught ? 0 : 1);
 }
 
 const results = [];

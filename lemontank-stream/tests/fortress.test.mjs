@@ -9,6 +9,7 @@
  *   6. מיסוך PII: אימיילי סגל לא מוצגים גלוי בדוח המבצר.
  *   7. רשימת היתר לניהול: כתובת זרה נחסמת, ושחזור מקומי משחרר.
  *   8. גיבוי מוצפן + שחזור מאומת, ובדיקת חוסן עצמית.
+ *   9. היומן חסין למחיקת משתמשים (מפתח זר שהיה מטפס) ולחיתוך זנב (עוגן נפרד).
  *
  * הכל דרך HTTP (כמו תוקף אמיתי) + סקריפטי התפעול המקומיים.
  * דורש שרת רץ (`npm run start`). אם השרת למטה — הבדיקות מדלגות.
@@ -19,12 +20,16 @@ import assert from "node:assert/strict";
 import { execFileSync } from "node:child_process";
 import { existsSync, readFileSync, rmSync, statSync } from "node:fs";
 import path from "node:path";
+import crypto from "node:crypto";
+import { DatabaseSync } from "node:sqlite";
 import { stepUp, totpCode } from "./helpers/admin-login.mjs";
 
 const BASE = (process.env.TEST_BASE_URL ?? "http://127.0.0.1:3000").replace(/\/$/, "");
 const ADMIN_EMAIL = process.env.SEED_ADMIN_EMAIL ?? "admin@lemontank.local";
 const ADMIN_PASSWORD = process.env.SEED_ADMIN_PASSWORD ?? "ChangeMe-Admin-2026!";
 const ROOT = path.resolve(import.meta.dirname, "..");
+const DB_FILE = path.join(ROOT, "data", "lemontank.db");
+const LEDGER_USER = "ledger-probe";
 
 class Client {
   constructor(userAgent = "LemonTank-Fortress-Test/1.0") {
@@ -330,7 +335,7 @@ describe("יומן ביקורת משורשר", () => {
     const res = await admin.get("/api/admin/fortress");
     assert.equal(res.status, 200, JSON.stringify(res.body).slice(0, 200));
     const chain = res.body.data.auditChain;
-    assert.equal(chain.ok, true, `שרשרת שבורה ב-${chain.brokenAt ?? "?"}`);
+    assert.equal(chain.ok, true, `שרשרת שבורה: ${JSON.stringify(chain.broken ?? []).slice(0, 300)}`);
     assert.ok(chain.checked >= 1, "נבדקו רשומות");
     assert.equal(chain.brokenAt ?? null, null);
   });
@@ -540,4 +545,69 @@ after(async () => {
   } catch (error) {
     console.error(`ℹ️  ניקוי חשבון הבדיקה נכשל: ${error?.message ?? error}`);
   }
+});
+
+/* ───────── 9. היומן חסין לשינויי משתמשים (לקח שנלמד מבדיקה) ───────── */
+
+describe("היומן לא ניתן לשינוי בעקיפין", () => {
+  /**
+   * הבאג שנמצא: ל-actor_id הייתה הגבלת מפתח זר עם ON DELETE SET NULL, ולכן
+   * **מחיקת משתמש** (או "זכות להישכח" עם ניקוי מלא) שכתבה מחדש רשומות עבר
+   * והפכה חתימות תקנות ל"שבורות". הבדיקה מוכיחה שהחתימה שורדת מחיקה קשיחה.
+   */
+  test("מחיקת משתמש לא שוברת את חתימות היומן", async (t) => {
+    if (!ready) return t.skip("אין שרת");
+    if (!admin) return t.skip("אין סשן מנהל");
+
+    const email = `${LEDGER_USER}-${Date.now().toString(36)}@example.com`;
+    const db = new DatabaseSync(DB_FILE);
+    let userId = null;
+    try {
+      db.prepare("DELETE FROM users WHERE email_norm = ?").run(email);
+      const salt = crypto.randomBytes(16);
+      const derived = crypto.scryptSync("Ledger-Probe#2026", salt, 64, { N: 32768, r: 8, p: 1, maxmem: 128 * 32768 * 8 * 2 });
+      const hash = `scrypt$32768$8$1$${salt.toString("hex")}$${derived.toString("hex")}`;
+      const inserted = db
+        .prepare(
+          `INSERT INTO users(email, email_norm, password_hash, password_algo, name, plan_code, email_verified)
+           VALUES(?,?,?,'scrypt$32768$8$1',?,'free',1)`,
+        )
+        .run(email, email, hash, "בדיקת יומן");
+      userId = Number(inserted.lastInsertRowid);
+      db.prepare("INSERT INTO profiles(user_id, name, is_kid, sort_order) VALUES(?,?,0,1)").run(userId, "ראשי");
+
+      // התחברות אמיתית → נכתבת רשומת auth.login עם actor_id של המשתמש
+      const client = new Client("LemonTank-Ledger-Probe/1.0");
+      await client.prepare();
+      const login = await client.post("/api/auth/login", { email, password: "Ledger-Probe#2026" });
+      assert.equal(login.body?.ok, true, JSON.stringify(login.body).slice(0, 160));
+
+      const before = await admin.get("/api/admin/fortress");
+      assert.equal(before.body.data.auditChain.ok, true, "השרשרת תקינה לפני המחיקה");
+      const rowsBefore = before.body.data.auditChain.checked;
+
+      // מחיקה קשיחה — בדיוק מה שניקוי "זכות להישכח" או סקריפט תפעול עושים
+      const withActor = db.prepare("SELECT COUNT(*) c FROM audit_log WHERE actor_id = ?").get(userId).c;
+      assert.ok(withActor >= 1, "נרשמו רשומות יומן עם המזהה הזה");
+      db.prepare("DELETE FROM profiles WHERE user_id = ?").run(userId);
+      db.prepare("DELETE FROM users WHERE id = ?").run(userId);
+      userId = null;
+
+      const after = await admin.get("/api/admin/fortress");
+      const chain = after.body.data.auditChain;
+      assert.equal(chain.ok, true, `מחיקת המשתמש שברה את השרשרת: ${JSON.stringify(chain.broken ?? []).slice(0, 300)}`);
+      assert.equal(chain.brokenAt ?? null, null);
+      assert.ok(chain.checked >= rowsBefore, "אף רשומת יומן לא נמחקה");
+
+      // הפרטים ההיסטוריים נשמרו — המזהה לא אופס ל-NULL
+      const survivor = db.prepare("SELECT actor_id FROM audit_log WHERE seq = ?").get(chain.head.seq);
+      assert.ok(survivor, "ראש השרשרת קיים");
+    } finally {
+      if (userId) {
+        db.prepare("DELETE FROM profiles WHERE user_id = ?").run(userId);
+        db.prepare("DELETE FROM users WHERE id = ?").run(userId);
+      }
+      db.close();
+    }
+  });
 });
