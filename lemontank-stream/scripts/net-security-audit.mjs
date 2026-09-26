@@ -15,6 +15,7 @@
  */
 
 import fs from "node:fs";
+import { gateHeaders, cookieName } from "./lib/gate.mjs";
 import path from "node:path";
 import crypto from "node:crypto";
 import { fileURLToPath } from "node:url";
@@ -80,7 +81,14 @@ async function call(pathname, options = {}) {
     ...(options.cookies
       ? {
           cookie: [...options.cookies.entries()].map(([k, v]) => `${k}=${v}`).join("; "),
-          "x-csrf-token": options.cookies.get("lt_csrf") ?? "",
+          "x-csrf-token": options.cookies.get(cookieName("csrf")) ?? "",
+          /**
+           * הסימן הסודי של השער. בלי זה, במצב חמקן כל "תקיפה" נעצרת בשער
+           * ולא מגיעה לאפליקציה — והדוח היה מציג 100% הצלחה שהיא בעצם מדידה
+           * של השער בלבד. כאן נמדדת **האפליקציה**; השער נמדד בנפרד בכלי
+           * undetectability-audit.
+           */
+          ...gateHeaders(),
           origin: BASE,
         }
       : {}),
@@ -302,7 +310,7 @@ await attack("הרשאות", "שינוי מסלול מנוי ישירות ב-API
 await attack("אימות", "עוגיית סשן מזויפת (חתימה לא תקפה)", async () => {
   const jar = new Map([
     ["lt_session", "eyJ1aWQiOjEsInJvbGUiOiJvd25lciJ9." + "a".repeat(64)],
-    ["lt_csrf", "b".repeat(48)],
+    [cookieName("csrf"), "b".repeat(48)],
   ]);
   const response = await call("/api/users/me", { cookies: jar });
   const body = safeParse(response.text);
@@ -313,7 +321,7 @@ await attack("אימות", "עוגייה של משתמש אחר (החלפת _id)
   const response = await call("/api/users/me", {
     cookies: new Map([
       ["lt_session", Buffer.from(JSON.stringify({ uid: 1, role: "owner" })).toString("base64url") + ".x"],
-      ["lt_csrf", "c".repeat(48)],
+      [cookieName("csrf"), "c".repeat(48)],
     ]),
   });
   const body = safeParse(response.text);

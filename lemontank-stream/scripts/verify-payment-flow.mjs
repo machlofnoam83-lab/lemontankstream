@@ -15,6 +15,7 @@
  */
 
 import fs from "node:fs";
+import { gateHeaders, cookieName } from "./lib/gate.mjs";
 import path from "node:path";
 import crypto from "node:crypto";
 import { execFileSync } from "node:child_process";
@@ -72,10 +73,11 @@ class Client {
     }
   }
   csrf() {
-    return this.cookies.get("lt_csrf") ?? "";
+    return this.cookies.get(cookieName("csrf")) ?? "";
   }
   async raw(pathname, options = {}) {
-    const headers = { "user-agent": "LemonTank-Verifier/1.0", ...(options.headers ?? {}) };
+    // gateHeaders(): מעבר שער החמקן (ריק כשהחמקן כבוי)
+    const headers = { ...gateHeaders(), "user-agent": "LemonTank-Verifier/1.0", ...(options.headers ?? {}) };
     if (this.cookies.size) headers.cookie = this.header();
     if (options.method && !["GET", "HEAD"].includes(options.method)) {
       headers["x-csrf-token"] = this.csrf();

@@ -22,6 +22,7 @@
  */
 
 import fs from "node:fs";
+import { gateHeaders, cookieName } from "./lib/gate.mjs";
 import path from "node:path";
 import crypto from "node:crypto";
 import { fileURLToPath } from "node:url";
@@ -105,7 +106,8 @@ class Api {
     this.cookies = new Map();
   }
   headers(extra = {}) {
-    const out = { ...extra, "user-agent": "LemonTank-Ops/1.0" };
+    // gateHeaders(): מעבר שער החמקן (ריק כשהחמקן כבוי — אפס השפעה במצב רגיל)
+    const out = { ...gateHeaders(), ...extra, "user-agent": "LemonTank-Ops/1.0" };
     if (this.cookies.size) out.cookie = [...this.cookies].map(([k, v]) => `${k}=${v}`).join("; ");
     return out;
   }
@@ -117,7 +119,7 @@ class Api {
     }
   }
   csrf() {
-    return this.cookies.get("lt_csrf") ?? "";
+    return this.cookies.get(cookieName("csrf")) ?? "";
   }
   async request(method, pathname, body) {
     const headers = this.headers();
