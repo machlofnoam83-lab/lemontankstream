@@ -78,6 +78,7 @@ export const bindAll = (arr: unknown[]): SqlValue[] => arr.map(bind);
 declare global {
   // eslint-disable-next-line no-var
   var __lemontankDb: DatabaseSync | undefined;
+  var __lemontankMigrated: boolean | undefined;
 }
 
 function dbFile(): string {
@@ -112,9 +113,31 @@ function openDatabase(): DatabaseSync {
 
 export function getDb(): DatabaseSync {
   if (!globalThis.__lemontankDb) {
+    // סדר הפעולות קריטי: קודם שומרים את החיבור במטמון, ורק אחר כך מריצים הגירות.
+    // אם ההגירות ירוצו לפני — הן יקראו ל-getDb דרך run/all וייצרו רקורסיה אינסופית.
     globalThis.__lemontankDb = openDatabase();
+    applyMigrations();
   }
   return globalThis.__lemontankDb;
+}
+
+/**
+ * הרצת הגירות עמודות — פעם אחת לכל תהליך.
+ * SCHEMA_SQL יוצר טבלאות חדשות אך לא נוגע בקיימות, ולכן עמודות שנוספו
+ * לשכבת "המבצר" (קישור סשן למכשיר, שרשרת הביקורת) מגיעות מכאן.
+ */
+function applyMigrations(): void {
+  if (globalThis.__lemontankMigrated) return;
+  globalThis.__lemontankMigrated = true;
+  try {
+    // require דינמי שובר תלות מעגלית (migrations מייבא מ-db)
+    const { runMigrations } = require("./migrations") as typeof import("./migrations");
+    const result = runMigrations();
+    if (result.applied.length) console.log(`[db] הוחלו ${result.applied.length} הגירות: ${result.applied.join(", ")}`);
+  } catch (error) {
+    console.error("[db] הגירות נכשלו:", (error as Error)?.message);
+    throw error;
+  }
 }
 
 /* ──────────────────────────── מטמון statements ──────────────────────────── */

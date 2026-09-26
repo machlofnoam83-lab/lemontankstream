@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { ToastProvider } from "@/components/ui/toast";
 import { AdminNav } from "@/components/admin/admin-nav";
 import { getCurrentUser } from "@/lib/session";
+import { needs2faSetup } from "@/lib/fortress";
 import { isAdminRole, ROLE_NAMES_HE, type Role } from "@/lib/rbac";
 import { getSettings } from "@/lib/settings";
 import { count } from "@/lib/db";
@@ -14,6 +15,31 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   const user = await getCurrentUser();
   if (!user) redirect("/login?next=/admin");
   if (!isAdminRole(user.role)) redirect("/?error=forbidden");
+
+  /*
+   * שער "המבצר": אזור הניהול דורש אימות דו-שלבי מכל מי שיש לו הרשאת ניהול.
+   * אם הוא עדיין לא הופעל — לא מפנים החוצה (זה היה יוצר לולאה), אלא מציגים
+   * מסך אחד עם ההסבר והקישור היחיד שצריך. החסימה האמיתית בכל נקודות ה-API.
+   */
+  if (needs2faSetup(user)) {
+    return (
+      <div className="mx-auto flex min-h-dvh max-w-lg flex-col items-center justify-center gap-4 px-6 text-center">
+        <div className="text-5xl">🔐</div>
+        <h1 className="text-2xl font-black">אזור הניהול דורש אימות דו-שלבי</h1>
+        <p className="text-ink-300">
+          החשבון שלך הוא חשבון ניהול, ולכן סיסמה לבדה לא מספיקה. הפעל אימות דו-שלבי
+          באפליקציה (Google Authenticator / Authy / 1Password) — זה לוקח פחות מדקה,
+          ומרגע זה כל כניסה לניהול תדרוש גם קוד.
+        </p>
+        <Link href="/account/security" className="rounded-xl bg-lemon-400 px-6 py-3 font-bold text-ink-950">
+          להפעלת אימות דו-שלבי
+        </Link>
+        <p className="text-[0.85rem] text-ink-500">
+          אפשר לכבות את החובה הזו בהגדרות האבטחה (<code>require_staff_2fa</code>) — אך לא מומלץ.
+        </p>
+      </div>
+    );
+  }
 
   const settings = getSettings();
   const pendingReports = count("SELECT COUNT(*) c FROM reports WHERE status='open'");

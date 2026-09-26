@@ -13,6 +13,8 @@ import { cookies } from "next/headers";
 import { all, get, run, tx } from "./db";
 import { randomId, randomToken, sha256, safeEqual, deviceFingerprint } from "./crypto";
 import { clientIp, userAgent, ApiError } from "./http";
+import { applyPosture, bindSession, evaluateSession } from "./fortress";
+import { logSecurityEvent } from "./audit";
 
 export { SESSION_COOKIE, CSRF_COOKIE } from "./cookies";
 import { SESSION_COOKIE, CSRF_COOKIE } from "./cookies";
@@ -46,6 +48,11 @@ export type SessionRecord = {
   created_at: string;
   last_seen_at: string;
   expires_at: string;
+  ua_hash?: string | null;
+  ip_prefix?: string | null;
+  absolute_expires_at?: string | null;
+  stepup_until?: string | null;
+  risk_score?: number | null;
 };
 
 const iso = (msFromNow: number) => new Date(Date.now() + msFromNow).toISOString();
@@ -93,6 +100,11 @@ export function createSession(
     ]);
   });
 
+  // ── שכבת "המבצר": קישור הסשן למכשיר ולרשת + פקיעה מוחלטת שאינה מתארכת ──
+  // (התפקיד נלקח מהמשתמש כדי שסגל יקבל חלון חיים קצר יותר)
+  const role = get<{ role: string }>("SELECT role FROM users WHERE id = ?", [userId])?.role;
+  bindSession(sessionId, { ip: clientIp(req), userAgent: ua, role });
+
   return { token, sessionId, expiresAt, csrfSecret };
 }
 
@@ -104,7 +116,8 @@ export function validateSession(rawToken: string | undefined): ValidatedSession 
   const hash = sha256(rawToken);
 
   const row = get<SessionRecord & { revoked_at: string | null; user_id: number }>(
-    `SELECT id, user_id, profile_id, ip, user_agent, device_label, created_at, last_seen_at, expires_at, revoked_at
+    `SELECT id, user_id, profile_id, ip, user_agent, device_label, created_at, last_seen_at, expires_at, revoked_at,
+            ua_hash, ip_prefix, absolute_expires_at, stepup_until, risk_score
      FROM sessions WHERE token_hash = ?`,
     [hash],
   );
@@ -127,9 +140,41 @@ export function validateSession(rawToken: string | undefined): ValidatedSession 
     return null;
   }
 
+  // ── שכבת "המבצר": האם הסשן עדיין שייך לאותו מכשיר ואותה רשת? ──────────────
+  const posture = evaluateSession({
+    row: {
+      ip: row.ip,
+      ua_hash: row.ua_hash ?? null,
+      ip_prefix: row.ip_prefix ?? null,
+      last_seen_at: row.last_seen_at,
+      absolute_expires_at: row.absolute_expires_at ?? null,
+      stepup_until: row.stepup_until ?? null,
+      risk_score: row.risk_score ?? 0,
+    },
+    now: Date.now(),
+    ip: row.ip ?? "",
+    userAgent: row.user_agent ?? "",
+    role: user.role,
+  });
+
+  if (!posture.allow) {
+    applyPosture(row.id, posture);
+    void logSecurityEvent({
+      kind: `session_${posture.posture}`,
+      severity: posture.posture === "device_changed" ? "critical" : "info",
+      ip: row.ip ?? undefined,
+      userId: user.id,
+      detail: posture.reason ?? "",
+    });
+    return null;
+  }
+
   // עדכון "נראה לאחרונה" — לא בכל בקשה (כתיבה מיותרת ל-DB)
   if (Date.now() - new Date(row.last_seen_at).getTime() > 60_000) {
     run("UPDATE sessions SET last_seen_at=strftime('%Y-%m-%dT%H:%M:%fZ','now') WHERE id=?", [row.id]);
+    if (posture.posture === "new_network") {
+      run("UPDATE sessions SET last_ip = ? WHERE id = ?", [row.ip, row.id]);
+    }
   }
 
   const effective = resolveEffectivePlan(user.id, user.plan_code);

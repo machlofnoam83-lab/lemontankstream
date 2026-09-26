@@ -11,6 +11,7 @@
 
 import { test, before, describe } from "node:test";
 import assert from "node:assert/strict";
+import { restoreSession, saveSecret, saveSession, savedSecret, totpCode } from "./helpers/admin-login.mjs";
 
 const BASE = (process.env.TEST_BASE_URL ?? "http://127.0.0.1:3000").replace(/\/$/, "");
 const ADMIN_EMAIL = process.env.SEED_ADMIN_EMAIL ?? "admin@lemontank.local";
@@ -80,9 +81,45 @@ class Client {
     return this.json(path, { method: "DELETE", body: JSON.stringify(data ?? {}) });
   }
 
+  /**
+   * התחברות מלאה — כולל מסלול 2FA כשהחשבון מוגן.
+   * (אזור הניהול דורש 2FA, ולכן הבדיקות עוברות את אותו מסלול שהאדם עובר.)
+   */
   async login(email, password) {
     await this.raw("/login");
-    return this.post("/api/auth/login", { email, password });
+    const first = await this.post("/api/auth/login", { email, password });
+
+    if (first.body?.data?.requires2fa && first.body?.data?.challenge) {
+      const secret = savedSecret();
+      if (!secret) return first;
+      const done = await this.post("/api/auth/login", {
+        challenge: first.body.data.challenge,
+        totp: totpCode(secret),
+      });
+      if (done.body?.ok === true) {
+        // גם את התוצאה השנייה מחזירים בפורמט זהה כדי ששאר הבדיקות לא ישתנו
+        return { ...done, body: { ok: true, data: done.body.data } };
+      }
+      return done;
+    }
+    return first;
+  }
+
+  /** הפעלת 2FA על החשבון הזה — כדי שאזור הניהול ייפתח (מדיניות המבצר) */
+  async enableTwoFactorIfNeeded() {
+    const me = await this.get("/api/auth/me");
+    const user = me.body?.data?.user ?? me.body?.data ?? null;
+    if (user && Number(user.twofa_enabled) === 1) return { enabled: true, already: true };
+
+    const setup = await this.post("/api/auth/2fa", { action: "setup" });
+    const secret = setup.body?.data?.secret;
+    if (!secret) return { enabled: false, reason: `setup_failed:${setup.status}` };
+
+    const enabled = await this.post("/api/auth/2fa", { action: "enable", code: totpCode(secret) });
+    if (enabled.body?.ok !== true) return { enabled: false, reason: `enable_failed:${enabled.status}` };
+
+    saveSecret(secret);
+    return { enabled: true, already: false };
   }
 }
 
@@ -127,12 +164,25 @@ before(async () => {
     console.error(`\n⚠️  אין שרת ב-${BASE} — הבדיקות ידולגו. הרץ: npm run dev (או npm run start)\n`);
     return;
   }
-  admin = new Client();
-  const res = await admin.login(ADMIN_EMAIL, ADMIN_PASSWORD);
-  if (res.body?.ok === true) {
+  // קודם מנסים להמשיך סשן מנהל קיים (מכסת ההתחברות מוגבלת במכוון)
+  admin = await restoreSession(Client, BASE);
+  if (admin) {
+    console.log("ℹ️  ממשיכים עם סשן מנהל קיים");
     authOk = true;
     return;
   }
+
+  admin = new Client();
+  const res = await admin.login(ADMIN_EMAIL, ADMIN_PASSWORD);
+  if (res.body?.ok === true) {
+    // שכבת "המבצר": אזור הניהול דורש 2FA — מפעילים אותו על חשבון הבדיקות
+    const twofa = await admin.enableTwoFactorIfNeeded();
+    if (!twofa.enabled) console.error(`\n⚠️  הפעלת 2FA למנהל נכשלה: ${twofa.reason}\n`);
+    saveSession(admin);
+    authOk = true;
+    return;
+  }
+
   console.error(
     `\n⚠️  התחברות מנהל נכשלה (${res.status} ${res.body?.error?.code ?? "?"}) — בדיקות שדורשות סשן ידולגו.` +
       `\n    סיבות אפשריות: המסד לא מזורזע, סיסמה שונה, או הגבלת קצב התחברות (המתן 5 דקות).\n`,

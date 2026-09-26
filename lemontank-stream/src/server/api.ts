@@ -13,7 +13,8 @@ import { RATE_RULES, consumeRateLimit, type RateRuleName } from "@/lib/ratelimit
 import { logSecurityEvent, writeAudit, type AuditAction } from "@/lib/audit";
 import { assertCsrf } from "@/lib/csrf";
 import { getCurrentSession, type SessionUser } from "@/lib/session";
-import { can, type Permission } from "@/lib/rbac";
+import { can, type Permission, isAdminRole } from "@/lib/rbac";
+import { adminIpAllowed, needs2faSetup, requireStepUp } from "@/lib/fortress";
 import { findActiveBan, banIp } from "@/lib/security/bans";
 import { inspectUrl, inspectValue, type InspectionHit } from "@/lib/security/inspect";
 import { consumeRateLimit as consumeKeyLimit } from "@/lib/ratelimit";
@@ -144,6 +145,32 @@ export async function withApi(req: NextRequest, options: GuardOptions, handler: 
         writeAudit({ action: "security.permission_denied", entity: "permission", entityId: permission, severity: "warning" }, { req, actorId: user.id, actorEmail: user.email });
         throw new ApiError("FORBIDDEN", 403);
       }
+    }
+
+    /* ── 2.5 שער "המבצר": ניהול דורש 2FA, ורשימת היתר לכתובות ───────────── */
+    if (user && permission && isAdminRole(user.role)) {
+      // מפתח API אינו עובר את שער הניהול — מפתחות מיועדים לקריאה, לא לניהול
+      if (!apiKeyInfo) {
+        if (needs2faSetup(user)) {
+          await logSecurityEvent({ kind: "admin_2fa_missing", severity: "warning", ip, userId: user.id, detail: routeKey(req) });
+          throw new ApiError(
+            "TWOFA_REQUIRED",
+            403,
+            { setup: "/account/security" },
+            "אזור הניהול דורש אימות דו-שלבי — יש להפעיל אותו בהגדרות האבטחה",
+          );
+        }
+        if (!adminIpAllowed(ip)) {
+          await logSecurityEvent({ kind: "admin_ip_blocked", severity: "warning", ip, userId: user.id, detail: routeKey(req) });
+          writeAudit({ action: "security.permission_denied", entity: "admin_ip", entityId: ip, severity: "warning" }, { req, actorId: user.id, actorEmail: user.email });
+          throw new ApiError("FORBIDDEN", 403, undefined, "הכתובת שלך אינה ברשימת ההיתר של אזור הניהול");
+        }
+      }
+    }
+
+    /* ── 2.6 re-auth מדורג: פעולה הרסנית דורשת אימות סיסמה בחלון קצר ───── */
+    if (user && options.audit?.action) {
+      requireStepUp(user, sessionId ?? undefined, String(options.audit.action));
     }
 
     /* ── 3. CSRF לבקשות משנות מצב ─────────────────────────────────────── */

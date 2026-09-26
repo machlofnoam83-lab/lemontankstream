@@ -654,6 +654,15 @@ CREATE TABLE IF NOT EXISTS settings (
 --  7. אבטחה, ביקורת, אנליטיקה
 -- ═══════════════════════════════════════════════════════════════════════════
 
+-- ── הגירת עמודות לטבלאות קיימות ─────────────────────────────────────────────
+-- SQLite מוסיף עמודה רק כשהיא חסרה; הרשומות כאן רצות פעם אחת לכל התקנה.
+-- העמודות משרתות את שכבת "המבצר": קישור סשן ל-UA/רשת, פקיעות מוחלטות,
+-- חלון re-auth מדורג, וחתימת Hash על יומן הביקורת כדי לזהות שינוי בדיעבד.
+CREATE TABLE IF NOT EXISTS schema_migrations (
+  name       TEXT PRIMARY KEY,
+  applied_at TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ','now'))
+) STRICT;
+
 CREATE TABLE IF NOT EXISTS audit_log (
   id            INTEGER PRIMARY KEY AUTOINCREMENT,
   actor_id      INTEGER REFERENCES users(id) ON DELETE SET NULL,

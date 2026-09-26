@@ -197,6 +197,11 @@ export const DEFAULT_SECURITY_SETTINGS: Record<string, string> = {
   retention_days: "90",
   ip_mode: "full",
   honeypot_paths: "on",
+  // מדיניות "המבצר": חובת 2FA לכל מי שיש לו הרשאת צוות, ורשימת היתר לאזור הניהול
+  require_staff_2fa: "on",
+  admin_ip_allowlist: "",
+  // בקרת שלמות יומן הביקורת בכל עליית מערכת
+  audit_chain_check: "on",
 };
 
 export function securitySettings(): Record<string, string> {

@@ -10,6 +10,7 @@
 
 import { test, before, describe } from "node:test";
 import assert from "node:assert/strict";
+import { restoreSession, saveSecret, saveSession, savedSecret, stepUp, totpCode } from "./helpers/admin-login.mjs";
 
 const BASE = (process.env.TEST_BASE_URL ?? "http://127.0.0.1:3000").replace(/\/$/, "");
 const ADMIN_EMAIL = process.env.SEED_ADMIN_EMAIL ?? "admin@lemontank.local";
@@ -79,9 +80,45 @@ class Client {
     return this.json(path, { method: "DELETE", body: JSON.stringify(data ?? {}) });
   }
 
+  /**
+   * התחברות מלאה — כולל מסלול 2FA כשהחשבון מוגן.
+   * (אזור הניהול דורש 2FA, ולכן הבדיקות עוברות את אותו מסלול שהאדם עובר.)
+   */
   async login(email, password) {
     await this.raw("/login");
-    return this.post("/api/auth/login", { email, password });
+    const first = await this.post("/api/auth/login", { email, password });
+
+    if (first.body?.data?.requires2fa && first.body?.data?.challenge) {
+      const secret = savedSecret();
+      if (!secret) return first;
+      const done = await this.post("/api/auth/login", {
+        challenge: first.body.data.challenge,
+        totp: totpCode(secret),
+      });
+      if (done.body?.ok === true) {
+        // גם את התוצאה השנייה מחזירים בפורמט זהה כדי ששאר הבדיקות לא ישתנו
+        return { ...done, body: { ok: true, data: done.body.data } };
+      }
+      return done;
+    }
+    return first;
+  }
+
+  /** הפעלת 2FA על החשבון הזה — כדי שאזור הניהול ייפתח (מדיניות המבצר) */
+  async enableTwoFactorIfNeeded() {
+    const me = await this.get("/api/auth/me");
+    const user = me.body?.data?.user ?? me.body?.data ?? null;
+    if (user && Number(user.twofa_enabled) === 1) return { enabled: true, already: true };
+
+    const setup = await this.post("/api/auth/2fa", { action: "setup" });
+    const secret = setup.body?.data?.secret;
+    if (!secret) return { enabled: false, reason: `setup_failed:${setup.status}` };
+
+    const enabled = await this.post("/api/auth/2fa", { action: "enable", code: totpCode(secret) });
+    if (enabled.body?.ok !== true) return { enabled: false, reason: `enable_failed:${enabled.status}` };
+
+    saveSecret(secret);
+    return { enabled: true, already: false };
   }
 }
 
@@ -127,12 +164,26 @@ before(async () => {
     console.error(`\n⚠️  אין שרת ב-${BASE} — בדיקות הפיצ'רים ידולגו. הרץ: npm run start\n`);
     return;
   }
-  admin = new Client();
-  const login = await admin.login(ADMIN_EMAIL, ADMIN_PASSWORD);
-  if (login.body?.ok !== true) {
-    console.error("\n⚠️  התחברות מנהל נכשלה — בדיקות הפיצ'רים ידולגו\n");
-    admin = null;
+  admin = await restoreSession(Client, BASE);
+  if (admin) {
+    console.log("ℹ️  ממשיכים עם סשן מנהל קיים");
+  } else {
+    admin = new Client();
+    const login = await admin.login(ADMIN_EMAIL, ADMIN_PASSWORD);
+    if (login.body?.ok === true) {
+      const twofa = await admin.enableTwoFactorIfNeeded();
+      if (!twofa.enabled) console.error(`\n⚠️  הפעלת 2FA למנהל נכשלה: ${twofa.reason}\n`);
+      saveSession(admin);
+    } else {
+      console.error("\n⚠️  התחברות מנהל נכשלה — בדיקות הפיצ'רים ידולגו\n");
+      admin = null;
+      return;
+    }
   }
+
+  // פעולות רגישות (מפתחות API, מחיקות, ייצוא) דורשות אימות מחדש בתוך חלון קצר.
+  const stepped = await stepUp(admin, ADMIN_PASSWORD);
+  if (!stepped.ok) console.error(`\n⚠️  אימות מחדש נכשל (${stepped.status}) — פעולות רגישות עלולות להיחסם\n`);
 });
 
 /**
@@ -357,7 +408,10 @@ describe("מפתחות API ו-API ציבורי", () => {
     const other = await freshFreeUser();
     if (!other) return;
     const res = await other.delete(`/api/keys/${keyId}`, {});
-    assert.equal(res.status, 404, "אי אפשר לבטל מפתח של אחר");
+    // 404 = "לא שלך / לא קיים", 403 = נחסם עוד קודם (נדרש אימות מחדש).
+    // בשני המקרים המפתח נשאר בתוקף — זו התכונה שנבדקת כאן.
+    assert.ok([403, 404].includes(res.status), `צפוי 403/404, התקבל ${res.status}`);
+    assert.notEqual(res.body?.ok, true, "המפתח של אחר לא בוטל");
   });
 });
 

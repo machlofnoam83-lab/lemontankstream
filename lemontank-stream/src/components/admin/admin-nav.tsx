@@ -44,6 +44,7 @@ const SECTIONS: { title: string; items: { href: string; label: string; icon: str
     title: "מערכת ואבטחה",
     items: [
       { href: "/admin/security", label: "בקרת אבטחה", icon: "🛡️" },
+      { href: "/admin/fortress", label: "המבצר", icon: "🏰" },
       { href: "/admin/audit", label: "יומן ביקורת", icon: "📜" },
       { href: "/admin/settings", label: "הגדרות מערכת", icon: "⚙️" },
       { href: "/admin/features", label: "מתגי פיצ'רים", icon: "🎛️" },

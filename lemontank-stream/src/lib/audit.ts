@@ -6,7 +6,8 @@
  * הרשומות אינן ניתנות למחיקה דרך ה-API (רק אדמין יכול לקרוא), ונשמרות לצמיתות.
  */
 
-import { all, run, parseJson } from "./db";
+import { all, get, run, tx, parseJson } from "./db";
+import { sha256 } from "./crypto";
 import { clientIp, userAgent } from "./http";
 
 export type AuditAction =
@@ -62,29 +63,169 @@ function serialize(value: unknown): string | null {
   }
 }
 
+/**
+ * חתימת רשומת יומן — משורשרת לרשומה הקודמת.
+ *
+ * הרעיון: כל רשומה מכילה את ה-Hash של כל מה שקדם לה, ולכן **כל** שינוי,
+ * מחיקה או החדרה בדיעבד שוברים את השרשרת. זו הגנה מסוג "היסטוריה שלא
+ * משכתבים בשקט" — בדיוק מה שמבקשים בביקורת פורנזית.
+ */
+export const GENESIS_HASH = "0".repeat(64);
+
+const chainHash = (parts: {
+  seq: number;
+  prevHash: string;
+  action: string;
+  actorId: number | null;
+  entity: string | null;
+  entityId: string | null;
+  severity: string;
+  createdAt: string;
+  payload: string | null;
+}): string =>
+  sha256(
+    [
+      parts.seq,
+      parts.prevHash,
+      parts.action,
+      parts.actorId ?? "",
+      parts.entity ?? "",
+      parts.entityId ?? "",
+      parts.severity,
+      parts.createdAt,
+      parts.payload ?? "",
+    ].join("\u0001"),
+  );
+
+/** הרשומה האחרונה בשרשרת (לפי seq) */
+function chainHead(): { seq: number; entry_hash: string | null } {
+  const row = get<{ seq: number | null; entry_hash: string | null }>(
+    "SELECT seq, entry_hash FROM audit_log WHERE seq IS NOT NULL ORDER BY seq DESC LIMIT 1",
+  );
+  return { seq: Number(row?.seq ?? 0), entry_hash: row?.entry_hash ?? null };
+}
+
 /** רישום פעולה ביומן הביקורת. לעולם לא זורק — לוג לא אמור להפיל בקשה. */
 export function writeAudit(input: AuditInput, ctx: AuditContext = {}): void {
   try {
-    run(
-      `INSERT INTO audit_log(actor_id, actor_email, action, entity, entity_id, severity, before_json, after_json, ip, user_agent, request_id)
-       VALUES(?,?,?,?,?,?,?,?,?,?,?)`,
-      [
-        ctx.actorId ?? null,
-        ctx.actorEmail ?? null,
-        input.action,
-        input.entity ?? null,
-        input.entityId != null ? String(input.entityId) : null,
-        input.severity ?? "info",
-        serialize(input.before),
-        serialize(input.after ?? (input.detail ? { detail: input.detail } : undefined)),
-        ctx.req ? clientIp(ctx.req) : null,
-        ctx.req ? userAgent(ctx.req) : null,
-        ctx.req?.headers.get("x-request-id") ?? null,
-      ],
-    );
+    const createdAt = new Date().toISOString();
+    const payload = serialize(input.after ?? (input.detail ? { detail: input.detail } : undefined));
+
+    tx(() => {
+      const head = chainHead();
+      const seq = head.seq + 1;
+      const prevHash = head.entry_hash ?? GENESIS_HASH;
+      const entryHash = chainHash({
+        seq,
+        prevHash,
+        action: input.action,
+        actorId: ctx.actorId ?? null,
+        entity: input.entity ?? null,
+        entityId: input.entityId != null ? String(input.entityId) : null,
+        severity: input.severity ?? "info",
+        createdAt,
+        payload,
+      });
+
+      run(
+        `INSERT INTO audit_log(actor_id, actor_email, action, entity, entity_id, severity, before_json, after_json, ip, user_agent, request_id,
+                               seq, prev_hash, entry_hash, created_at)
+         VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`,
+        [
+          ctx.actorId ?? null,
+          ctx.actorEmail ?? null,
+          input.action,
+          input.entity ?? null,
+          input.entityId != null ? String(input.entityId) : null,
+          input.severity ?? "info",
+          serialize(input.before),
+          payload,
+          ctx.req ? clientIp(ctx.req) : null,
+          ctx.req ? userAgent(ctx.req) : null,
+          ctx.req?.headers.get("x-request-id") ?? null,
+          seq,
+          prevHash,
+          entryHash,
+          createdAt,
+        ],
+      );
+    });
   } catch (err) {
     console.error("[audit] failed to write", err);
   }
+}
+
+export type ChainVerification = {
+  ok: boolean;
+  checked: number;
+  broken: { id: number; seq: number | null; reason: string }[];
+  head: { seq: number; entryHash: string | null };
+  legacyRows: number;
+  verifiedAt: string;
+};
+
+/**
+ * אימות שלמות השרשרת.
+ * רשומות ותיקות (מלפני שהשרשרת הופעלה) מדולגות בכוונה ומדווחות בנפרד —
+ * הן לא "שבורות", הן פשוט טרום-שרשרת.
+ */
+export function verifyAuditChain(limit = 5000): ChainVerification {
+  const rows = all<{
+    id: number;
+    seq: number | null;
+    prev_hash: string | null;
+    entry_hash: string | null;
+    action: string;
+    actor_id: number | null;
+    entity: string | null;
+    entity_id: string | null;
+    severity: string;
+    after_json: string | null;
+    created_at: string;
+  }>(
+    `SELECT id, seq, prev_hash, entry_hash, action, actor_id, entity, entity_id, severity, after_json, created_at
+     FROM audit_log WHERE seq IS NOT NULL ORDER BY seq ASC LIMIT ?`,
+    [Math.min(Math.max(limit, 1), 20_000)],
+  );
+
+  const broken: { id: number; seq: number | null; reason: string }[] = [];
+  let previous = GENESIS_HASH;
+  let expectedSeq = rows.length ? Number(rows[0].seq) : 1;
+
+  for (const row of rows) {
+    if (Number(row.seq) !== expectedSeq) {
+      broken.push({ id: row.id, seq: row.seq, reason: `רצף לא תקין (צפוי ${expectedSeq})` });
+    }
+    if ((row.prev_hash ?? GENESIS_HASH) !== previous) {
+      broken.push({ id: row.id, seq: row.seq, reason: "החוליה הקודמת לא תואמת" });
+    }
+    const expected = chainHash({
+      seq: Number(row.seq),
+      prevHash: row.prev_hash ?? GENESIS_HASH,
+      action: row.action,
+      actorId: row.actor_id,
+      entity: row.entity,
+      entityId: row.entity_id,
+      severity: row.severity,
+      createdAt: row.created_at,
+      payload: row.after_json,
+    });
+    if (expected !== row.entry_hash) {
+      broken.push({ id: row.id, seq: row.seq, reason: "תוכן הרשומה שונה מהחתימה" });
+    }
+    previous = row.entry_hash ?? previous;
+    expectedSeq += 1;
+  }
+
+  const head = chainHead();
+  return {
+    ok: broken.length === 0,
+    checked: rows.length,
+    broken: broken.slice(0, 50),
+    head: { seq: head.seq, entryHash: head.entry_hash },
+    legacyRows: Number(get<{ c: number }>("SELECT COUNT(*) c FROM audit_log WHERE seq IS NULL")?.c ?? 0),
+    verifiedAt: new Date().toISOString(),
+  };
 }
 
 /** רישום אירוע אבטחה (משמש גם את ה-rate limiter ואת מנוע הזיהוי) */
