@@ -39,8 +39,15 @@ export type GuardOptions = {
   /** null = ציבורי (ברירת מחדל) */
   auth?: "required" | "optional";
   permission?: Permission;
-  /** null = ללא הגבלת קצב */
-  rateLimit?: RateRuleName;
+  /**
+   * הגבלת קצב. **ברירת מחדל: מוגבל** (`api` — 240 לדקה לכל כתובת ולכל נתיב).
+   *
+   * למה זה הפוך מהאינטואיציה: קודם ההגבלה הייתה אופציונלית, וכל נתיב ששכחו
+   * להוסיף לו כלל היה **ללא הגבלה בכלל** — וכך נתיב ציבורי אחד שנשכח הפך
+   * למכונת סריקה/הצפה. עכשיו המצב הפוך: מי שרוצה נתיב ללא הגבלה חייב
+   * לכתוב `rateLimit: null` במפורש, כלומר זו החלטה מודעת ולא שכחה.
+   */
+  rateLimit?: RateRuleName | null;
   /** האם לדרוש אימות CSRF בבקשות משנות מצב (true כברירת מחדל) */
   csrf?: boolean;
   audit?: { action: AuditAction; entity?: string; entityId?: string | number; severity?: "info" | "warning" | "critical" };
@@ -77,8 +84,9 @@ export async function withApi(req: NextRequest, options: GuardOptions, handler: 
     }
 
     /* ── 1. הגבלת קצב ─────────────────────────────────────────────────── */
-    if (options.rateLimit) {
-      const rule = RATE_RULES[options.rateLimit];
+    // null = הנתיב ביקש במפורש להיות ללא הגבלה; undefined = ברירת המחדל המוגנת.
+    if (options.rateLimit !== null) {
+      const rule = RATE_RULES[options.rateLimit ?? "api"];
       const res = consumeRateLimit(rule, `${ip}:${routeKey(req)}`);
       if (!res.allowed) {
         await logSecurityEvent({ kind: "rate_limit_exceeded", severity: "warning", ip, detail: `route=${routeKey(req)} rule=${rule.name}` });

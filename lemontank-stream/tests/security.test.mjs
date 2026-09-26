@@ -142,6 +142,35 @@ t("גלישה לגיטימית לא נחסמת", async () => {
   }
 });
 
+/* ─────────────── הגבלת קצב כברירת מחדל (לקח מהמדידה) ─────────────── */
+
+/**
+ * הבאג שנחשף במדידת ההתקפות: ההגבלה הייתה **אופציונלית** — כל נתיב שלא
+ * הוסיפו לו כלל במפורש היה ללא הגבלה בכלל. נתיב ציבורי אחד שנשכח = מכונת
+ * הצפה. הבדיקה כאן נכשלת אם מישהו יוסיף בעתיד נתיב בלי הגנה, כי היא
+ * בודקת נתיב שאין לו כלל מפורש בקוד.
+ */
+t("נתיב בלי כלל מפורש עדיין מוגבל (ברירת מחדל)", async () => {
+  const ip = makeIp();
+  let blocked = 0;
+  let sawOk = 0;
+  for (let i = 0; i < 260; i += 1) {
+    const response = await probe(`/api/genres?limit=1&p=${i}`, { ip });
+    if (response.status === 429) blocked += 1;
+    if (response.status === 200) sawOk += 1;
+  }
+  assert.ok(sawOk > 0, "הנתיב אמור לעבוד לפני החסימה");
+  assert.ok(blocked > 0, "נתיב בלי rateLimit מפורש חייב עדיין להיחסם אחרי המכסה (240/דקה)");
+});
+
+t("קצב גלישה אנושי לא נחסם", async () => {
+  const ip = makeIp();
+  for (let i = 0; i < 20; i += 1) {
+    const response = await probe(i % 2 ? "/movies" : "/", { ip });
+    assert.notEqual(response.status, 429, "גלישה רגילה לא אמורה להיחסם");
+  }
+});
+
 t("חיפוש בעברית עם גרש לא נחסם", async () => {
   const res = await probe("/search?q=rock%27n%27roll");
   assert.equal(res.status, 200);
