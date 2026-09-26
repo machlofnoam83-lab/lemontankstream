@@ -17,6 +17,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import crypto from "node:crypto";
+import { execFileSync } from "node:child_process";
 import { DatabaseSync } from "node:sqlite";
 import { fileURLToPath } from "node:url";
 
@@ -94,6 +95,19 @@ class Client {
   }
   get = (p) => this.raw(p);
   post = (p, b) => this.raw(p, { method: "POST", body: JSON.stringify(b ?? {}) });
+}
+
+/**
+ * הכנה מקומית: מריצים את test-prep כדי לנקות מכסות ושאריות של בדיקות.
+ * בלי זה ההוכחה עלולה להיתקל ב-429 (המכסה האמיתית של האתר — 6 מימושים
+ * ל-10 דקות לאותו IP — והבדיקות שרפו אותה לפנינו). אפשר לבטל עם --no-prep.
+ */
+if (!process.argv.includes("--no-prep")) {
+  try {
+    execFileSync(process.execPath, [path.join(ROOT, "scripts", "test-prep.mjs")], { cwd: ROOT, stdio: "pipe" });
+  } catch {
+    console.log("ℹ️  הכנה מקומית לא הורצה — ממשיכים בכל זאת");
+  }
 }
 
 const db = new DatabaseSync(DB_FILE);
