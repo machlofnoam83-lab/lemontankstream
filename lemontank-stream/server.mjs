@@ -29,6 +29,24 @@ import { fileURLToPath } from "node:url";
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const APP_ROOT = process.env.APP_ROOT ?? __dirname;
 
+/* ───────────────── בדיקת גרסת Node — לפני כל דבר אחר ─────────────────────
+ * האתר משתמש במסד SQLite המובנה של Node (`node:sqlite`): נוסף ב-22.5 מאחורי
+ * דגל, וזמין **בלי דגל מ-22.13** (וגם מ-23.4). בלי הבדיקה הזו המשתמש מקבל
+ * שגיאת import סתומה על `node:sqlite` שלא מסבירה מה לעשות.
+ */
+{
+  const [maj, min] = process.versions.node.split(".").map(Number);
+  const ok = maj >= 24 || (maj === 23 && min >= 4) || (maj === 22 && min >= 13);
+  if (!ok) {
+    console.error(
+      "\n✗ נדרש Node.js 22.13 ומעלה (או 23.4+) — המותקן אצלך: v" + process.versions.node + "\n" +
+      "  הסיבה: מסד הנתונים הוא node:sqlite המובנה של Node (בלי חבילות חוץ).\n" +
+      "  הורדה: https://nodejs.org — בחר בגרסת LTS, התקן, ופתח חלון טרמינל חדש.\n"
+    );
+    process.exit(1);
+  }
+}
+
 /* ─────────────────────────── טעינת .env (בלי תלות חוץ) ───────────────────── */
 
 function loadEnvFile(file) {
@@ -657,6 +675,24 @@ function sendBlocked(reqInfo, res, decision) {
 }
 
 /* ──────────────────────────────── השרת ──────────────────────────────────── */
+
+/* ── בדיקת בנייה מוקדמת ─────────────────────────────────────────────────────
+ * `npm run start` דורש build. בלי הבדיקה הזו Next זורק שגיאה באנגלית עמוק
+ * בתוך החבילה ("Could not find a production build") — מבלבל למי שמריץ אצלו
+ * במחשב בפעם הראשונה. במקום זה: הודעה בעברית עם הפקודה המדויקת.
+ */
+if (!DEV && !fs.existsSync(path.join(APP_ROOT, ".next", "BUILD_ID"))) {
+  console.error(
+    "\n✗ אין בנייה (תיקיית .next חסרה או לא שלמה) — אי אפשר להריץ במצב רגיל.\n\n" +
+    "  מה עושים (אחת מהשתיים):\n" +
+    "    1. הכנה אוטומטית — מתקין, מייצר סודות, יוצר מסד ובונה:\n" +
+    "         npm run setup\n\n" +
+    "    2. ידנית:\n" +
+    "         npm run build\n\n" +
+    "  רוצה לרוץ בלי בנייה (מצב פיתוח)?  npm run dev\n"
+  );
+  process.exit(1);
+}
 
 const nextModule = await import("next");
 const next = nextModule.default ?? nextModule;

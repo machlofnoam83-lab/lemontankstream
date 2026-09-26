@@ -10,24 +10,38 @@ SQLite מובנה ב-Node (`node:sqlite`) — **בלי עלויות, בלי שר
 
 ## ⚡ התחלה מהירה (3 דקות)
 
+**דרישה אחת בלבד:** [Node.js](https://nodejs.org) גרסת **LTS** (22.13 ומעלה) —
+המסד הוא SQLite המובנה של Node, ולכן אין MySQL/Docker/חבילות נייטיביות.
+
 ```bash
 # 1. התקנת תלויות
-npm install
+npm ci
 
-# 2. הפקת סודות + כתיבה ל-.env.local (כולל סיסמת מנהל)
-node scripts/gen-secrets.mjs --write
+# 2. הכנה אוטומטית: סודות → מסד → בנייה (בטוח להרצה חוזרת)
+npm run setup
 
-# 3. יצירת המסד — מערכת נקייה, בלי תוכן (התוכן הוא שלך)
-node scripts/seed.mjs
+# 3. הרצה
+npm run start        # → http://localhost:3000
+# או במצב פיתוח עם רענון חי:
+npm run dev
+```
 
-#    רוצה לראות קודם איך זה נראה עם תוכן לדוגמה? (אפשר למחוק אחר כך)
-# node scripts/seed.mjs --reset --demo
+**מעדיף קליק כפול?** 🖱️
+Windows: `START-HERE-WINDOWS.cmd` · macOS: `START-HERE-MAC.command` —
+המדריך המלא (כולל טלפון באותה רשת, עדכונים ופתרון תקלות): **[RUN-LOCALLY.md](./RUN-LOCALLY.md)**
 
-# 4. הרצה
-npm run dev          # פיתוח → http://localhost:3000
-# או
+<details>
+<summary>השלבים הידניים (אם אתה מעדיף שליטה מלאה)</summary>
+
+```bash
+npm ci                                   # תלויות
+node scripts/gen-secrets.mjs --write     # סודות + .env.local (כולל סיסמת מנהל)
+node scripts/seed.mjs                    # מסד חדש — קטלוג ריק, התוכן הוא שלך
+# node scripts/seed.mjs --reset --demo   #   או: תוכן לדוגמה שאפשר למחוק
 npm run build && npm run start
 ```
+
+</details>
 
 ### 🔑 כניסת מנהל
 
