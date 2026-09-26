@@ -8,10 +8,26 @@
  *   node scripts/open-later.mjs --dry-run            # בלי לפתוח דפדפן (לבדיקות)
  */
 import { spawn } from "node:child_process";
+import os from "node:os";
 
 const args = process.argv.slice(2);
 const dryRun = args.includes("--dry-run");
 const url = args.find((a) => a.startsWith("http")) ?? "http://localhost:3000";
+
+/** כתובות שמישות ברשת הביתית — כדי שגם הטלפון יוכל להיכנס (בלי 169.254/אדפטרים וירטואליים) */
+function lanAddresses() {
+  return Object.values(os.networkInterfaces())
+    .flat()
+    .filter((entry) => {
+      if (!entry || entry.family !== "IPv4" || entry.internal) return false;
+      if (entry.address.startsWith("169.254.")) return false;
+      const [a, b] = entry.address.split(".").map(Number);
+      return a === 10 || (a === 172 && b >= 16 && b <= 31) || (a === 192 && b === 168);
+    })
+    .map((entry) => entry.address)
+    .sort((x, y) => Number(y.startsWith("192.168.")) - Number(x.startsWith("192.168.")))
+    .slice(0, 2);
+}
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
@@ -55,6 +71,12 @@ while (Date.now() < deadline) {
 if (ready) {
   console.log(`האתר עלה — פותח את הדפדפן: ${url}`);
   openBrowser(url);
+  const port = new URL(url).port || "3000";
+  const lan = lanAddresses();
+  if (lan.length) {
+    console.log(`מהטלפון או ממחשב אחר באותה רשת Wi-Fi:`);
+    for (const ip of lan) console.log(`   http://${ip}:${port}`);
+  }
 } else if (dryRun) {
   console.log(`[dry-run] השרת לא ענה תוך 90 שניות — הייתי פותח בכל זאת: ${url}`);
 } else {

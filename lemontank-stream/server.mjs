@@ -22,6 +22,7 @@
 import http from "node:http";
 import https from "node:https";
 import fs from "node:fs";
+import os from "node:os";
 import path from "node:path";
 import crypto from "node:crypto";
 import { fileURLToPath } from "node:url";
@@ -71,6 +72,8 @@ loadEnvFile(path.join(APP_ROOT, ".env"));
 
 const DEV = process.argv.includes("--dev") || process.env.NODE_ENV === "development";
 const HOST = process.env.HOST ?? "0.0.0.0";
+/** האם להציג גם כתובות ברשת המקומית (כשמאזינים לכל כרטיסי הרשת) */
+const LAN_HINT = HOST === "0.0.0.0" || HOST === "::" || HOST === "";
 const PORT = Number(process.env.PORT ?? 3000);
 const INTERNAL_PORT = Number(process.env.INTERNAL_PORT ?? 3311);
 const APP_SECRET = process.env.APP_SECRET ?? "dev-secret-not-for-production";
@@ -939,11 +942,43 @@ if (upgradeHandler) server.on("upgrade", upgradeHandler);
 
 server.on("listening", () => {
   const settings = engine.settings();
+
+  /**
+   * כתובות אמיתיות ללחיצה — ולא `0.0.0.0`.
+   *
+   * `HOST=0.0.0.0` הוא הוראת *האזנה* ("קבל מכל כרטיס רשת"), לא כתובת שאפשר
+   * לגלוש אליה: הדפדפן מחזיר ERR_ADDRESS_INVALID. הכתובת הנכונה למחשב הזה
+   * היא localhost, ולשאר המכשירים ברשת הביתית — כתובת ה-IPv4 של כרטיס הרשת.
+   */
+  const lanAddresses = Object.values(os.networkInterfaces())
+    .flat()
+    .filter((entry) => {
+      if (!entry || entry.family !== "IPv4" || entry.internal) return false;
+      // 169.254.x.x = "אין כתובת מהראוטר" (APIPA) — לא שמישה לשום מכשיר אחר
+      if (entry.address.startsWith("169.254.")) return false;
+      const [a, b] = entry.address.split(".").map(Number);
+      const isPrivate =
+        a === 10 || // 10.x.x.x
+        (a === 172 && b >= 16 && b <= 31) || // 172.16–31.x.x
+        (a === 192 && b === 168); // 192.168.x.x — הכי שכיח בבית
+      return isPrivate;
+    })
+    .map((entry) => entry.address)
+    // מעדיפים 192.168.x.x — זו הכתובת שהראוטר הביתי מחלק בדרך כלל
+    .sort((x, y) => Number(y.startsWith("192.168.")) - Number(x.startsWith("192.168.")))
+    .slice(0, 2);
+
+  const primary = `http://localhost:${PORT}`;
+  const lines = [`   🌐  האתר:              ${primary}`];
+  if (LAN_HINT && lanAddresses.length) {
+    lines.push(`   📱  מהטלפון/מהרשת הביתית:  ${lanAddresses.map((ip) => `http://${ip}:${PORT}`).join("  ·  ")}`);
+  }
+
   console.log(`
 ╭──────────────────────────────────────────────────────────────╮
 │  🍋 LemonTank Stream — שרת מאובטח                            │
 ╰──────────────────────────────────────────────────────────────╯
-   🌐  כתובת:            http://${HOST}:${PORT}
+${lines.join("\n")}
    🔒  Next.js:           בתוך התהליך — אין פורט נפרד שחשוף לאינטרנט
    🛡️   מצב אבטחה:        ${settings.mode === "monitor" ? "MONITOR (לוג בלבד)" : "ENFORCE (חסימה פעילה)"}
    ⚡  חסימת IP אוטומטית: ${settings.autoban === "on" ? "פעילה" : "כבויה"}
