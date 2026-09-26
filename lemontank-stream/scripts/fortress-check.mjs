@@ -16,9 +16,13 @@
  *
  * הרצה ידנית:  node scripts/fortress-check.mjs
  * הרצה עם פרטים: node scripts/fortress-check.mjs --verbose
+ * הוכחת גילוי:  node scripts/fortress-check.mjs --tamper
+ *   (מעתיק את המסד לקובץ זמני, מזייף רשומת ביקורת, ומוודא שהשרשרת
+ *    אכן מזוהה כשבורה — ההוכחה שהגלאי עובד, לא רק שהוא קיים.)
  */
 
 import fs from "node:fs";
+import os from "node:os";
 import path from "node:path";
 import crypto from "node:crypto";
 import { DatabaseSync } from "node:sqlite";
@@ -26,6 +30,55 @@ import { DatabaseSync } from "node:sqlite";
 const ROOT = path.resolve(import.meta.dirname, "..");
 const DB_FILE = process.env.DATABASE_FILE ?? path.join(ROOT, "data", "lemontank.db");
 const verbose = process.argv.includes("--verbose");
+
+/**
+ * מצב --tamper: מוכיח שהשרשרת מזהה זיוף. לא נוגעים במסד האמיתי —
+ * עובדים על העתק זמני, מזייפים בו רשומה, ובודקים שהאימות נכשל.
+ */
+if (process.argv.includes("--tamper")) {
+  const tmp = path.join(os.tmpdir(), `lt-tamper-${Date.now()}.db`);
+  fs.copyFileSync(DB_FILE, tmp);
+  const copy = new DatabaseSync(tmp);
+  const row = copy
+    .prepare("SELECT id, after_json FROM audit_log WHERE entry_hash IS NOT NULL AND seq IS NOT NULL ORDER BY seq DESC LIMIT 1")
+    .get();
+  if (!row) {
+    console.error("❌ אין רשומות משורשרות לזייף — הרץ קודם פעולה שתירשם ביומן.");
+    copy.close();
+    fs.unlinkSync(tmp);
+    process.exit(2);
+  }
+  copy.prepare("UPDATE audit_log SET after_json = ? WHERE id = ?").run('{"tampered":true}', row.id);
+  copy.close();
+
+  const check = new DatabaseSync(tmp);
+  const rows = check
+    .prepare(
+      `SELECT id, seq, prev_hash, entry_hash, action, actor_id, entity, entity_id, severity, after_json, created_at
+       FROM audit_log WHERE seq IS NOT NULL ORDER BY seq ASC LIMIT 2000`,
+    )
+    .all();
+  const hash = (parts) =>
+    crypto
+      .createHash("sha256")
+      .update(
+        [parts.seq, parts.prev_hash, parts.action, parts.actor_id ?? "", parts.entity ?? "", parts.entity_id ?? "",
+          parts.severity, parts.created_at, parts.after_json ?? ""].join("\u0001"),
+      )
+      .digest("hex");
+  let previous = "0".repeat(64);
+  let broken = 0;
+  for (const entry of rows) {
+    if (hash({ ...entry, prev_hash: entry.prev_hash ?? "0".repeat(64) }) !== entry.entry_hash) broken += 1;
+    if ((entry.prev_hash ?? "0".repeat(64)) !== previous) broken += 1;
+    previous = entry.entry_hash ?? previous;
+  }
+  check.close();
+  fs.unlinkSync(tmp);
+
+  console.log(broken > 0 ? `✅ הגלאי עובד: זיוף הרשומה ${row.id} זוהה (${broken} חריגות בשרשרת)` : `❌ הגלאי לא זיהה זיוף של רשומה ${row.id}`);
+  process.exit(broken > 0 ? 0 : 1);
+}
 
 const results = [];
 const add = (level, name, detail) => {

@@ -7,7 +7,7 @@ import { apiCall } from "@/lib/client/api";
 type FortressReport = {
   generatedAt: string;
   sessions: { active: number; risky: number; staffWithoutBinding: number; unbounded: number };
-  staff: { total: number; with2fa: number; missing2fa: string[] };
+  staff: { total: number; with2fa: number; missing2fa: string[]; accounts?: string[] };
   anomalies: { kind: string; severity: string; title: string; detail: string }[];
   allowlist: { enabled: boolean; entries: number };
   criticalActions: number;
@@ -18,9 +18,19 @@ type ChainReport = { ok: boolean; checked: number; broken: { id: number; seq: nu
 
 export type FortressData = {
   report: FortressReport;
+  /** אותם נתונים, עם אימיילי צוות ממוסכים — מה שמוצג במסך */
+  maskedStaff: { total: number; with2fa: number; missing2fa: string[]; accounts: string[] };
   auditChain: ChainReport;
   allowlist: string[];
   criticalActions: string[];
+  passwordPolicy: { breachMode: "off" | "warn" | "enforce"; breachCache: { ranges: number; lastCheckedAt: string | null } };
+  requireStaff2fa?: "on" | "off";
+};
+
+const BREACH_LABEL: Record<"off" | "warn" | "enforce", string> = {
+  enforce: "לחסום סיסמאות דלופות",
+  warn: "להתריע בלבד",
+  off: "בלי בדיקת דליפה",
 };
 
 const SEVERITY_STYLE: Record<string, string> = {
@@ -41,6 +51,8 @@ export function FortressDashboard({ initial, canManage }: { initial: FortressDat
   const [stepUpFor, setStepUpFor] = useState<null | (() => Promise<void>)>(null);
   const [password, setPassword] = useState("");
   const [stepError, setStepError] = useState("");
+  const [breachMode, setBreachMode] = useState(initial.passwordPolicy.breachMode);
+  const [staff2fa, setStaff2fa] = useState<"on" | "off">(initial.requireStaff2fa ?? "on");
 
   const refresh = async () => {
     const res = await apiCall<FortressData>("/api/admin/fortress");
@@ -98,7 +110,36 @@ export function FortressDashboard({ initial, canManage }: { initial: FortressDat
     await refresh();
   };
 
+  /** עדכון בקרות מדיניות (מצב בדיקת דליפה / חובת 2FA לסגל) */
+  const savePolicy = async (changes: { breachMode?: "off" | "warn" | "enforce"; requireStaff2fa?: "on" | "off" }) => {
+    setBusy(true);
+    setStatus("");
+    const res = await apiCall<{ breachMode: "off" | "warn" | "enforce" }>("/api/admin/fortress", {
+      method: "PATCH",
+      body: changes,
+    });
+    setBusy(false);
+    if (!res.ok) {
+      setStatus(res.error.message);
+      return;
+    }
+    if (changes.breachMode) setBreachMode(res.data.breachMode);
+    if (changes.requireStaff2fa) setStaff2fa(changes.requireStaff2fa);
+    setStatus(
+      changes.breachMode
+        ? `מדיניות הסיסמאות עודכנה: ${BREACH_LABEL[res.data.breachMode]}.`
+        : `חובת 2FA לסגל: ${changes.requireStaff2fa === "off" ? "כבויה (לא מומלץ)" : "פעילה"}.`,
+    );
+    await refresh();
+  };
+
   const { report, auditChain } = data;
+  const masked = data.maskedStaff ?? {
+    total: report.staff.total,
+    with2fa: report.staff.with2fa,
+    missing2fa: report.staff.missing2fa,
+    accounts: report.staff.accounts ?? [],
+  };
 
   return (
     <div className="space-y-6">
@@ -115,9 +156,9 @@ export function FortressDashboard({ initial, canManage }: { initial: FortressDat
           <div className="mt-1 text-2xl font-black">
             {report.staff.with2fa}/{report.staff.total}
           </div>
-          {report.staff.missing2fa.length > 0 ? (
-            <div className="mt-1 truncate text-[0.82rem] text-amber-300" title={report.staff.missing2fa.join(", ")}>
-              חסר: {report.staff.missing2fa.join(", ")}
+          {masked.missing2fa.length > 0 ? (
+            <div className="mt-1 truncate text-[0.82rem] text-amber-300" title={masked.missing2fa.join(", ")}>
+              חסר: {masked.missing2fa.join(", ")}
             </div>
           ) : (
             <div className="mt-1 text-[0.82rem] text-emerald-300">כל הסגל מוגן ✓</div>
@@ -209,6 +250,56 @@ export function FortressDashboard({ initial, canManage }: { initial: FortressDat
         </div>
         {!canManage && <p className="mt-2 text-[0.85rem] text-amber-300">רק בעל המערכת יכול לשנות את הרשימה.</p>}
         {status && <p className="mt-2 text-[0.9rem] text-lemon-300">{status}</p>}
+      </Card>
+
+      <Card className="p-4">
+        <h2 className="text-lg font-bold">🔑 מדיניות סיסמאות</h2>
+        <p className="mt-1 text-[0.9rem] text-ink-300">
+          בדיקת דליפה מבוצעת מול Have I Been Pwned בשיטת k-anonymity — נשלחים 5 תווים של Hash בלבד,
+          הסיסמה עצמה לא עוזבת את השרת. בלי אינטרנט הבדיקה המרוחקת מדולגת והרשימה המקומית ממשיכה לעבוד.
+        </p>
+        <div className="mt-3 flex flex-wrap items-center gap-2">
+          {(["enforce", "warn", "off"] as const).map((mode) => (
+            <button
+              key={mode}
+              type="button"
+              disabled={!canManage || busy}
+              onClick={() => void runCritical(() => savePolicy({ breachMode: mode }))}
+              className={`rounded-xl px-3 py-2 text-[0.88rem] font-bold disabled:opacity-50 ${
+                breachMode === mode ? "bg-lemon-400 text-ink-950" : "bg-white/[0.07] text-ink-200"
+              }`}
+            >
+              {BREACH_LABEL[mode]}
+            </button>
+          ))}
+        </div>
+        <div className="mt-2 text-[0.85rem] text-ink-400">
+          מטמון בדיקות: {data.passwordPolicy?.breachCache?.ranges ?? 0} קידומות
+          {data.passwordPolicy?.breachCache?.lastCheckedAt
+            ? ` · נבדק לאחרונה ${new Date(data.passwordPolicy.breachCache.lastCheckedAt).toLocaleString("he-IL")}`
+            : ""}
+        </div>
+        <div className="mt-4 border-t border-white/10 pt-3">
+          <div className="text-[0.9rem] text-ink-300">חובת אימות דו-שלבי על כל חשבונות הצוות</div>
+          <div className="mt-2 flex gap-2">
+            {(["on", "off"] as const).map((value) => (
+              <button
+                key={value}
+                type="button"
+                disabled={!canManage || busy}
+                onClick={() => void runCritical(() => savePolicy({ requireStaff2fa: value }))}
+                className={`rounded-xl px-3 py-2 text-[0.88rem] font-bold disabled:opacity-50 ${
+                  staff2fa === value ? "bg-lemon-400 text-ink-950" : "bg-white/[0.07] text-ink-200"
+                }`}
+              >
+                {value === "on" ? "חובה" : "רשות"}
+              </button>
+            ))}
+          </div>
+          <p className="mt-2 text-[0.85rem] text-amber-300">
+            החיווי כאן משקף את בחירתך במסך — מצב החובה בפועל נשמר בשרת ונבדק בכל בקשה לניהול.
+          </p>
+        </div>
       </Card>
 
       <Card className="p-4">

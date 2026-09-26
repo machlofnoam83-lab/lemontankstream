@@ -13,6 +13,7 @@ import { clientIp, userAgent } from "./http";
 export type AuditAction =
   | "auth.register" | "auth.login" | "auth.login_failed" | "auth.logout" | "auth.password_change"
   | "auth.password_reset" | "auth.2fa_enable" | "auth.2fa_disable" | "auth.session_revoke"
+  | "auth.anomaly" | "auth.stepup" | "auth.breach_block"
   | "user.create" | "user.update" | "user.delete" | "user.plan_change" | "user.role_change"
   | "user.suspend" | "user.unsuspend" | "user.impersonate" | "user.export"
   | "title.create" | "title.update" | "title.delete" | "title.publish" | "title.unpublish"

@@ -5,12 +5,14 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { apiCall } from "@/lib/client/api";
 import { Alert, Button, Field, Input } from "@/components/ui/primitives";
+import { PasswordMeter } from "@/components/auth/password-meter";
 
 export function ResetPasswordForm({ token: initialToken }: { token: string }) {
   const router = useRouter();
   const [token, setToken] = useState(initialToken);
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
+  const [passwordOk, setPasswordOk] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [problems, setProblems] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
@@ -20,6 +22,7 @@ export function ResetPasswordForm({ token: initialToken }: { token: string }) {
     setError(null);
     setProblems([]);
 
+    if (password && !passwordOk) return setError("הסיסמה לא עומדת במדיניות האבטחה — ראה את ההערות מתחת לשדה");
     if (password !== confirm) {
       setError("הסיסמאות אינן זהות");
       return;
@@ -61,6 +64,7 @@ export function ResetPasswordForm({ token: initialToken }: { token: string }) {
 
       <Field label="סיסמה חדשה" required htmlFor="password" hint="לפחות 10 תווים, עם ספרה ותו מיוחד">
         <Input id="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} dir="ltr" autoComplete="new-password" required />
+        <PasswordMeter password={password} onVerdict={setPasswordOk} />
       </Field>
 
       <Field label="אימות סיסמה" required htmlFor="confirm">

@@ -13,7 +13,12 @@ export type RateRule = { limit: number; windowSec: number; name: string };
 
 /** חוקי ברירת מחדל לכל שכבת API — ניתנים לכוונון */
 export const RATE_RULES = {
-  login: { name: "login", limit: 8, windowSec: 300 },          // 8 ניסיונות ב-5 דק'
+  // כל בקשות ההתחברות (כולל השלמת 2FA, שהיא בקשה נוספת לכל התחברות).
+  // הדלי הזה נדיב בכוונה: משפחה שלמה מאחורי NAT אחד לא אמורה להיחסם.
+  login: { name: "login", limit: 30, windowSec: 300 },
+  // **כשלי התחברות בלבד** — זה מה שעוצר brute-force באמת. התחברות מוצלחת
+  // לא שורפת מכסה, כך שאין חסימה עצמית של משתמשים לגיטימיים.
+  loginFailure: { name: "login_failure", limit: 8, windowSec: 300 },
   // מעבר פרופיל רגיל (בלי קוד) — דלי נדיב, כדי שהחלפות במשפחה לא ייחסמו
   profileSwitch: { name: "profile_switch", limit: 40, windowSec: 300 },
   // ניסויי קוד (PIN) — דלי קשיח במיוחד: 8 ניסיונות ל-5 דק' לאותו משתמש.
@@ -28,6 +33,9 @@ export const RATE_RULES = {
   comment: { name: "comment", limit: 12, windowSec: 600 },
   progress: { name: "progress", limit: 600, windowSec: 60 },
   streamStart: { name: "stream_start", limit: 120, windowSec: 60 },
+  // מדד חוזק סיסמה: נדיב מספיק להקלדה, צר מספיק כדי שלא ישמש לבדיקת
+  // סיסמאות בכמות — כל בקשה עולה לשרת בדיקת Hash וקריאת רשת.
+  passwordCheck: { name: "password_check", limit: 30, windowSec: 60 },
 } as const satisfies Record<string, RateRule>;
 
 export type RateRuleName = keyof typeof RATE_RULES;

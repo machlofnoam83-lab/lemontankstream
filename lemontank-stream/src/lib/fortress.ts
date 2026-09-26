@@ -17,7 +17,7 @@
 
 import crypto from "node:crypto";
 import { all, count, get, run } from "./db";
-import { ApiError } from "./http";
+import { ApiError, clientIp } from "./http";
 import { sha256 } from "./crypto";
 import { isAdminRole, isStaff } from "./rbac";
 import type { SessionUser } from "./session";
@@ -360,6 +360,23 @@ export function detectLoginAnomalies(userId: number, ip: string, userAgent: stri
       at: now,
     });
   }
+
+  // התחברות מוצלחת מיד אחרי שורת כישלונות — דגל אדום קלאסי (ניחוש שהצליח)
+  const recentFailures = count(
+    `SELECT COUNT(*) c FROM login_attempts WHERE success = 0 AND created_at > datetime('now','-30 minutes')
+     AND (ip = ? OR user_id = ?)`,
+    [ip, userId],
+  );
+  if (recentFailures >= 5) {
+    out.push({
+      kind: "success_after_failures",
+      severity: "warning",
+      title: "התחברות מוצלחת אחרי ניסיונות כושלים",
+      detail: `${recentFailures} ניסיונות כושלים ב-30 הדקות שקדמו להתחברות הזו. אם זו לא הייתה התחברות שלך — החלף סיסמה עכשיו.`,
+      actorId: userId,
+      at: now,
+    });
+  }
   return out;
 }
 
@@ -457,6 +474,52 @@ export function systemAnomalies(): Anomaly[] {
   return out;
 }
 
+/**
+ * נקרא אחרי התחברות מוצלחת (סיסמה, או סיסמה+2FA).
+ *
+ * כל חריגה מייצרת גם התראה בתוך האתר למשתמש עצמו, וגם — אם מדובר בחשבון
+ * צוות — התראה לכל שאר הצוות. הרעיון: אם תוקף נכנס לחשבון שלי, אני אמור
+ * לדעת מזה מיד, ולא מהממונה שלי בעוד שבוע.
+ */
+export function noteSuccessfulLogin(
+  user: { id: number; role?: string | null; email?: string | null },
+  req: Request,
+): Anomaly[] {
+  const anomalies = detectLoginAnomalies(user.id, clientIp(req), userAgentHeader(req));
+  for (const anomaly of anomalies) {
+    alertAnomaly(anomaly);
+    if (anomaly.severity !== "info" && isStaff(user.role)) notifyStaff(anomaly, user);
+  }
+  return anomalies;
+}
+
+/** התראה לכל חברי הצוות (חוץ מהמשתמש עצמו) — על חריגה בחשבון של צוות */
+function notifyStaff(anomaly: Anomaly, actor: { id: number; email?: string | null }): void {
+  const staff = all<{ id: number }>(
+    "SELECT id FROM users WHERE role IN ('editor','admin','owner') AND deleted_at IS NULL AND status = 'active' AND id != ?",
+    [actor.id],
+  );
+  const who = maskEmail(actor.email);
+  for (const member of staff) {
+    run("INSERT INTO notifications(user_id, kind, title, body, link) VALUES(?,?,?,?,?)", [
+      member.id,
+      "security_staff",
+      `התראת אבטחה: ${anomaly.title}`,
+      `בחשבון הצוות ${who}: ${anomaly.detail}`,
+      "/admin/fortress",
+    ]);
+  }
+}
+
+/** שליפת ה-User-Agent מהבקשה (נשמר כ-Hash בלבד) */
+function userAgentHeader(req: Request): string {
+  try {
+    return req.headers.get("user-agent") ?? "";
+  } catch {
+    return "";
+  }
+}
+
 // ═══════════════════════════════════════════════════════════════════════════
 //  תמונת מצב כוללת — למסך האבטחה ולבדיקות
 // ═══════════════════════════════════════════════════════════════════════════
@@ -464,7 +527,7 @@ export function systemAnomalies(): Anomaly[] {
 export type FortressReport = {
   generatedAt: string;
   sessions: { active: number; risky: number; staffWithoutBinding: number; unbounded: number };
-  staff: { total: number; with2fa: number; missing2fa: string[] };
+  staff: { total: number; with2fa: number; missing2fa: string[]; accounts: string[] };
   anomalies: Anomaly[];
   allowlist: { enabled: boolean; entries: number };
   criticalActions: number;
@@ -490,6 +553,7 @@ export function fortressReport(): FortressReport {
       total: staffRows.length,
       with2fa: staffRows.filter((row) => row.twofa_enabled === 1).length,
       missing2fa: staffRows.filter((row) => row.twofa_enabled !== 1).map((row) => row.email),
+      accounts: staffRows.map((row) => row.email),
     },
     anomalies: systemAnomalies(),
     allowlist: { enabled: adminIpAllowlist().length > 0, entries: adminIpAllowlist().length },
@@ -497,6 +561,38 @@ export function fortressReport(): FortressReport {
     migrations: count("SELECT COUNT(*) c FROM schema_migrations"),
   };
 }
+
+// ═══════════════════════════════════════════════════════════════════════════
+//  מיסוך פרטים מזהים (PII) — מידע מוגן לא נכתב גלוי ולא מוצג גלוי
+// ═══════════════════════════════════════════════════════════════════════════
+
+/**
+ * מיסוך אימייל לתצוגה וליומנים: `noam@gmail.com` → `n**m@g****.com`.
+ * נשמר מספיק מידע כדי לזהות "איזה חשבון", בלי לפרסם את הכתובת המלאה
+ * בכל מסך ניהול, ייצוא או התראה.
+ */
+export function maskEmail(email: string | null | undefined): string {
+  const value = String(email ?? "").trim();
+  if (!value.includes("@")) return value ? `${value.slice(0, 2)}***` : "";
+  const [local, domain] = value.split("@");
+  const [host, ...rest] = domain.split(".");
+  const maskPart = (part: string): string =>
+    part.length <= 2 ? `${part.slice(0, 1)}*` : `${part[0]}${"*".repeat(Math.min(3, Math.max(1, part.length - 2)))}${part.slice(-1)}`;
+  return `${maskPart(local)}@${maskPart(host)}${rest.length ? `.${rest.join(".")}` : ""}`;
+}
+
+/** מיסוך כתובת IP: `203.0.113.45` → `203.0.113.x` (רשת, בלי המארח) */
+export function maskIp(ip: string | null | undefined): string {
+  const value = String(ip ?? "").trim();
+  if (!value) return "";
+  if (value.includes(":")) return `${value.split(":").slice(0, 4).join(":")}::x`;
+  const parts = value.split(".");
+  return parts.length === 4 ? `${parts[0]}.${parts[1]}.${parts[2]}.x` : value.slice(0, 8) + "…";
+}
+
+/** כמה רשומות PII נחשפו בפועל במסך הזה — לבדיקות ולסטטיסטיקה */
+export const containsRawEmail = (value: unknown): boolean =>
+  /[\w.+-]+@[\w-]+\.[\w.]{2,}/.test(typeof value === "string" ? value : JSON.stringify(value ?? ""));
 
 // ═══════════════════════════════════════════════════════════════════════════
 //  חתימה על הפעולה — "מה בדיוק אושר" (אימות מדורג עם ראיה)

@@ -1,11 +1,12 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { apiCall } from "@/lib/client/api";
 import { Alert, Button, Checkbox, Field, Input } from "@/components/ui/primitives";
 import { useToast } from "@/components/ui/toast";
+import { PasswordMeter } from "@/components/auth/password-meter";
 
 type Plan = { code: string; name_he: string; price_ils: number; max_quality: string };
 
@@ -26,18 +27,7 @@ export function RegisterForm({ plans, initialPlan = "free", referral }: { plans:
   const [problems, setProblems] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
 
-  const strength = useMemo(() => {
-    let score = 0;
-    if (password.length >= 10) score++;
-    if (/[a-z]/.test(password)) score++;
-    if (/[A-Z]/.test(password) || /[\u0590-\u05FF]/.test(password)) score++;
-    if (/\d/.test(password)) score++;
-    if (/[^A-Za-z0-9\u0590-\u05FF]/.test(password)) score++;
-    return Math.min(5, score);
-  }, [password]);
-
-  const strengthLabels = ["חלשה מאוד", "חלשה", "בינונית", "טובה", "חזקה", "מצוינת 💪"];
-  const strengthColors = ["bg-red-500", "bg-red-400", "bg-amber-400", "bg-emerald-400", "bg-emerald-500", "bg-emerald-500"];
+  const [passwordOk, setPasswordOk] = useState(false);
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -46,6 +36,10 @@ export function RegisterForm({ plans, initialPlan = "free", referral }: { plans:
 
     if (password !== confirm) {
       setError("הסיסמאות אינן זהות");
+      return;
+    }
+    if (password && !passwordOk) {
+      setError("הסיסמה לא עומדת במדיניות האבטחה — ראה את ההערות מתחת לשדה הסיסמה");
       return;
     }
     if (!accept) {
@@ -102,18 +96,7 @@ export function RegisterForm({ plans, initialPlan = "free", referral }: { plans:
         hint="לפחות 10 תווים, עם ספרה ותו מיוחד. מומלץ גם אות גדולה."
       >
         <Input id="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="••••••••" dir="ltr" autoComplete="new-password" required />
-        {password ? (
-          <div className="mt-2 space-y-1">
-            <div className="flex gap-1" aria-hidden="true">
-              {Array.from({ length: 5 }, (_, i) => (
-                <span key={i} className={`h-1.5 flex-1 rounded-full ${i < strength ? strengthColors[strength] : "bg-white/10"}`} />
-              ))}
-            </div>
-            <p className="text-[0.85rem] text-ink-400">
-              חוזק סיסמה: <span className="font-bold text-ink-200">{strengthLabels[strength]}</span>
-            </p>
-          </div>
-        ) : null}
+        <PasswordMeter password={password} email={email} name={name} onVerdict={setPasswordOk} />
       </Field>
 
       <Field label="אימות סיסמה" required htmlFor="confirm" error={confirm && confirm !== password ? "הסיסמאות אינן זהות" : null}>

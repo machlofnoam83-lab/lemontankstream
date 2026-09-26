@@ -12,6 +12,7 @@
 import { cookies } from "next/headers";
 import { all, get, run, tx } from "./db";
 import { randomId, randomToken, sha256, safeEqual, deviceFingerprint } from "./crypto";
+import { headers } from "next/headers";
 import { clientIp, userAgent, ApiError } from "./http";
 import { applyPosture, bindSession, evaluateSession } from "./fortress";
 import { logSecurityEvent } from "./audit";
@@ -110,8 +111,15 @@ export function createSession(
 
 export type ValidatedSession = { session: SessionRecord; user: SessionUser; suspicious: boolean };
 
-/** מאמת סשן מתוך עוגייה; מחזיר null אם אין/פג תוקף/בוטל */
-export function validateSession(rawToken: string | undefined): ValidatedSession | null {
+/**
+ * מאמת סשן מתוך עוגייה; מחזיר null אם אין/פג תוקף/בוטל.
+ *
+ * `current` = **פרטי הבקשה הנוכחית** (IP ו-User-Agent). זה מה שהופך את
+ * קישור הסשן למכשיר מבדיקה תיאורטית לבדיקה אמיתית: בלעדיו המשווים הם
+ * הערכים של הסשן עצמו, וזה תמיד "תואם". מי שקורא לפונקציה בלי ההקשר
+ * (למשל סקריפט) מקבל התנהגות סלחנית — לא חסימה שגויה.
+ */
+export function validateSession(rawToken: string | undefined, current?: { ip?: string | null; userAgent?: string | null }): ValidatedSession | null {
   if (!rawToken || rawToken.length < 20 || rawToken.length > 200) return null;
   const hash = sha256(rawToken);
 
@@ -152,8 +160,9 @@ export function validateSession(rawToken: string | undefined): ValidatedSession 
       risk_score: row.risk_score ?? 0,
     },
     now: Date.now(),
-    ip: row.ip ?? "",
-    userAgent: row.user_agent ?? "",
+    // ההקשר הנוכחי אם סופק; אחרת נופלים לערכי הסשן (בלי לחסום בטעות)
+    ip: String(current?.ip ?? row.ip ?? ""),
+    userAgent: String(current?.userAgent ?? row.user_agent ?? ""),
     role: user.role,
   });
 
@@ -257,10 +266,25 @@ export async function getCurrentUser(): Promise<SessionUser | null> {
   return validated?.user ?? null;
 }
 
-/** מחזיר סשן מלא (משתמש + מזהה סשן) לצורך CSRF/ביקורת */
+/**
+ * מחזיר סשן מלא (משתמש + מזהה סשן) לצורך CSRF/ביקורת.
+ *
+ * כאן מוזרק ההקשר האמיתי של הבקשה (IP + דפדפן) — כך עוגיית סשן שנגנבה
+ * ומשמשת מדפדפן אחר מזוהה ונשללת מיד, גם אם היא בתוקף מבחינת זמן.
+ */
 export async function getCurrentSession(): Promise<ValidatedSession | null> {
   const store = await cookies();
-  return validateSession(store.get(SESSION_COOKIE)?.value);
+  const token = store.get(SESSION_COOKIE)?.value;
+  if (!token) return null;
+
+  let context: { ip?: string | null; userAgent?: string | null } | undefined;
+  try {
+    const h = await headers();
+    context = { ip: clientIp({ headers: h } as unknown as Request), userAgent: h.get("user-agent") };
+  } catch {
+    context = undefined; // אין הקשר בקשה (למשל בזמן בנייה) — לא חוסמים
+  }
+  return validateSession(token, context);
 }
 
 /**

@@ -2,6 +2,8 @@ import type { NextRequest } from "next/server";
 import { withApi } from "@/server/api";
 import { jsonOk } from "@/lib/http";
 import { all, count, get } from "@/lib/db";
+import { maskEmail, maskIp } from "@/lib/fortress";
+import { isAdminRole } from "@/lib/rbac";
 import { securitySummary } from "@/lib/audit";
 import { pruneRateLimits } from "@/lib/ratelimit";
 import { optimizeDb, pruneCsrfSafe, runMaintenance } from "@/server/maintenance";
@@ -22,22 +24,25 @@ export async function GET(req: NextRequest) {
       "SELECT severity, COUNT(*) c FROM security_events WHERE created_at > datetime('now','-7 day') GROUP BY severity",
     );
 
-    const failedLogins = all(
+    const failedLogins = all<{ email_norm: string | null; ip: string | null; reason: string | null; created_at: string }>(
       `SELECT email_norm, ip, reason, created_at FROM login_attempts
        WHERE success = 0 ORDER BY id DESC LIMIT 60`,
     );
 
-    const lockedAccounts = all(
+    const lockedAccounts = all<{ id: number; email: string; name: string; failed_logins: number; locked_until: string }>(
       `SELECT id, email, name, failed_logins, locked_until FROM users
        WHERE locked_until IS NOT NULL AND locked_until > strftime('%Y-%m-%dT%H:%M:%fZ','now')`,
     );
 
-    const topIps = all(
+    const topIps = all<{ ip: string | null; hits: number; kinds: number }>(
       `SELECT ip, COUNT(*) hits, COUNT(DISTINCT kind) kinds FROM security_events
        WHERE created_at > datetime('now','-1 day') AND ip IS NOT NULL GROUP BY ip ORDER BY hits DESC LIMIT 15`,
     );
 
-    const suspiciousSessions = all(
+    const suspiciousSessions = all<{
+      id: string; user_id: number; email: string; ip: string | null; user_agent: string | null;
+      created_at: string; last_seen_at: string | null;
+    }>(
       `SELECT s.id, s.user_id, u.email, s.ip, s.user_agent, s.created_at, s.last_seen_at
        FROM sessions s JOIN users u ON u.id = s.user_id
        WHERE s.revoked_at IS NULL AND s.created_at > datetime('now','-7 day')
@@ -58,7 +63,32 @@ export async function GET(req: NextRequest) {
       foreignKeyViolations: all("PRAGMA foreign_key_check").length,
     };
 
-    return jsonOk({ summary, events, bySeverity, failedLogins, lockedAccounts, topIps, suspiciousSessions, stats }, undefined, req);
+    /**
+     * מיסוך PII לתצוגה: עורך שרואה את לוח האבטחה לא צריך כתובות אימייל
+     * מלאות של משתמשים. בעלים/מנהל מקבלים את הערך המלא — הם גם אלו
+     * שמטפלים בפניות. היומן המלא נשאר במסד, ממוסך.
+     */
+    const full = isAdminRole(ctx.user!.role);
+    return jsonOk(
+      {
+        summary,
+        events,
+        bySeverity,
+        failedLogins: failedLogins.map((row) =>
+          full ? row : { ...row, email_norm: maskEmail(row.email_norm), ip: maskIp(row.ip) },
+        ),
+        lockedAccounts: lockedAccounts.map((row) =>
+          full ? row : { ...row, email: maskEmail(row.email) },
+        ),
+        topIps: full ? topIps : topIps.map((row) => ({ ...row, ip: maskIp(row.ip) })),
+        suspiciousSessions: suspiciousSessions.map((row) =>
+          full ? row : { ...row, email: maskEmail(row.email), ip: maskIp(row.ip) },
+        ),
+        stats: { ...stats, piiMasked: !full },
+      },
+      undefined,
+      req,
+    );
   });
 }
 

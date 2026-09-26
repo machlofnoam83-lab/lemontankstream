@@ -29,6 +29,9 @@ const values = {
   APP_SECRET: secret(48),
   CSRF_SECRET: secret(48),
   MEDIA_SECRET: secret(48),
+  // מפתח ייעודי לגיבויים מוצפנים — נפרד מסודות האפליקציה, כדי שאפשר יהיה
+  // למסור גיבוי לגורם חיצוני בלי למסור את סודות המערכת.
+  BACKUP_KEY: secret(48),
   DATABASE_FILE: "./data/lemontank.db",
   APP_URL: "http://localhost:3000",
   COOKIE_SECURE: "false",

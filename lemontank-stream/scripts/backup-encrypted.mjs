@@ -41,12 +41,26 @@ function loadEnvFile() {
 
 const env = { ...loadEnvFile(), ...process.env };
 
-/** מפתח הגיבוי: BACKUP_KEY אם קיים, אחרת נגזר מ-FIELD_ENCRYPTION_KEY (HKDF-like) */
+/**
+ * מפתח הגיבוי, בסדר עדיפויות:
+ *   BACKUP_KEY → FIELD_ENCRYPTION_KEY → APP_SECRET
+ *
+ * למה דווקא כך: האפליקציה מצפינה שדות רגישים (סודות 2FA) במפתח שנגזר
+ * מ-APP_SECRET. מי שמחזיק את `.env.local` מחזיק בפועל את המפתחות כולם —
+ * ולכן הגיבוי יכול תמיד להיות מופק באותו מסלול. אין מצב שבו "יש סודות
+ * אבל אי אפשר לגבות". אם אין BACKUP_KEY ייעודי — מדפיסים אזהרה מפורשת.
+ */
 function backupKey() {
-  const raw = env.BACKUP_KEY || env.FIELD_ENCRYPTION_KEY;
-  if (!raw || raw.length < 32) {
-    console.error("❌ חסר BACKUP_KEY (או FIELD_ENCRYPTION_KEY באורך 32+) — הרץ: node scripts/gen-secrets.mjs --write");
+  const dedicated = env.BACKUP_KEY || env.FIELD_ENCRYPTION_KEY;
+  const raw = dedicated || env.APP_SECRET;
+  if (!raw || raw.length < 24) {
+    console.error("❌ אין מפתח לגיבוי — הוסף BACKUP_KEY (מומלץ) או ודא ש-APP_SECRET קיים ב-.env.local");
+    console.error("   הרצה: node scripts/gen-secrets.mjs --write");
     process.exit(2);
+  }
+  if (!dedicated) {
+    console.error("⚠️  אין BACKUP_KEY ייעודי — המפתח נגזר מ-APP_SECRET.");
+    console.error("   מומלץ להוסיף BACKUP_KEY נפרד, כדי שגיבוי לא ייפתח עם סוד האפליקציה בלבד.");
   }
   // גזירה דטרמיניסטית: אותו סוד ⇒ אותו מפתח, גם אחרי שחזור גיבוי
   return crypto.createHash("sha256").update(`lemontank-backup-v1:${raw}`).digest();

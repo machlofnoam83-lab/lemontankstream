@@ -12,13 +12,15 @@
 
 import { all, get, run, tx } from "./db";
 import {
-  checkPasswordStrength, decryptField, encryptField, hashPassword, randomCode, randomId, randomToken,
+  decryptField, encryptField, hashPassword, randomCode, randomId, randomToken,
   sha256, verifyPassword, verifyTotp,
 } from "./crypto";
 import { ApiError, clientIp, userAgent } from "./http";
 import { lockoutSeconds } from "./ratelimit";
 import { writeAudit, logSecurityEvent } from "./audit";
 import { createSession, revokeAllUserSessions, type SessionUser } from "./session";
+import { enforcePasswordPolicy } from "./password-policy";
+import { maskEmail, noteSuccessfulLogin } from "./fortress";
 import { csrfTokenFor } from "./csrf";
 
 export type UserRow = {
@@ -70,8 +72,8 @@ export async function registerUser(
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(emailNorm)) throw new ApiError("BAD_REQUEST", 400, undefined, "כתובת אימייל לא תקינה");
   if (name.length < 2 || name.length > 60) throw new ApiError("BAD_REQUEST", 400, undefined, "שם חייב להיות בין 2 ל-60 תווים");
 
-  const strength = checkPasswordStrength(input.password);
-  if (!strength.ok) throw new ApiError("BAD_REQUEST", 400, { problems: strength.problems }, strength.problems[0]);
+  // מדיניות מלאה: מבנה + הקשר (אימייל/שם) + בדיקת דליפה מול HIBP
+  await enforcePasswordPolicy(input.password, { email: emailNorm, name });
 
   const existing = get<{ id: number }>("SELECT id FROM users WHERE email_norm = ?", [emailNorm]);
   if (existing) throw new ApiError("CONFLICT", 409, undefined, "האימייל הזה כבר רשום במערכת");
@@ -138,9 +140,9 @@ export async function authenticate(email: string, password: string, req: Request
   const ip = clientIp(req);
   const ua = userAgent(req);
 
-  const record = (success: boolean, reason: string) =>
-    run("INSERT INTO login_attempts(email_norm, ip, user_agent, success, reason) VALUES(?,?,?,?,?)", [
-      emailNorm, ip, ua, success ? 1 : 0, reason,
+  const record = (success: boolean, reason: string, userId: number | null = null) =>
+    run("INSERT INTO login_attempts(email_norm, ip, user_agent, success, reason, user_id) VALUES(?,?,?,?,?,?)", [
+      emailNorm, ip, ua, success ? 1 : 0, reason, userId,
     ]);
 
   const row = get<UserRow>(
@@ -156,12 +158,13 @@ export async function authenticate(email: string, password: string, req: Request
   if (!row) {
     await sleep(delay);
     record(false, "no_such_user");
-    await logSecurityEvent({ kind: "login_failed", severity: "info", ip, detail: `email_norm=${emailNorm} reason=no_such_user` });
+    // האימייל נשמר ביומן ממוסך — היומן לא אמור להיות מאגר כתובות
+    await logSecurityEvent({ kind: "login_failed", severity: "info", ip, detail: `account=${maskEmail(emailNorm)} reason=no_such_user` });
     return { ok: false, reason: "invalid_credentials", message: "אימייל או סיסמה שגויים" };
   }
 
   if (row.locked_until && new Date(row.locked_until).getTime() > Date.now()) {
-    record(false, "locked");
+    record(false, "locked", row.id);
     return {
       ok: false, reason: "locked", lockedUntil: row.locked_until,
       message: `החשבון נעול זמנית עד ${new Date(row.locked_until).toLocaleTimeString("he-IL")} בגלל ניסיונות כושלים`,
@@ -180,7 +183,7 @@ export async function authenticate(email: string, password: string, req: Request
         failed, lockSec > 0 ? new Date(Date.now() + lockSec * 1000).toISOString() : null, row.id,
       ]);
     });
-    record(false, lockSec > 0 ? "locked" : "bad_password");
+    record(false, lockSec > 0 ? "locked" : "bad_password", row.id);
     await logSecurityEvent({
       kind: lockSec > 0 ? "account_locked" : "login_failed",
       severity: lockSec > 0 ? "warning" : "info",
@@ -225,7 +228,7 @@ export async function completeTwoFactor(challengeToken: string, code: string, re
   if (!secret) return { ok: false, reason: "invalid_credentials", message: "2FA אינו מוגדר כראוי" };
 
   if (!verifyTotp(secret, code)) {
-    run("INSERT INTO login_attempts(email_norm, ip, user_agent, success, reason) VALUES(NULL,?,?,0,'bad_2fa')", [ip, userAgent(req)]);
+    run("INSERT INTO login_attempts(email_norm, ip, user_agent, success, reason, user_id) VALUES(NULL,?,?,0,'bad_2fa',?)", [ip, userAgent(req), row.user_id]);
     await logSecurityEvent({ kind: "2fa_failed", severity: "warning", ip, userId: row.user_id });
     return { ok: false, reason: "invalid_credentials", message: "קוד האימות שגוי" };
   }
@@ -241,7 +244,10 @@ async function finishLogin(userId: number, req: Request, ip: string): Promise<Lo
        last_login_at=strftime('%Y-%m-%dT%H:%M:%fZ','now'), last_login_ip=?, last_login_ua=? WHERE id=?`,
     [ip, userAgent(req), userId],
   );
-  run("INSERT INTO login_attempts(email_norm, ip, user_agent, success, reason) SELECT email_norm, ?, ?, 1, 'ok' FROM users WHERE id=?", [ip, userAgent(req), userId]);
+  run(
+    "INSERT INTO login_attempts(email_norm, ip, user_agent, success, reason, user_id) SELECT email_norm, ?, ?, 1, 'ok', id FROM users WHERE id=?",
+    [ip, userAgent(req), userId],
+  );
 
   const session = createSession(userId, req);
   const user = get<SessionUser>(
@@ -251,6 +257,16 @@ async function finishLogin(userId: number, req: Request, ip: string): Promise<Lo
   )!;
 
   writeAudit({ action: "auth.login", entity: "user", entityId: userId }, { req, actorId: userId, actorEmail: user.email });
+
+  // גילוי חריגות: מכשיר חדש / רשת חדשה / התחברות אחרי שורת כישלונות.
+  // כל חריגה = התראה למשתמש, ו-2FA/צוות = גם התראה לכל הצוות.
+  const anomalies = noteSuccessfulLogin({ id: userId, role: user.role, email: user.email }, req);
+  if (anomalies.length) {
+    writeAudit(
+      { action: "auth.anomaly", entity: "user", entityId: userId, severity: "warning", after: { kinds: anomalies.map((a) => a.kind) } },
+      { req, actorId: userId, actorEmail: user.email },
+    );
+  }
   return {
     ok: true,
     user,
@@ -278,14 +294,15 @@ export function createPasswordResetToken(email: string, req: Request): { token: 
 }
 
 export async function resetPasswordWithToken(token: string, newPassword: string, req: Request): Promise<boolean> {
-  const strength = checkPasswordStrength(newPassword);
-  if (!strength.ok) throw new ApiError("BAD_REQUEST", 400, { problems: strength.problems }, strength.problems[0]);
-
   const row = get<{ id: number; user_id: number; expires_at: string; used_at: string | null }>(
     "SELECT id, user_id, expires_at, used_at FROM auth_tokens WHERE token_hash=? AND kind='reset'",
     [sha256(token)],
   );
   if (!row || row.used_at || new Date(row.expires_at).getTime() < Date.now()) return false;
+
+  // הסיסמה נבדקת מול ההקשר של בעל החשבון (אימייל/שם) ומול רשימת דליפות
+  const owner = get<{ email: string; name: string }>("SELECT email, name FROM users WHERE id=?", [row.user_id]);
+  await enforcePasswordPolicy(newPassword, { email: owner?.email, name: owner?.name });
 
   const hash = await hashPassword(newPassword);
   tx(() => {
@@ -349,9 +366,10 @@ export async function changeOwnPassword(userId: number, current: string, next: s
     await logSecurityEvent({ kind: "password_change_failed", severity: "warning", ip: clientIp(req), userId });
     throw new ApiError("FORBIDDEN", 403, undefined, "הסיסמה הנוכחית שגויה");
   }
-  const strength = checkPasswordStrength(next);
-  if (!strength.ok) throw new ApiError("BAD_REQUEST", 400, { problems: strength.problems }, strength.problems[0]);
   if (current === next) throw new ApiError("BAD_REQUEST", 400, undefined, "הסיסמה החדשה זהה לישנה");
+
+  const me = get<{ email: string; name: string }>("SELECT email, name FROM users WHERE id=?", [userId]);
+  await enforcePasswordPolicy(next, { email: me?.email, name: me?.name });
 
   const hash = await hashPassword(next);
   run("UPDATE users SET password_hash=?, password_changed_at=strftime('%Y-%m-%dT%H:%M:%fZ','now') WHERE id=?", [hash, userId]);

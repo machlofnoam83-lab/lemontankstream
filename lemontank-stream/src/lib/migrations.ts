@@ -45,6 +45,30 @@ const MIGRATIONS: Migration[] = [
       "ALTER TABLE sessions ADD COLUMN mfa_used INTEGER NOT NULL DEFAULT 0",
     ],
   },
+  {
+    name: "2026-09-fortress-breach-cache",
+    sql: [
+      // מטמון לבדיקות דליפה (k-anonymity): נשמר רק ה-prefix של ה-Hash
+      // ורשימת הסיומות שהוחזרה מה-API — לא הסיסמה עצמה, בשום צורה.
+      `CREATE TABLE IF NOT EXISTS breach_checks (
+        prefix TEXT PRIMARY KEY,
+        payload TEXT NOT NULL,
+        checked_at TEXT NOT NULL
+      )`,
+      "CREATE INDEX IF NOT EXISTS idx_breach_checked ON breach_checks(checked_at)",
+      // ברירת מחדל: אכיפה. 'warn' = להתריע בלי לחסום, 'off' = כבוי.
+      "INSERT OR IGNORE INTO security_settings(key, value) VALUES('breach_check', 'enforce')",
+    ],
+  },
+  {
+    name: "2026-09-fortress-login-attempts-user",
+    sql: [
+      // קישור ניסיון ההתחברות לחשבון — מאפשר לזהות "שורת כישלונות ואז הצלחה"
+      // בחשבון מסוים, ולא רק לפי כתובת IP (שמשתנה מאחורי NAT/proxy).
+      "ALTER TABLE login_attempts ADD COLUMN user_id INTEGER",
+      "CREATE INDEX IF NOT EXISTS idx_login_attempts_user ON login_attempts(user_id, created_at)",
+    ],
+  },
 ];
 
 let applied = false;

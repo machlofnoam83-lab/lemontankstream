@@ -38,7 +38,10 @@ export async function POST(req: NextRequest) {
         rateLimit: input.rate_limit,
         expiresInDays: input.expires_in_days ?? null,
       });
-      return jsonOk({ key, record }, undefined, req);
+      // ה-Hash של המפתח לא יוצא מהשרת: מי שמקבל אותו יכול לנסות
+      // השוואות offline מול רשימות גנובות. הלקוח צריך רק מזהה וקידומת.
+      const { key_hash: _omit, ...safeRecord } = record as Record<string, unknown> & { key_hash?: string };
+      return jsonOk({ key, record: safeRecord }, undefined, req);
     },
   );
 }
