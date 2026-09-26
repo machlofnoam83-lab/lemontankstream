@@ -236,13 +236,18 @@ async function cmdShow(api) {
   if (!id) die("צריך מספר כרטיס: show <id>");
   const res = await api.post("/api/admin/giftcards", { action: "reveal", id });
   if (res.body?.ok !== true) die(`לא ניתן להציג: ${res.body?.error?.message ?? res.status}`);
-  const card = res.body.data.card;
+
+  // הקוד מגיע מהעותק המוצפן שבמסד — כלומר ההצגה הזו מוכיחה גם את הפענוח.
+  const details = (await api.get("/api/admin/giftcards")).body?.data?.cards?.find((card) => card.id === id) ?? null;
   console.log("");
-  console.log(`🎟️  כרטיס #${card.id}`);
+  console.log(`🎟️  כרטיס #${id}`);
   console.log(`   קוד: ${res.body.data.code}`);
-  console.log(`   מסלול: ${card.plan_code} · ${card.months} חודשים · שווי ${ils(card.value_ils)}`);
-  console.log(`   סטטוס: ${card.status} · נוצל ${card.used_count}/${card.max_uses} פעמים`);
-  console.log(`   נוצר: ${card.created_at} · פג: ${card.expires_at ?? "ללא"}`);
+  console.log(`   סטטוס: ${res.body.data.status}`);
+  if (details) {
+    console.log(`   מסלול: ${details.plan_code} · ${details.months} חודשים · שווי ${ils(details.value_ils)}`);
+    console.log(`   נוצל ${details.used_count}/${details.max_uses} פעמים · נוצר ${String(details.created_at).slice(0, 16)}`);
+    if (details.note) console.log(`   הערה: ${details.note}`);
+  }
   console.log("   (הצגת הקוד נרשמת ביומן הביקורת — פעולה רגישה)");
 }
 
