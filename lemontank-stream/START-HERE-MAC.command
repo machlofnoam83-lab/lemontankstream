@@ -34,14 +34,18 @@ if ! node scripts/local-setup.mjs; then
 fi
 
 echo
-echo "  [2/2] מדליק את האתר…"
+echo "  [3/3] מדליק את האתר…"
+PORT="$(node scripts/pick-port.mjs 2>/dev/null || echo 3000)"
+export PORT
+echo "      פורט: $PORT"
 echo
-node scripts/open-later.mjs http://localhost:3000 &
+node scripts/open-later.mjs "http://localhost:$PORT" &
 echo "  ------------------------------------------------------------"
-echo "    האתר רץ בכתובת:  http://localhost:3000"
+echo "    האתר רץ בכתובת:  http://localhost:$PORT"
 echo "    כניסת מנהל:      admin@lemontank.local / ChangeMe-Admin-2026!"
 echo
-echo "    לעצירה: לחץ Ctrl+C"
+echo "    חשוב: השאר את החלון הזה פתוח כל עוד אתה רוצה שהאתר יעבוד."
+echo "    לעצירה: לחץ Ctrl+C."
 echo "  ------------------------------------------------------------"
 echo
 npm run start

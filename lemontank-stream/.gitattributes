@@ -1,0 +1,32 @@
+# סיומות שורה נכונות לכל מערכת — כדי שקבצים שהורדו לווינדוס יעבדו מיד
+#
+# למה זה חשוב כאן: קובץ .cmd עם סיומות LF בלבד (מה שגיט עושה כברירת מחדל)
+# עלול להתנהג מוזר ב-cmd.exe — במיוחד סביב goto/for. ואם מישהו יוריד את
+# הקובץ בלי CRLF הוא פשוט לא ירוץ בקליק כפול.
+#
+# * text=auto  → גיט מנרמל את התוכן ל-LF במאגר (נקי להיסטוריה)
+# * eol=crlf   → בצ'קאאוט לווינדוס ייכתבו סיומות CRLF אוטומטית
+# * .command / .sh = סקריפטים של macOS/לינוקס → חייבים להישאר LF
+
+* text=auto
+
+# ווינדוס — קליק כפול
+*.cmd text eol=crlf
+*.bat text eol=crlf
+
+# macOS / לינוקס / שרת
+*.sh text eol=lf
+*.command text eol=lf
+
+# קבצים בינאריים — אסור לגעת בהם
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.webp binary
+*.gif binary
+*.ico binary
+*.mp4 binary
+*.ltbk binary
+*.db binary
+*.woff binary
+*.woff2 binary

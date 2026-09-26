@@ -16,7 +16,9 @@
     "setup:check": "node scripts/local-setup.mjs --check",
     "recover": "node scripts/recover.mjs",
     "db:migrate": "node scripts/apply-migrations.mjs",
-    "db:status": "node scripts/apply-migrations.mjs --status"
+    "db:status": "node scripts/apply-migrations.mjs --status",
+    "port": "node scripts/pick-port.mjs",
+    "status": "node scripts/status.mjs"
   },
   "dependencies": {
     "next": "^15.5.26",
