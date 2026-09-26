@@ -112,5 +112,16 @@ for (const title of testTitles) {
   purgedTitles += Number(db.prepare("DELETE FROM titles WHERE id = ?").run(title.id).changes ?? 0);
 }
 if (purgedTitles) console.log(`🧹 הוסרו ${purgedTitles} כותרי בדיקה מהארכיון (הקטלוג נשאר בדיוק כמו שהבעלים בנה)`);
+
+/**
+ * כרטיסי גיפט קארד שהבדיקות הנפיקו — זיהוי לפי הערה מסומנת בלבד.
+ * כרטיסים אמיתיים לא נגעים בהם, גם אם אין להם הערה.
+ */
+let purgedCards = 0;
+for (const card of db.prepare("SELECT code_hash FROM gift_cards WHERE note LIKE '🧪%'").all()) {
+  db.prepare("DELETE FROM redemption_requests WHERE code_hash = ?").run(card.code_hash);
+  purgedCards += Number(db.prepare("DELETE FROM gift_cards WHERE code_hash = ?").run(card.code_hash).changes ?? 0);
+}
+if (purgedCards) console.log(`🧹 הוסרו ${purgedCards} כרטיסי בדיקה (כרטיסים אמיתיים לא נגעים)`);
 console.log(`📚 מצב הקטלוג: ${db.prepare("SELECT COUNT(*) c FROM titles").get().c} כותרות`);
 db.close();

@@ -25,6 +25,8 @@ const ADMIN_PASSWORD = process.env.SEED_ADMIN_PASSWORD ?? "ChangeMe-Admin-2026!"
 const ROOT = path.resolve(import.meta.dirname, "..");
 const DB_FILE = path.join(ROOT, "data", "lemontank.db");
 const MARK = "paytest";
+/** סימון לכל כרטיס שהבדיקות מייצרות — כדי שסינון יזהה אותם ולא ייגע בכרטיסים אמיתיים */
+const TEST_CARD_NOTE = "🧪 כרטיס בדיקה אוטומטי";
 const USER_PASSWORD = "Kartis-Matana#77-Lavan";
 
 /* ────────────── יצירת משתמש בדיקה ישירות במסד ────────────── */
@@ -200,7 +202,7 @@ describe("הנפקת כרטיסי מתנה", () => {
     const login = await fresh.loginAdmin(ADMIN_EMAIL, ADMIN_PASSWORD);
     if (login.body?.ok !== true) return t.skip("אין סוד 2FA להשלמת התחברות");
 
-    const blocked = await fresh.post("/api/admin/giftcards", { action: "create", months: 1, count: 1 });
+    const blocked = await fresh.post("/api/admin/giftcards", { action: "create", months: 1, count: 1, note: TEST_CARD_NOTE });
     assert.equal(blocked.status, 403, JSON.stringify(blocked.body).slice(0, 200));
     assert.equal(blocked.body.error.code, "STEP_UP_REQUIRED");
   });
@@ -216,7 +218,7 @@ describe("הנפקת כרטיסי מתנה", () => {
       count: 1,
       valueIls: 99.9,
       maxUses: 1,
-      note: "בדיקה אוטומטית",
+      note: TEST_CARD_NOTE,
     });
     assert.equal(res.status, 201, JSON.stringify(res.body).slice(0, 240));
     const codes = res.body.data.codes;
@@ -246,7 +248,7 @@ describe("מימוש כרטיס שהאתר הנפיק", () => {
 
   test("מכין כרטיס למסלול פלוס", async (t) => {
     if (!ready || !admin) return t.skip("אין סשן מנהל");
-    const res = await admin.post("/api/admin/giftcards", { action: "create", months: 2, count: 1, valueIls: 79.8 });
+    const res = await admin.post("/api/admin/giftcards", { action: "create", months: 2, count: 1, valueIls: 79.8, note: TEST_CARD_NOTE });
     if (res.status !== 201) return t.skip(`יצירת כרטיס נכשלה (${res.status})`);
     code = res.body.data.codes[0];
     assert.ok(code);
@@ -291,7 +293,7 @@ describe("מימוש כרטיס שהאתר הנפיק", () => {
 
   test("כרטיס מבוטל לא ניתן למימוש", async (t) => {
     if (!ready || !admin || !payer) return t.skip("אין סשן");
-    const created = await admin.post("/api/admin/giftcards", { action: "create", months: 1, count: 1 });
+    const created = await admin.post("/api/admin/giftcards", { action: "create", months: 1, count: 1, note: TEST_CARD_NOTE });
     if (created.status !== 201) return t.skip("יצירת כרטיס נכשלה");
     const revokedCode = created.body.data.codes[0];
 
