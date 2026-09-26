@@ -105,27 +105,62 @@ if (CHECK_ONLY) {
 
 /* ── 2. סנכרון מ-origin ───────────────────────────────────────────────────── */
 step("2️⃣  סנכרון הקוד");
+const target = `origin/${branch}`;
+const sha = (rev) => git(["rev-parse", rev]).stdout.trim();
+const isAncestor = (older, newer) => git(["merge-base", "--is-ancestor", older, newer]).status === 0;
+
 if (CHECK_ONLY) {
-  if (git(["fetch", "origin", "--dry-run"]).status === 0) ok("אפשר להתחבר ל-origin");
+  const dry = git(["fetch", "origin", "refs/heads/" + branch, "--dry-run"]);
+  if (dry.status === 0) ok("אפשר להתחבר ל-origin");
+  else warn("לא הצלחתי לבדוק מול origin (אינטרנט/הרשאות)");
 } else {
-  const fetch = git(["fetch", "origin"], { quiet: false });
+  // מייבאים במפורש את הענף הזה — כדי ש-origin/<branch> יהיה מעודכן *באמת*
+  // ולא יישאר על מצב ישן (זה מה שגרם בעבר לאיפוס אחורה).
+  const fetch = git(["fetch", "origin", `+refs/heads/${branch}:refs/remotes/origin/${branch}`], { quiet: false });
   if (fetch.status !== 0) {
-    bad("לא הצלחתי להתחבר ל-origin (אינטרנט/הרשאות). המשך עם הקוד הקיים.");
+    bad("לא הצלחתי להתחבר ל-origin (אינטרנט/הרשאות). הקוד נשאר כפי שהוא.");
     process.exit(1);
   }
-  const target = `origin/${branch}`;
+
   const exists = git(["rev-parse", "--verify", target]);
   if (exists.status !== 0) {
     warn(`אין ${target} ב-origin — ממשיך מהענף המקומי`);
   } else {
-    const before = git(["rev-parse", "--short", "HEAD"]).stdout.trim();
-    const reset = git(["reset", "--hard", target], { quiet: false });
-    if (reset.status !== 0) {
-      bad("הסנכרון נכשל.");
+    const headSha = sha("HEAD");
+    const targetSha = sha(target);
+    const before = headSha.slice(0, 7);
+    const after = targetSha.slice(0, 7);
+
+    if (headSha === targetSha) {
+      ok(`הקוד כבר מעודכן (${after})`);
+    } else if (isAncestor(headSha, targetSha)) {
+      // התקדמות רגילה ונטו — בטוח לאיפוס
+      if (git(["reset", "--hard", targetSha], { quiet: false }).status !== 0) {
+        bad("הסנכרון נכשל.");
+        process.exit(1);
+      }
+      ok(`עודכן ${before} → ${after}`);
+    } else if (FORCE) {
+      warn(`הקוד ב-origin (${after}) אינו המשך של הקוד המקומי (${before}) — מאפס בכוח`);
+      if (git(["reset", "--hard", targetSha], { quiet: false }).status !== 0) {
+        bad("הסנכרון נכשל.");
+        process.exit(1);
+      }
+      ok(`אופס ל-${after} (המצב הקודם נשמר ב-reflog: git reflog)`);
+    } else {
+      // המקרה המסוכן: origin לא מכיל את מה שיש לך מקומית. איפוס כאן היה מוחק
+      // קומיטים מקומיים בשקט — לכן עוצרים ומסבירים.
+      warn(`origin/${branch} (${after}) אינו מכיל את הקומיטים המקומיים שלך (${before}).`);
+      console.log(`
+  לכן לא נגעתי בקוד. הסיבות האפשריות:
+    • יש לך קומיטים מקומיים שלא נדחפו (git log origin/${branch}..HEAD)
+    • מראה ה-origin היה לא מעודכן — עכשיו ייבאתי אותו מחדש, הרץ שוב את הפקודה
+
+  אם באמת רוצה לזרוק את המקומי ולעבור למה שיש ב-origin:
+    npm run recover -- --force      (המצב הקודם נשמר ב-reflog)
+`);
       process.exit(1);
     }
-    const after = git(["rev-parse", "--short", "HEAD"]).stdout.trim();
-    ok(before === after ? `הקוד כבר מעודכן (${after})` : `עודכן ${before} → ${after}`);
   }
 }
 
