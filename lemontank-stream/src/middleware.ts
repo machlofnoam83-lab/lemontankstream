@@ -148,12 +148,22 @@ export async function middleware(req: NextRequest): Promise<NextResponse> {
   const hasSession = Boolean(req.cookies.get(SESSION_COOKIE)?.value);
 
   if (!hasSession && PROTECTED_PREFIXES.some((p) => pathname === p || pathname.startsWith(`${p}/`))) {
-    // במצב חמקן לא חושפים את קיום מערכת הניהול: 404 זהה לכל כתובת לא קיימת.
-    if (stealth) {
-      const res = new NextResponse("<!DOCTYPE html><html><head><title>404 Not Found</title></head><body><h1>404 Not Found</h1></body></html>", {
-        status: 404,
-        headers: { "content-type": "text/html; charset=utf-8" },
-      });
+    /**
+     * שכבת גיבוי בלבד. את הסתרת מערכת הניהול עושה השרת (server.mjs) לפני
+     * שהבקשה בכלל מגיעה לכאן: הוא ממפה ‎/admin לכתובת דמיונית באותו אורך,
+     * וכך התשובה זהה לחלוטין לתשובה של "כתובת לא קיימת".
+     *
+     * למה לא לעשות את זה כאן: rewrite מתוך ה-middleware מנסה לממש קריאת
+     * HTTP לפורט פנימי שאינו קיים בסרוויס הזה (ECONNREFUSED → 500), ותשובת
+     * 404 מקוצרת משלנו **דווקא חושפת** את קיום הניהול (גודל שונה מכל 404 אחר).
+     *
+     * אם בכל זאת מגיעים לכאן עם מצב הסתרה דלוק — מחזירים 404 ריק, בלי תוכן
+     * שמסגיר. במצב רגיל: הפניה רגילה לעמוד ההתחברות.
+     */
+    const adminHide = req.headers.get("x-lt-admin-hide") === "on";
+    const isAdminPath = pathname === "/admin" || pathname.startsWith("/admin/");
+    if (stealth && adminHide && isAdminPath) {
+      const res = new NextResponse(null, { status: 404 });
       applySecurityHeaders(res, csp, isDev, true);
       return res;
     }

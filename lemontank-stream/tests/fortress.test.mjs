@@ -16,6 +16,7 @@
  */
 
 import { test, before, after, describe } from "node:test";
+import { stealthHeaders, CSRF_COOKIE, SESSION_COOKIE } from "./helpers/stealth-entry.mjs";
 import assert from "node:assert/strict";
 import { execFileSync } from "node:child_process";
 import { existsSync, readFileSync, rmSync, statSync } from "node:fs";
@@ -50,12 +51,12 @@ class Client {
   }
 
   csrf() {
-    return this.cookies.get("lt_csrf") ?? "";
+    return this.cookies.get(CSRF_COOKIE) ?? "";
   }
 
   /** טעינת דף כדי לקבל עוגיית CSRF — כמו דפדפן אמיתי */
   async prepare() {
-    if (this.cookies.has("lt_csrf")) return;
+    if (this.cookies.has(CSRF_COOKIE)) return;
     await this.raw("/login");
   }
 
@@ -66,7 +67,7 @@ class Client {
   }
 
   async raw(pathname, options = {}) {
-    const headers = { ...(options.headers ?? {}), "user-agent": this.userAgent };
+    const headers = { ...(options.headers ?? {}), ...stealthHeaders(), "user-agent": this.userAgent };
     if (this.cookies.size) headers.cookie = this.cookieHeader();
     if (options.method && options.method !== "GET" && options.method !== "HEAD") {
       headers["x-csrf-token"] = options.csrf ?? this.csrf();
@@ -213,7 +214,7 @@ describe("אימות דו-שלבי", () => {
     assert.equal(res.body.data.user, undefined, "אסור להחזיר משתמש לפני שהקוד אומת");
 
     // אין עוגיית סשן — כלומר אין דרך "לדלג" על הקוד
-    assert.equal(client.cookies.get("lt_session") ?? null, null, "לא נוצרת עוגיית סשן לפני 2FA");
+    assert.equal(client.cookies.get(SESSION_COOKIE) ?? null, null, "לא נוצרת עוגיית סשן לפני 2FA");
     const me = await client.get("/api/auth/me");
     assert.equal(me.body?.data?.user ?? null, null);
   });
@@ -233,13 +234,18 @@ describe("אימות דו-שלבי", () => {
     const wrong = String((Number(valid) + 1) % 1_000_000).padStart(6, "0");
     const rejected = await client.post("/api/auth/login", { challenge, totp: wrong });
     assert.equal(rejected.status, 401, JSON.stringify(rejected.body));
-    assert.equal(client.cookies.get("lt_session") ?? null, null, "קוד שגוי לא יוצר סשן");
+    assert.equal(client.cookies.get(SESSION_COOKIE) ?? null, null, "קוד שגוי לא יוצר סשן");
 
     const accepted = await client.post("/api/auth/login", { challenge, totp: valid });
     assert.equal(accepted.status, 200, JSON.stringify(accepted.body));
-    assert.equal(accepted.body.data.user.email.toLowerCase(), ADMIN_EMAIL.toLowerCase());
+    /**
+     * במצב חמקן כל טקסט שיוצא מהשרת מוחלף — כולל כתובת שמכילה את שם המערכת.
+     * לכן ההשוואה מתעלמת מההסוואה: העיקר שזו אותה כתובת (אותו משתמש מחובר).
+     */
+    const masked = (value) => String(value).toLowerCase().replace(/northwind media/g, "lemontank");
+    assert.equal(masked(accepted.body.data.user.email), ADMIN_EMAIL.toLowerCase());
     assert.equal(accepted.body.data.twoFactor, true);
-    assert.ok(client.cookies.get("lt_session"), "אחרי קוד נכון נוצרת עוגיית סשן");
+    assert.ok(client.cookies.get(SESSION_COOKIE), "אחרי קוד נכון נוצרת עוגיית סשן");
   });
 });
 

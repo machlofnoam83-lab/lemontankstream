@@ -60,6 +60,10 @@ const DEFAULT_CONFIG = {
   assetMask: "on",             // הסוואת /_next/ בתחילית אקראית
   assetPrefix: null,           // נוצר אוטומטית בהפעלה הראשונה
   bootstrapAlias: null,        // שם פנימי מוסווה ל-__next_f (נוצר אוטומטית)
+  brandCover: "",              // שם מוסווה למותג בגוף התשובה (ריק = אוטומטי)
+  faviconMask: "on",           // אייקון גנרי במקום אייקון שמזהה את האתר
+  cookiePrefix: null,          // קידומת עוגיות אקראית (במקום lt_) — נוצרת אוטומטית
+  tokenAliases: {},            // שמות פנימיים של המסגרת שמוחלפים בשמות סתמיים (נוצר אוטומטית)
   canaries: [],                // נתיבי מלכודת סודיים לאיתור דליפת השרת
   updatedAt: null,
 };
@@ -178,6 +182,21 @@ export function stealthDecision(info, { file, headers } = {}) {
 
   const peer = normalizeIp(info.socketIp) ?? normalizeIp(info.ip);
   const peerInternal = peer ? isLoopback(peer) || isInternal(peer) : false;
+
+  /**
+   * `allowLocalNoHeaders` — גלישה מקומית בלי סימן, למפתח שיושב על אותה מכונה.
+   *
+   * הבאג שהיה כאן: האפשרות הוצהרה ותועדה ("נוח לפיתוח, פחות חמקן") אבל
+   * **אף פעם לא נקראה** — מי שהפעיל אותה גילה שהיא לא עושה כלום. מימוש
+   * מדויק: רק חיבור **מהלולאה** (127.0.0.1/::1) ובלי זהות מועברת.
+   * זו לא הקלה אבטחתית אמיתית: אף אחד באינטרנט לא יכול לגרום לבקשה
+   * להיראות כמגיעה מלולאה, ובפרודקשן המנהרה תמיד מוסיפה CF-Connecting-IP
+   * (ולכן מסומנת כמנהרה גם ככה).
+   */
+  const forwardedIdentity = Boolean(normalizeIp(get("cf-connecting-ip")) ?? normalizeIp(get("x-forwarded-for")));
+  if (config.allowLocalNoHeaders === "on" && peer && isLoopback(peer) && !forwardedIdentity) {
+    return result("serve", "local_no_headers_allowed");
+  }
   const peerTrustedProxy = peer
     ? inAnyCidr(peer, [...CLOUDFLARE_CIDRS, ...OTHER_PROXY_CIDRS, ...config.allowCidrs])
     : false;
@@ -236,6 +255,200 @@ export function stealthDecision(info, { file, headers } = {}) {
   return result("serve", "ok");
 }
 
+/* ───────────────────────── הסוואת זהות המותג ────────────────────────────── */
+
+/**
+ * ברירת המחדל של שם ההסוואה: שם סתמי שלא מושך עין ולא מתאים לאף מותג אמיתי.
+ * אפשר לשנות עם brandCover (למשל שם של עסק אחר שהאתר אמור להיראות כמוהו).
+ */
+export const DEFAULT_BRAND_COVER = "Northwind Media";
+
+/** כל התצורות של שם המערכת שמופיעות בפועל בתשובות — כולל בעברית ובקידוד שונה */
+const BRAND_PATTERNS = [
+  /LemonTank Stream/g,
+  /LemonTank/gi,
+  /lemontank/gi,
+  /לימונטנק/g,
+  /לימון\s*טנק/g,
+];
+
+/**
+ * מחליף שם מותג בכל טקסט שיוצא החוצה. **למה זה נחוץ:** טביעת האצבע
+ * החזקה ביותר שהאתר משאיר אינה המסגרת — היא **השם שלו**. סורק שמחפש
+ * מחרוזת אחת בסריקת אינטרנט שלם מוצא כל עותק של האתר בכל דומיין,
+ * גם אם הוא מאחורי CDN, גם אם אין DNS, וגם אם הוא על כתובת IP אחרת.
+ */
+export function coverBrand(text, config) {
+  if (!text) return text;
+  const cover = (config?.brandCover && String(config.brandCover).trim()) || DEFAULT_BRAND_COVER;
+  let out = text;
+  for (const pattern of BRAND_PATTERNS) out = out.replace(pattern, cover);
+  return out;
+}
+
+/**
+ * ── החלפת שמות פנימיים של המסגרת ─────────────────────────────────────────
+ *
+ * למה זה בטוח: כל שם ברשימה הוא **מזהה פנימי של החבילה עצמה** (webpack /
+ * Next). כל עוד ההחלפה נעשית אותו דבר גם בגוף היוצא וגם בנתיב הנכנס,
+ * הקוד ממשיך לעבוד — הדפדפן פשוט רואה שמות אחרים. אין שום דבר מחוץ לקבצים
+ * המוגשים שמכיר את השמות האלה.
+ *
+ * למה זה נחוץ: סורק לא צריך לנחש — הוא מחפש "webpack" בגוף התשובה או בשם
+ * הקובץ ומסיק מיד מהיכן האתר נבנה. הסוואת נתיב הנכסים לבדה לא מספיקה כי
+ * שם הקובץ עצמו מכיל את המילה.
+ */
+const ALIAS_SOURCES = [
+  // ── שמות מודולים/גלובלים פנימיים של החבילה ──
+  "react-server-dom-webpack",
+  "webpackChunk_N_E",
+  "__webpack_require__",
+  "__webpack_modules__",
+  "__webpack_exports__",
+  "__NEXT_DATA__",
+  "webpack",
+  // ── שמות קבצים/תיקיות שהמסגרת מייצרת (הנתיב נכנס לשרת ומתורגם חזרה) ──
+  // ── סימנים ספציפיים ל-Next שנשארים בתוך ה-HTML ──
+  "next-error-h1",
+  /**
+   * ערך ה-precedence של React מגיע ללקוח בתוך ה-Flight payload, גם בצורה
+   * escaped. **חשוב:** מחליפים את הצירוף המלא (מפתח+ערך) ולא את הדפוס
+   * `":"next"` — דפוס כזה מופיע גם בנתונים אמיתיים של האתר (למשל קטגוריית
+   * דגל בשם "next") והיה הופך גוף JSON תקין לשבור: `"category":"next"`
+   * הפך ל-`"categoryx1a2b"`. כלומר ההסוואה עצמה הפילה בקשות.
+   */
+  '"precedence":"next"',
+  '\\"precedence\\":\\"next\\"',
+  "next-error",
+  "data-precedence",
+  "app-pages-internals",
+  "app-build-manifest",
+  "static/chunks",
+  "static/media",
+  "static/css",
+  "build-manifest",
+  "_buildManifest",
+  "_ssgManifest",
+  "__nextjs_",
+  "next/dist",
+  "turbopack",
+  "main-app",
+  "polyfills",
+  // ── סמלי פרוטוקול של React (Symbol.for) — מוחלפים באופן זהה בשני הצדדים ──
+  "react.suspense_list",
+  "react.forward_ref",
+  "react.strict_mode",
+  "react.debug_trace_mode",
+  "react.legacy_hidden",
+  "react.tracing_marker",
+  "react.suspense",
+  "react.fragment",
+  "react.consumer",
+  "react.profiler",
+  "react.activity",
+  "react.offscreen",
+  "react.context",
+  "react.element",
+  "react.portal",
+  "react.server",
+  "react.lazy",
+  "react.memo",
+  "react-dom",
+  "_reactRetry",
+];
+
+/** מייצר מילון החלפה אקראי (פעם אחת להתקנה — נשמר בהגדרות) */
+export function generateAliases() {
+  const map = {};
+  for (const source of ALIAS_SOURCES) {
+    const rand = crypto.randomBytes(4).toString("hex");
+    map[source] = source.startsWith("__") ? `__x${rand}__` : `x${rand}`;
+  }
+  return map;
+}
+
+/** האם המילון מלא ותקין — אחרת מייצרים חדש */
+export function aliasesComplete(aliases) {
+  if (!aliases || typeof aliases !== "object") return false;
+  return ALIAS_SOURCES.every((k) => typeof aliases[k] === "string" && aliases[k].length >= 5);
+}
+
+/**
+ * **כלל ברזל של ההסוואה:** מחליפים רק מחרוזות שהן *תוכן* — לעולם לא חתיכות
+ * שמכילות את מבנה ה-JSON/HTML. אחרת גוף תקין הופך לשבור:
+ *   `{"category":"next"}`  →  `{"categoryx1a2b"}`   ← JSON לא תקין, ה-API נופל.
+ * לכן ערך שנמצא *בתוך* הקשר (למשל ה-precedence של React) מוחלף רק דרך
+ * תבנית שמזהה את המפתח ואת המרכאות — ורק את הערך עצמו.
+ */
+const CONTEXT_ONLY = new Set(['"precedence":"next"', '\\"precedence\\":\\"next\\"']);
+
+const CONTEXT_REWRITES = [
+  // "precedence":"next"  — JSON רגיל
+  { pattern: /("precedence"\s*:\s*")([^"]*)(")/g, source: '"precedence":"next"' },
+  // \"precedence\":\"next\" — בתוך ה-Flight payload (escaped)
+  { pattern: /(\\"precedence\\"\s*:\s*\\")([^"\\]*)(\\")/g, source: '\\"precedence\\":\\"next\\"' },
+];
+
+/**
+ * מחליף שמות פנימיים בטקסט יוצא. הסדר חשוב: הארוך קודם, אחרת "webpack"
+ * היה נכנס לתוך "webpackChunk_N_E" ומפרק אותו.
+ */
+export function coverTokens(text, config) {
+  if (!text) return text;
+  const aliases = config?.tokenAliases;
+  if (!aliasesComplete(aliases)) return text;
+  let out = text;
+  for (const source of ALIAS_SOURCES) {
+    if (CONTEXT_ONLY.has(source)) continue; // מטופל רק בהקשר, כדי לא לשבור מבנה
+    out = out.split(source).join(aliases[source]);
+  }
+  for (const { pattern, source } of CONTEXT_REWRITES) {
+    out = out.replace(pattern, (_match, before, _value, after) => `${before}${aliases[source]}${after}`);
+  }
+  return out;
+}
+
+/** הופך את ההחלפה על נתיב נכנס — כדי שהנכס עצמו יימצא */
+export function uncoverPath(pathname, config) {
+  const aliases = config?.tokenAliases;
+  if (!pathname || !aliasesComplete(aliases)) return pathname;
+  let out = pathname;
+  // היפוך בסדר הפוך — מבטל את ההחלפה האחרונה ראשונה
+  for (const source of [...ALIAS_SOURCES].reverse()) out = out.split(aliases[source]).join(source);
+  return out;
+}
+
+/**
+ * אייקון גנרי במצב חמקן.
+ *
+ * למה זה חשוב: Shodan ו-Censys מחשבים hash של favicon ומשתמשים בו כמזהה
+ * דומיין-על. אייקון מותג קבוע = "כל האתרים עם ה-hash הזה הם אותו מוצר".
+ * אייקון גנרי נראה כמו כל אתר ברירת-מחדל — כלומר כמו מיליון אחרים.
+ */
+export function genericFavicon(seed) {
+  /**
+   * חשוב: אייקון **זהה לכל ההתקנות** היה יוצר hash משותף — בדיוק הכלי
+   * שאיתו Shodan/Censys מקשרים בין דומיינים ("כל מי שיש לו את ה-hash הזה
+   * הוא אותו מוצר"). לכן כל התקנה מקבלת צבע רקע אקראי מתוך פלטה נפוצה:
+   * האייקון נשאר סתמי לחלוטין, אבל ה-hash שלו ייחודי ולא מקשר לשום דבר.
+   */
+  const palette = ["#f2f3f5", "#ffffff", "#e9ecef", "#f8f9fa", "#eceff1", "#f5f5f5", "#eef1f4", "#fbfbfb"];
+  const key = String(seed ?? "seed");
+  let h = 2166136261;
+  for (let i = 0; i < key.length; i += 1) {
+    h ^= key.charCodeAt(i);
+    h = Math.imul(h, 16777619);
+  }
+  const color = palette[Math.abs(h) % palette.length];
+  const radius = Math.abs(h >> 3) % 3;
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><rect width="32" height="32" rx="${radius}" fill="${color}"/></svg>`;
+}
+
+/** מניפסט ניטרלי — בלי שם מערכת, בלי רשימת עמודים שמסגירה את המבנה */
+export function genericManifest() {
+  return JSON.stringify({ name: "Site", short_name: "Site", start_url: "/", display: "standalone" });
+}
+
 /* ────────────────────────── הקבצים שמגישים ──────────────────────────────── */
 
 /** עמוד "decoy" — נראה כמו התקנת nginx טרייה, בלי שום רמז שיש כאן אפליקציה */
@@ -289,6 +502,10 @@ export function stealthStatus(file) {
     minimalHeaders: config.minimalHeaders,
     robotsBait: config.robotsBait,
     assetMask: config.assetMask,
+    brandCover: (config.brandCover && String(config.brandCover).trim()) || DEFAULT_BRAND_COVER,
+    faviconMask: config.faviconMask,
+    cookiePrefix: config.cookiePrefix,
+    tokenAliases: aliasesComplete(config.tokenAliases) ? Object.keys(config.tokenAliases).length : 0,
     assetPrefix: config.assetPrefix,
     updatedAt: config.updatedAt,
   };

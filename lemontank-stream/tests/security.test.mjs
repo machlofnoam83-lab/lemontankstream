@@ -13,6 +13,7 @@ import assert from "node:assert/strict";
 import { createRequire } from "node:module";
 import { fileURLToPath } from "node:url";
 import path from "node:path";
+import { stealthHeaders, CSRF_COOKIE, SESSION_COOKIE, STEALTH_ON } from "./helpers/stealth-entry.mjs";
 
 const require = createRequire(import.meta.url);
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
@@ -45,7 +46,7 @@ async function probe(pathname, { ip = makeIp(), headers = {}, method = "GET", bo
   const res = await fetch(`${BASE}${pathname}`, {
     method,
     redirect: "manual",
-    headers: { "x-forwarded-for": ip, "user-agent": "Mozilla/5.0 (Windows NT 10.0) Chrome/122 Safari/537.36", "accept-language": "he-IL", ...headers },
+    headers: { "x-forwarded-for": ip, "user-agent": "Mozilla/5.0 (Windows NT 10.0) Chrome/122 Safari/537.36", "accept-language": "he-IL", ...stealthHeaders(), ...headers },
     body,
   });
   return { status: res.status, headers: res.headers, text: await res.text(), ip };
@@ -57,7 +58,8 @@ t("כותרות אבטחה קיימות בכל תשובה", async () => {
   const res = await fetch(`${BASE}/`);
   assert.equal(res.headers.get("x-content-type-options"), "nosniff");
   assert.match(res.headers.get("content-security-policy") ?? "", /default-src 'self'/);
-  assert.match(res.headers.get("referrer-policy") ?? "", /strict-origin/);
+  // במצב חמקן: no-referrer (בלי דליפת נתיב למקורות חיצוניים)
+  assert.match(res.headers.get("referrer-policy") ?? "", STEALTH_ON ? /no-referrer/ : /strict-origin/);
   assert.equal(res.headers.get("x-powered-by"), null);
   assert.equal(res.headers.get("server"), null, "אין חשיפת שם שרת");
 });

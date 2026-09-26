@@ -90,7 +90,8 @@ process.env.NODE_ENV = DEV ? "development" : "production";
 const { createEngine } = await import("./security/engine.mjs");
 const {
   stealthDecision, decoyPage, stealthRobots, loadStealth, stealthStatus,
-  makeCanary, saveStealth, entryTokenFromRequest,
+  makeCanary, saveStealth, entryTokenFromRequest, coverBrand, genericFavicon, genericManifest,
+  coverTokens, uncoverPath, generateAliases, aliasesComplete,
 } = await import("./security/stealth.mjs");
 const { resolveClientIp, isInternal, isLoopback, normalizeIp, hashIp } = await import("./security/net.mjs");
 const { LIMITS } = await import("./security/patterns.mjs");
@@ -115,7 +116,13 @@ let STEALTH = loadStealth();
 if (
   STEALTH.enabled === "on" &&
   STEALTH.assetMask === "on" &&
-  (!STEALTH.assetPrefix || !STEALTH.bootstrapAlias)
+  /**
+   * התנאי חייב לכסות **כל** חלקי הזהות המוסווית, לא רק את הראשונים.
+   * הבאג שהיה כאן: ברגע שתחילית הנכסים והכינוי נוצרו פעם אחת, הבלוק דולג
+   * לתמיד — ולכן זהות חדשה שהוספה (מיפוי שמות פנימיים, קידומת עוגיות)
+   * פשוט לא נוצרה אף פעם בשדרוג של התקנה קיימת.
+   */
+  (!STEALTH.assetPrefix || !STEALTH.bootstrapAlias || !aliasesComplete(STEALTH.tokenAliases) || !STEALTH.cookiePrefix)
 ) {
   try {
     STEALTH = saveStealth({
@@ -127,10 +134,33 @@ if (
           ? STEALTH.bootstrapAlias
           : `__${crypto.randomBytes(4).toString("hex")}`,
       assetMask: "on",
+      // שמות עוגיות אקראיים: lt_session/lt_csrf הם טביעת אצבע מובנית.
+      // נוצר פעם אחת ונשמר; החלפה מנתקת סשנים קיימים.
+      cookiePrefix:
+        STEALTH.cookiePrefix && /^[a-z0-9]{6,16}$/i.test(STEALTH.cookiePrefix)
+          ? STEALTH.cookiePrefix
+          : crypto.randomBytes(6).toString("hex"),
+      // החלפת שמות פנימיים של המסגרת (webpack וכו') בשמות סתמיים —
+      // אותו מיפוי משמש גם להחזרת הבקשה, ולכן הנכסים ממשיכים לעבוד.
+      tokenAliases: aliasesComplete(STEALTH.tokenAliases) ? STEALTH.tokenAliases : generateAliases(),
     });
   } catch (err) {
     console.warn("[stealth] לא ניתן לשמור זהות מוסווית:", err?.message);
   }
+}
+
+/**
+ * מכניס את קידומת העוגיות האקראית לתוך סביבת התהליך **לפני** שנטענת
+ * האפליקציה — כך שכל שכבת הסשן/CSRF (src/lib/cookies.ts) משתמשת בשמות
+ * סתמיים. אסור לעשות את זה אחרי app.prepare(): הקידומת נקראת ברגע הטעינה.
+ */
+/**
+ * קידומת העוגיות: אם המפעיל קבע COOKIE_PREFIX מפורש (בסביבה או ב-.env.local)
+ * — זו הכוונה שלו ומכבדים אותה. אחרת נלקחת הקידומת האקראית שנוצרה בהגדרות
+ * החמקן, וזו ברירת המחדל המומלצת: lt_session / lt_csrf הם טביעת אצבע.
+ */
+if (STEALTH.enabled === "on" && STEALTH.cookiePrefix && !process.env.COOKIE_PREFIX) {
+  process.env.COOKIE_PREFIX = STEALTH.cookiePrefix;
 }
 
 /** החזקת חיבורים "מתים" — מדמה פורט סגור (firewall DROP) בלי לשרוף זיכרון */
@@ -178,7 +208,9 @@ function maskRequestPath(req) {
   if (!maskPrefix || !STEALTH.assetMask || STEALTH.assetMask !== "on") return;
   const url = req.url ?? "/";
   if (!url.startsWith(maskPrefix)) return;
-  req.url = MASK_FROM + url.slice(maskPrefix.length);
+  // מחזירים גם את שמות המזהים המוסווים (למשל x9a4f2c1b-e85dfe.js → webpack-e85dfe.js)
+  const rest = uncoverPath(url.slice(maskPrefix.length), STEALTH);
+  req.url = MASK_FROM + rest;
 }
 
 /**
@@ -190,8 +222,28 @@ function installHeaderStealth(res) {
   if (STEALTH.enabled !== "on" || STEALTH.minimalHeaders !== "on") return;
   // כל אסימון שמכיל rsc/next — כולל שמות חדשים שיתווספו בעתיד
   const NOISE = /rsc|next/i;
+  /**
+   * כותרות שגוף התשובה לא מכסה: כותרות preload/prefetch של Next מכילות
+   * נתיבי נכסים אמיתיים ("/_next/static/...") — כלומר הסוואת הגוף לבדה
+   * הייתה מפסידה את המידע הזה למי שקורא רק כותרות.
+   */
+  const MASKABLE_HEADERS = ["link", "x-middleware-rewrite", "x-matched-path", "refresh"];
+  const maskHeaderValue = (value) => {
+    if (typeof value !== "string") return value;
+    let out = value;
+    if (maskPrefix) out = out.split(MASK_FROM).join(maskPrefix);
+    out = coverTokens(out, STEALTH);
+    return out;
+  };
+
   const clean = () => {
     if (res.headersSent) return;
+    for (const name of MASKABLE_HEADERS) {
+      const current = res.getHeader(name);
+      if (!current) continue;
+      if (Array.isArray(current)) res.setHeader(name, current.map(maskHeaderValue));
+      else res.setHeader(name, maskHeaderValue(String(current)));
+    }
     const varying = res.getHeader("vary");
     if (!varying) return;
     const kept = String(varying)
@@ -232,6 +284,12 @@ function maskText(buffer) {
   if (STEALTH.bootstrapAlias && STEALTH.bootstrapAlias !== "off" && text.includes("__next_f")) {
     text = text.split("__next_f").join(STEALTH.bootstrapAlias);
   }
+  // שם המערכת הוא טביעת האצבע החזקה מכולן — סורק שמחפש מחרוזת אחת
+  // מוצא כל עותק של האתר בכל דומיין. מוחלף לפני שהגוף יוצא.
+  text = coverBrand(text, STEALTH);
+  // וגם השמות הפנימיים של המסגרת (webpack / Next) — כדי שגם ניתוח
+  // של קוד ה-JS לא יסגיר מהיכן האתר נבנה.
+  text = coverTokens(text, STEALTH);
   return Buffer.from(text, "utf8");
 }
 
@@ -471,6 +529,7 @@ function sanitizeHeaders(info) {
   // מצב חמקן מועבר לאפליקציה (middleware לא יכול לקרוא קבצים) — הכותרת נכתבת
   // רק כאן, אחרי מחיקת כל כותרות ה-x-lt-* שהגיעו מבחוץ.
   headers["x-lt-stealth"] = STEALTH.enabled === "on" ? "on" : "off";
+  headers["x-lt-admin-hide"] = STEALTH.enabled === "on" && STEALTH.adminHides404 === "on" ? "on" : "off";
   // במצב חמקן מסתירים נתיבי נכסים בתוך גוף התשובה, ולכן הגוף חייב להגיע
   // בלתי-דחוס. הדחיסה לדפדפן מתבצעת ממילא ב-Cloudflare מול הלקוח.
   if (STEALTH.enabled === "on" && STEALTH.assetMask === "on") headers["accept-encoding"] = "identity";
@@ -556,6 +615,27 @@ function sendBlocked(reqInfo, res, decision) {
   const isApi = reqInfo.path.startsWith("/api/") || reqInfo.path.startsWith("/_next/") ||
     /\.(json|svg|png|jpe?g|webp|css|js|mjs|woff2?|mp4|webm|vtt)$/i.test(reqInfo.path);
 
+  /**
+   * במצב חמקן תשובת החסימה **אחידה לחלוטין**.
+   *
+   * הסיבה: סורק שלומד מהאתר לא צריך לנחש כלום — הוא מסתכל על הגדלים.
+   * כשהודעה משתנה לפי סוג החסימה (סריקת נתיב / SQL / קצב), תוקף מקבל
+   * "אורקל": "הנתיב הזה קיים כי התשובה גדולה יותר". אחידות מונעת את זה.
+   * משתמש אמיתי כמעט לא נתקל בתשובה הזו, ולכן אין כאן פגיעה בחוויה.
+   */
+  if (STEALTH.enabled === "on") {
+    if (isApi) {
+      res.statusCode = status;
+      res.setHeader("Content-Type", "application/json; charset=utf-8");
+      res.end(JSON.stringify({ ok: false, error: { code: "BLOCKED", message: "הבקשה נדחתה." }, requestId }));
+      return;
+    }
+    res.statusCode = status;
+    res.setHeader("Content-Type", "text/html; charset=utf-8");
+    res.end(deniedPage("הבקשה נדחתה.", requestId, retryAfter));
+    return;
+  }
+
   if (isApi) {
     res.statusCode = status;
     res.setHeader("Content-Type", "application/json; charset=utf-8");
@@ -592,7 +672,21 @@ function onRequest(req, res) {
 
   /* 0.001 — מצב חמקן: האם בכלל מגיעים אלינו? */
   if (STEALTH.enabled === "on") {
-    const decision = stealthDecision(info, { headers: info.headerMap });
+    /**
+     * כניסה עם סימן בכתובת (?lt_entry=…) — **חייב להיבדק לפני החלטת החמקן**.
+     *
+     * הבאג שהיה כאן: הבדיקה ישבה בשלב 1.5, אחרי שהבקשה כבר הושלכה. כלומר
+     * הקישור היחיד שנועד להכניס את הבעלים פנימה היה נחסם בעצמו — מי שהפעיל
+     * חמקן נעל את עצמו בחוץ ולא הייתה לו דרך חזרה חוץ משינוי הקובץ ידנית.
+     * עכשיו: בקשה שנושאת סימן חוקי בכתובת נחשבת מזוהה, ומקבלת עוגיית מעבר
+     * בשלב 1.5 (שם היא גם מנוקה מהכתובת).
+     */
+    const entryMatch = entryTokenFromRequest(req.url, undefined);
+    if (entryMatch) info.entryGranted = true;
+
+    const decision = entryMatch
+      ? { action: "serve", reason: "entry_token" }
+      : stealthDecision(info, { headers: info.headerMap });
 
     if (decision.action === "drop") {
       if (decision.canary) {
@@ -686,9 +780,76 @@ function onRequest(req, res) {
     }
   }
 
+  /**
+   * 1.9 — הסתרת מערכת הניהול ממי שאינו מחובר.
+   *
+   * איך עובדים כאן: במקום להחזיר תשובה משלנו (שגודלה שונה מהתשובה הרגילה
+   * של "כתובת לא קיימת" — וזו בעצמה טביעת אצבע), **ממפים את הבקשה מחדש**
+   * לכתובת דמיונית באותו אורך בדיוק. Next מגיש עבורה את עמוד ה-404 הרגיל,
+   * וכך ‎/admin נראה זהה לחלוטין לכל כתובת שאינה קיימת.
+   *
+   * הערה: rewrite בתוך ה-middleware לא עובד בסרוויס הזה (Next מנסה לממש אותו
+   * כקריאת HTTP לפורט פנימי שאינו קיים — ECONNREFUSED ו-500). כאן, לפני
+   * מסירת הבקשה, פשוט משנים את הנתיב.
+   */
+  if (STEALTH.enabled === "on" && STEALTH.adminHides404 === "on") {
+    const lower = info.path.toLowerCase();
+    const isAdmin = lower === "/admin" || lower.startsWith("/admin/") || lower === "/api/admin" || lower.startsWith("/api/admin/");
+    if (isAdmin) {
+      const sessionName = `${(process.env.COOKIE_PREFIX ?? "lt").replace(/[^a-z0-9]/gi, "") || "lt"}_session`;
+      const hasSession = new RegExp(`(?:^|;\\s*)${sessionName}=[^;]{8,}`).test(info.cookieHeader ?? "");
+      if (!hasSession) {
+        const [pathOnly, query] = String(req.url ?? "/").split("?");
+        /**
+         * הדמיית שם הקטע חייבת להיות באותו אורך **ובאותו אופי תווים**
+         * (אותיות קטנות). מספרים בכתובת גורמים לקידוד שונה בתוך ה-JSON
+         * של העמוד — הפרש של כמה בתים שגם הוא טביעת אצבע.
+         */
+        const letters = "abcdefghijklmnopqrstuvwxyz";
+        const fake = Array.from(crypto.randomBytes(5), (byte) => letters[byte % 26]).join("");
+        req.url = pathOnly.replace(/admin/i, fake) + (query ? `?${query}` : "");
+        engine.store.event({ kind: "stealth_admin_hidden", severity: "info", ip: info.ip, detail: `path=${info.path}` });
+      }
+    }
+  }
+
   // 2 — העברת בקשה נקייה לאפליקציה (עם הסוואת נתיבי נכסים במצב חמקן)
   if (STEALTH.enabled === "on") {
     maskRequestPath(req);
+
+    /**
+     * אייקון ניטרלי. Shodan ו-Censys מחשבים hash של /favicon.ico ומשתמשים
+     * בו כמזהה-על: כל הדומיינים עם אותו hash מסווגים כ"אותו מוצר".
+     * אייקון גנרלי זהה למיליוני אתרים אחרים — כלומר לא מזהה כלום.
+     * מחזירים SVG בלי שם, בלי מטא-דאטה ובלי מלל שמסגיר.
+     */
+    if (STEALTH.faviconMask !== "off") {
+      const faviconPath = String(info.path ?? "/").split("?")[0].toLowerCase();
+      if (
+        faviconPath === "/favicon.ico" ||
+        faviconPath === "/icon.svg" ||
+        faviconPath === "/icon.png" ||
+        faviconPath === "/apple-icon.png" ||
+        faviconPath === "/apple-touch-icon.png"
+      ) {
+        const body = Buffer.from(genericFavicon(STEALTH.assetPrefix ?? "seed"), "utf8");
+        res.setHeader("Content-Type", "image/svg+xml");
+        res.setHeader("Content-Length", String(body.length));
+        res.setHeader("Cache-Control", "public, max-age=86400");
+        res.statusCode = 200;
+        return res.end(body);
+      }
+
+      // מניפסט ניטרלי — הגרסה של האפליקציה מציגה שם מערכת ורשימת עמודים
+      if (faviconPath === "/manifest.webmanifest" || faviconPath === "/manifest.json") {
+        const manifest = Buffer.from(genericManifest(), "utf8");
+        res.setHeader("Content-Type", "application/manifest+json");
+        res.setHeader("Content-Length", String(manifest.length));
+        res.statusCode = 200;
+        return res.end(manifest);
+      }
+    }
+
     installHeaderStealth(res);
     installHtmlMasking(res);
   }

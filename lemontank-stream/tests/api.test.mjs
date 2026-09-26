@@ -11,6 +11,7 @@
 
 import { test, before, describe } from "node:test";
 import { suiteIp } from "./helpers/suite-ip.mjs";
+import { stealthHeaders, CSRF_COOKIE, SESSION_COOKIE, STEALTH_ON } from "./helpers/stealth-entry.mjs";
 import assert from "node:assert/strict";
 import { restoreSession, saveSecret, saveSession, savedSecret, totpCode } from "./helpers/admin-login.mjs";
 
@@ -41,11 +42,11 @@ class Client {
   }
 
   csrf() {
-    return this.cookies.get("lt_csrf") ?? "";
+    return this.cookies.get(CSRF_COOKIE) ?? "";
   }
 
   async raw(path, options = {}) {
-    const headers = { ...(options.headers ?? {}), "x-forwarded-for": SUITE_IP };
+    const headers = { ...(options.headers ?? {}), "x-forwarded-for": SUITE_IP, ...stealthHeaders() };
     if (this.cookies.size) headers.cookie = this.cookieHeader();
     if (options.method && options.method !== "GET" && options.method !== "HEAD") {
       headers["x-csrf-token"] = options.csrf ?? this.csrf();
@@ -141,7 +142,7 @@ async function freshFreeUser() {
   if (res.body?.ok !== true) return null;
 
   // חלק מהתצורות יוצרות סשן כבר בהרשמה; אם לא — מתחברים עם אותו חשבון
-  if (!c.csrf() || !c.cookies.get("lt_session")) {
+  if (!c.csrf() || !c.cookies.get(SESSION_COOKIE)) {
     const login = await c.login(email, "Test-Pass-2026!Strong");
     if (login.body?.ok !== true) return null;
   }
@@ -239,7 +240,9 @@ describe("קטלוג ציבורי", () => {
     assert.match(csp, /default-src/, "חסר CSP");
     assert.match(csp, /nonce-/, "ה-CSP חייב nonce");
     assert.equal(res.headers.get("x-content-type-options"), "nosniff");
-    assert.match(res.headers.get("referrer-policy") ?? "", /strict-origin/);
+    // במצב חמקן ה-Referrer-Policy הוא no-referrer (בחירה מודעת: בלי דליפת נתיב)
+    const policy = res.headers.get("referrer-policy") ?? "";
+    assert.match(policy, STEALTH_ON ? /no-referrer/ : /strict-origin/);
   });
 });
 
@@ -272,6 +275,11 @@ describe("הגנות", () => {
     const anon = new Client();
     for (const path of ["/admin", "/account", "/my-list", "/watch/any-title"]) {
       const res = await anon.raw(path);
+      if (STEALTH_ON && path.startsWith("/admin")) {
+        // במצב חמקן ‎/admin מוסתר כ-404 זהה לכל כתובת שאינה קיימת
+        assert.equal(res.status, 404, `${path} החזיר ${res.status}`);
+        continue;
+      }
       assert.ok([302, 307, 308].includes(res.status), `${path} החזיר ${res.status}`);
       assert.match(res.headers.get("location") ?? "", /\/login/);
     }

@@ -22,7 +22,7 @@ import crypto from "node:crypto";
 import { fileURLToPath } from "node:url";
 import {
   loadStealth, saveStealth, stealthStatus, makeCanary,
-  CLOUDFLARE_CIDRS, OTHER_PROXY_CIDRS,
+  CLOUDFLARE_CIDRS, OTHER_PROXY_CIDRS, DEFAULT_BRAND_COVER,
 } from "../security/stealth.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
@@ -57,6 +57,8 @@ switch (command) {
     console.log(`   סימנים סודיים:       ${st.tokens}`);
     console.log(`   טווחי CDN מהימנים:   ${st.trustedCidrs}`);
     console.log(`   כתובות מורשות נוספות: ${st.allowCidrs}`);
+    console.log(`   הסוואת מותג:         ${st.brandCover ? `${C.cyan}${st.brandCover}${C.off}` : "כבויה"}`);
+    console.log(`   אייקון ניטרלי:       ${st.faviconMask === "on" ? "כן" : "לא"}`);
     console.log(`   /admin מוסתר כ-404:  ${st.adminHides404 === "on" ? "כן" : "לא"}`);
     console.log(`   כותרות מינימליות:    ${st.minimalHeaders === "on" ? "כן" : "לא"}`);
     console.log(`   חסימת אינדוקס:       ${st.noindex === "on" ? "כן" : "לא"}`);
@@ -91,6 +93,28 @@ switch (command) {
   case "off": {
     saveStealth({ ...config, enabled: "off" });
     console.log("🔓 מצב חמקן כבוי — האתר מגיש תוכן לכל מבקר (מצב פיתוח).");
+    break;
+  }
+
+  case "brand": {
+    const value = args.slice(1).join(" ").trim();
+    if (!value || value === "off") {
+      saveStealth({ ...config, brandCover: "" });
+      console.log(`\n✅ הסוואת המותג כבויה — האתר יציג את שמו האמיתי.\n`);
+      break;
+    }
+    if (value === "auto") {
+      saveStealth({ ...config, brandCover: "" });
+      console.log(`\n✅ הסוואת מותג אוטומטית — בגוף התשובה יוצג "${DEFAULT_BRAND_COVER}".\n`);
+      break;
+    }
+    if (value.length > 60) {
+      console.log("\n❌ שם ארוך מדי (עד 60 תווים).\n");
+      process.exit(1);
+    }
+    saveStealth({ ...config, brandCover: value });
+    console.log(`\n✅ שם מוסווה: ${C.cyan}${value}${C.off}\n`);
+    console.log(`   ${C.dim}בגוף התשובה יוצג השם הזה במקום שם המערכת.\n`);
     break;
   }
 
@@ -178,6 +202,9 @@ switch (command) {
       console.log(`שימוש: node scripts/stealth.mjs set <key> <value>
 
 מפתחות: enabled(on|off) mode(drop|decoy|block) originLock(on|off) originHeader(שם כותרת)
+  brand "<שם>" | brand auto | brand off     — שם מוסווה בגוף התשובה (ברירת מחדל: אוטומטי)
+  faviconMask(on|off)                       — אייקון ניטרלי במקום אייקון שמזהה את האתר
+  allowLocalNoHeaders(on|off)               — גלישה מהמכונה עצמה בלי סימן סודי
          dropHoldMs(מספר) maxHeldDrops(מספר) adminHides404(on|off) minimalHeaders(on|off)
          noindex(on|off) robotsBait(on|off) decoyTitle(טקסט) requireForwardedBy(on|off)`);
       break;

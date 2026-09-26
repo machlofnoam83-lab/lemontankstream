@@ -12,6 +12,7 @@
 
 import { test, before, after, describe } from "node:test";
 import { suiteIp } from "./helpers/suite-ip.mjs";
+import { stealthHeaders, CSRF_COOKIE, SESSION_COOKIE, STEALTH_ON } from "./helpers/stealth-entry.mjs";
 import assert from "node:assert/strict";
 import { restoreSession, saveSecret, saveSession, savedSecret, stepUp, totpCode } from "./helpers/admin-login.mjs";
 import { ensureTestTitle, leftoverTestTitles, removeTestTitle } from "./helpers/test-catalog.mjs";
@@ -43,11 +44,11 @@ class Client {
   }
 
   csrf() {
-    return this.cookies.get("lt_csrf") ?? "";
+    return this.cookies.get(CSRF_COOKIE) ?? "";
   }
 
   async raw(path, options = {}) {
-    const headers = { ...(options.headers ?? {}), "x-forwarded-for": SUITE_IP };
+    const headers = { ...(options.headers ?? {}), "x-forwarded-for": SUITE_IP, ...stealthHeaders() };
     if (this.cookies.size) headers.cookie = this.cookieHeader();
     if (options.method && options.method !== "GET" && options.method !== "HEAD") {
       headers["x-csrf-token"] = options.csrf ?? this.csrf();
@@ -179,7 +180,7 @@ async function freshFreeUser() {
   });
   if (res.body?.ok !== true) return null;
 
-  if (!c.cookies.get("lt_session")) {
+  if (!c.cookies.get(SESSION_COOKIE)) {
     const login = await c.login(email, FREE_PASSWORD);
     if (login.body?.ok !== true) return null;
   }
@@ -753,7 +754,9 @@ describe("בקשות תוכן", () => {
   test("ניהול בקשות דורש הרשאת צוות", async (t) => {
     if (!ready) return t.skip("אין שרת");
     const anon = new Client();
-    assert.ok([401, 403].includes((await anon.get("/api/admin/requests")).status));
+    // במצב חמקן ‎/api/admin מוסתר כ-404 (לא מסגיר שקיים)
+    const forbidden = [401, 403, ...(STEALTH_ON ? [404] : [])];
+    assert.ok(forbidden.includes((await anon.get("/api/admin/requests")).status));
     const free = await freshFreeUser();
     if (!free) return t.skip("הרשמה לא זמינה");
     assert.ok([401, 403].includes((await free.get("/api/admin/requests")).status), "משתמש רגיל לא אמור לראות את הקונסולה");
@@ -826,7 +829,8 @@ describe("השנה שלי ותובנות", () => {
   test("תובנות דורשות הרשאת אנליטיקה", async (t) => {
     if (!ready) return t.skip("אין שרת");
     const anon = new Client();
-    assert.ok([401, 403].includes((await anon.get("/api/admin/insights")).status));
+    const forbidden = [401, 403, ...(STEALTH_ON ? [404] : [])];
+    assert.ok(forbidden.includes((await anon.get("/api/admin/insights")).status));
   });
 });
 

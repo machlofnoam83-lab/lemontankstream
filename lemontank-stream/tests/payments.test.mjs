@@ -13,6 +13,7 @@
  */
 
 import { test, before, after, describe } from "node:test";
+import { stealthHeaders, CSRF_COOKIE, SESSION_COOKIE } from "./helpers/stealth-entry.mjs";
 import assert from "node:assert/strict";
 import crypto from "node:crypto";
 import path from "node:path";
@@ -90,15 +91,15 @@ class Client {
   }
 
   csrf() {
-    return this.cookies.get("lt_csrf") ?? "";
+    return this.cookies.get(CSRF_COOKIE) ?? "";
   }
 
   async prepare() {
-    if (!this.cookies.has("lt_csrf")) await this.raw("/login");
+    if (!this.cookies.has(CSRF_COOKIE)) await this.raw("/login");
   }
 
   async raw(pathname, options = {}) {
-    const headers = { ...(options.headers ?? {}), "user-agent": this.userAgent };
+    const headers = { ...(options.headers ?? {}), ...stealthHeaders(), "user-agent": this.userAgent };
     if (this.cookies.size) headers.cookie = this.cookieHeader();
     if (options.method && options.method !== "GET" && options.method !== "HEAD") {
       headers["x-csrf-token"] = options.csrf ?? this.csrf();

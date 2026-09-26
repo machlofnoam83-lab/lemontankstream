@@ -256,7 +256,7 @@ it("שרת חמקן: ה-bootstrap של React מוסווה והנכסים מסו�
   assert.ok(alias && alias !== "off", "נוצר שם מוסווה");
   assert.ok(body.includes(`self.${alias}=self.${alias}||[]`), "ה-HTML משתמש בשם המוסווה");
   // וכל הצ'אנקים שהדפדפן טוען מוסווים באותו שם בדיוק — אחרת האתר נשבר
-  const chunkUrls = [...new Set(body.match(/\/_[a-f0-9]{8}\/static\/chunks\/[A-Za-z0-9._-]+\.js/g) ?? [])].slice(0, 10);
+  const chunkUrls = [...new Set(body.match(/\/_[a-f0-9]{8}\/[A-Za-z0-9._-]+\/[A-Za-z0-9._-]+\.(?:js|css)/g) ?? [])].slice(0, 10);
   assert.ok(chunkUrls.length > 0, "נמצאו נתיבי צ'אנקים מוסווים");
   let seenAlias = false;
   for (const url of chunkUrls) {
@@ -320,6 +320,186 @@ it("שרת חמקן: מלכודת נרשמת, נחסמת לצמיתות והחי
   const raw = await rawRequest(port, trap, { "x-forwarded-for": "45.9.9.9", "cf-connecting-ip": "45.9.9.9" }, 6000);
   assert.equal(raw, null, "מלכודת לא אמורה להשיב");
   await new Promise((r) => setTimeout(r, 500));
+});
+
+/* ─────────────── בדיקות ההסוואה החדשה (זהות, נתיבים, אורקל) ───────────────── */
+
+it("שרת חמקן: כניסה עם סימן בכתובת בלבד (בלי כותרת) עובדת", async () => {
+  /**
+   * רגרסיה לבאג אמיתי: בדיקת הסימן ישבה בשלב מאוחר מדי — אחרי שהבקשה
+   * כבר הושלכה בשקט. כלומר הקישור היחיד שנועד להכניס את הבעלים פנימה
+   * נחסם בעצמו, ומי שהפעיל חמקן ננעל בחוץ בלי דרך חזרה.
+   */
+  const raw = await rawRequest(port, `/?lt_entry=${TOKEN}`, { "cf-connecting-ip": "82.166.20.7" }, 15000);
+  assert.equal(statusOf(raw), 302, "בקשה עם סימן בכתובת חייבת להיענות");
+  assert.match(raw, /set-cookie: s7kq2x_entry=/i, "הסימן מגדיר עוגיית מעבר");
+});
+
+it("שרת חמקן: אין אף זכר לשם המערכת או לפריימוורק בגוף הדף", async () => {
+  const raw = await rawRequest(port, "/", AUTH, 15000);
+  const body = raw.split("\r\n\r\n").slice(1).join("\r\n\r\n");
+  const forbidden = [
+    [/lemontank/i, "שם המערכת באנגלית"],
+    [/לימונטנק|לימון\s*טנק/, "שם המערכת בעברית"],
+    [/__next_f|_next\/static/, "טביעת Next"],
+    [/self\.__next/, "bootstrap של Next"],
+    [/\bwebpack\b/i, "טביעת webpack"],
+    [/static\/chunks/, "תיקיית נכסים של webpack"],
+    [/\$Sreact/, "סמל RSC של React"],
+    [/next-error-h1/, "מחלקת CSS פנימית של Next"],
+    [/data-precedence/, "מנגנון precedence של Next"],
+  ];
+  for (const [pattern, label] of forbidden) {
+    assert.doesNotMatch(body, pattern, `נשאר בגוף הדף: ${label}`);
+  }
+  assert.match(body, /Northwind Media/, "שם ההסוואה מוצג במקום שם המערכת");
+});
+
+it("שרת חמקן: כל נכס שהדף מבקש נטען (ההסוואה לא שוברת את האתר)", async () => {
+  const raw = await rawRequest(port, "/", AUTH, 15000);
+  const body = raw.split("\r\n\r\n").slice(1).join("\r\n\r\n");
+  const assets = [...new Set(body.match(/\/_[a-f0-9]{8}\/[A-Za-z0-9._-]+\/[A-Za-z0-9._-]+\.(?:js|css)/g) ?? [])];
+  assert.ok(assets.length >= 5, `נמצאו ${assets.length} נכסים — ציפינו ליותר`);
+  for (const url of assets) {
+    const asset = await rawRequest(port, url, AUTH, 15000);
+    assert.equal(statusOf(asset), 200, `הנכס המוסווה ${url} לא נטען`);
+  }
+});
+
+it("שרת חמקן: ‎/admin זהה לחלוטין לכתובת שאינה קיימת (אין אורקל מיפוי)", async () => {
+  /**
+   * הבדיקה שמכסה את הבאג הגדול: קודם ‎/admin החזיר עמוד 404 מקוצר משלו
+   * (כ-100 בתים) בעוד כל כתובת דמיונית מקבלת את ה-404 הרגיל (כ-12 אלף
+   * בתים) — כלומר ההסתרה עצמה הייתה טביעת אצבע שאומרת "כאן יש משהו".
+   * עכשיו: אותו סטטוס, אותו גודל, אותו תוכן.
+   */
+  const normalize = (raw) => (raw ?? "").replace(/nonce="[^"]*"/g, 'nonce=""');
+  const hidden = await rawRequest(port, "/admin", AUTH, 15000);
+  const fake = await rawRequest(port, "/abcde", AUTH, 15000);
+  assert.equal(statusOf(hidden), 404);
+  assert.equal(statusOf(hidden), statusOf(fake));
+  assert.equal(normalize(hidden).length, normalize(fake).length, "גודל התשובה שונה — זו טביעת אצבע");
+  assert.doesNotMatch(hidden.split("\r\n\r\n")[0], /location:/i);
+});
+
+/* ────────────────────────── יחידות: שכבת ההסוואה ─────────────────────────── */
+
+it("הסוואה: שם המערכת מוחלף בכל הצורות (אנגלית, עברית, רישיות)", async () => {
+  const { coverBrand, DEFAULT_BRAND_COVER } = await import(path.join(ROOT, "security/stealth.mjs"));
+  const text = "LemonTank Stream · lemontank · LemonTank · לימונטנק · לימון טנק";
+  const out = coverBrand(text, { brandCover: "" });
+  assert.doesNotMatch(out, /lemontank|לימון/i);
+  assert.match(out, new RegExp(DEFAULT_BRAND_COVER.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")));
+  assert.equal(coverBrand(text, { brandCover: "Acme TV" }), "Acme TV · Acme TV · Acme TV · Acme TV · Acme TV");
+});
+
+it("הסוואה: החלפת שמות פנימיים היא דו-כיוונית (הנכס חוזר לשרת בשלום)", async () => {
+  const { coverTokens, uncoverPath, generateAliases, aliasesComplete } = await import(path.join(ROOT, "security/stealth.mjs"));
+  const aliases = generateAliases();
+  assert.ok(aliasesComplete(aliases), "המילון שנוצר חייב להיות מלא");
+  const config = { tokenAliases: aliases };
+  for (const original of [
+    "/_next/static/chunks/webpack-e85dfe.js",
+    "/_next/static/chunks/main-app-cf85ff.js",
+    "/_next/static/chunks/polyfills-42372e.js",
+    "/_next/static/css/043f431e.css",
+    "/api/x?q=webpack",
+  ]) {
+    const masked = coverTokens(original, config);
+    // ‎/_next/ מוחלף בשכבת השרת (תחילית אקראית), לא כאן — כאן נבדקים השמות הפנימיים
+    assert.doesNotMatch(masked, /webpack|static\/chunks|main-app|polyfills/, `לא הוסווה: ${original}`);
+    assert.equal(uncoverPath(masked, config), original, `ההיפוך נכשל עבור ${original}`);
+  }
+  /**
+   * ההיפוך המלא בדיוק כמו שהשרת עושה: הנתיב בגוף התשובה (אחרי תחילית
+   * אקראית + החלפת שמות פנימיים) חייב להיות זהה לכתובת שהדפדפן יבקש —
+   * אחרת הדף נטען בלי CSS/JS, וזו הצורה השכיחה של "ההסוואה שברה את האתר".
+   */
+  const prefix = "/_21cd1c17";
+  const serverOriginal = "/_next/static/chunks/webpack-e85dfe.js";
+  const expected = `${prefix}/${aliases["static/chunks"]}/${aliases.webpack}-e85dfe.js`;
+  const bodyMasked = coverTokens(serverOriginal.replace("/_next/", `${prefix}/`), config);
+  assert.equal(bodyMasked, expected, "הנתיב בגוף חייב להתאים לזה שהדפדפן מבקש");
+  assert.equal(`/_next/${uncoverPath(expected.slice(prefix.length + 1), config)}`, serverOriginal, "הבקשה הנכנסת חייבת לחזור לנתיב המקורי");
+});
+
+it("הסוואה: החלפת שמות לא שוברת JSON (באג אמיתי שמנע תשובות תקינות)", async () => {
+  /**
+   * הרגרסיה: הדפוס ‎":"next" הוחלף בכל מקום שבו הופיע — כולל בנתוני האתר
+   * (`"category":"next"`), וכך גוף JSON תקין הפך ל-`"categoryx1a2b"`.
+   * כלומר ההסוואה הפילה בקשות API. הכלל שנקבע: מחליפים צירופים מלאים
+   * (מפתח+ערך) של המסגרת, לעולם לא דפוסים גנריים של תוכן.
+   */
+  const { coverTokens, uncoverPath, generateAliases } = await import(path.join(ROOT, "security/stealth.mjs"));
+  const config = { tokenAliases: generateAliases() };
+  const payload = {
+    category: "next",
+    name: "webpack",
+    lib: "react-dom",
+    asset: "/_next/static/chunks/webpack-e85dfe.js",
+    nested: { precedence: "next", items: ["next", "react.suspense"] },
+  };
+  const raw = JSON.stringify(payload);
+  const masked = coverTokens(raw, config);
+  const parsed = JSON.parse(masked); // אם זה זורק — ההסוואה שברה את הגוף
+  assert.deepEqual(Object.keys(parsed), Object.keys(payload), "המפתחות חייבים להישאר זהים");
+  assert.equal(parsed.category, "next", "ערך תוכן לא משתנה");
+  assert.equal(parsed.nested.items[0], "next");
+  assert.doesNotMatch(parsed.asset, /webpack|static\/chunks/, "נתיב נכס חייב להיות מוסווה");
+  assert.equal(uncoverPath(parsed.asset, config), payload.asset, "הנתיב חייב לחזור לקדמותו");
+});
+
+it("שרת חמקן: תשובות API נשארות JSON תקין (ההסוואה לא נוגעת במבנה)", async () => {
+  /**
+   * זו הבדיקה שתפסה באג אמיתי: ההסוואה החליפה גם דפוסי תוכן
+   * (`"category":"next"`) וכך הפכה גוף JSON תקין לשבור — כלומר האתר
+   * החזיר תשובות פגומות. המבנה חייב לשרוד כל החלפה.
+   */
+  const response = await fetch(`http://127.0.0.1:${port}/api/plans`, {
+    headers: { ...AUTH, ...(localStorageHeaders()) },
+    redirect: "manual",
+  });
+  assert.equal(response.status, 200);
+  const parsed = await response.json(); // אם הגוף שבור — כאן זה נכשל
+  assert.equal(parsed.ok, true, "מבנה התשובה נשמר");
+  assert.ok(Array.isArray(parsed.data?.plans ?? parsed.data), "רשימת המסלולים חזרה תקינה");
+});
+
+const localStorageHeaders = () => ({});
+
+it("הסוואה: לכל התקנה אייקון סתמי משל עצמה (אין hash משותף שמקשר בין אתרים)", async () => {
+  const { genericFavicon, genericManifest } = await import(path.join(ROOT, "security/stealth.mjs"));
+  const hashes = new Set();
+  for (let i = 0; i < 40; i += 1) hashes.add(genericFavicon(`seed-${i}`));
+  assert.ok(hashes.size > 5, "האייקון חייב להשתנות בין התקנות");
+  for (const svg of hashes) {
+    assert.match(svg, /^<svg /);
+    assert.doesNotMatch(svg, /lemon|tank|לימון|next|react/i, "האייקון לא מסגיר דבר");
+  }
+  const manifest = JSON.parse(genericManifest());
+  assert.equal(manifest.name, "Site");
+  assert.doesNotMatch(JSON.stringify(manifest), /lemon|tank|לימון|admin|api/i);
+});
+
+it("הסוואה: allowLocalNoHeaders פועל רק על חיבור מהמכונה עצמה", async () => {
+  const { stealthDecision } = await import(path.join(ROOT, "security/stealth.mjs"));
+  const localFile = path.join(tmpDir, "local.json");
+  saveStealth({ ...baseConfig, allowLocalNoHeaders: "on", originLock: "on" }, localFile);
+  const withFile = (info) => stealthDecision(info, { file: localFile, headers: info.headerMap });
+
+  // 1. לולאה, בלי זהות מועברת → משרת (זה המסלול של בעל האתר על המכונה)
+  const loopback = withFile({ path: "/", method: "GET", ip: "127.0.0.1", socketIp: "127.0.0.1", host: "x", headerMap: { host: "x" } });
+  assert.equal(loopback.action, "serve");
+
+  // 2. תוקף מהאינטרנט — לא משרת גם כשהאפשרות דלוקה
+  const external = withFile({ path: "/", method: "GET", ip: "203.0.113.9", socketIp: "203.0.113.9", host: "x", headerMap: { host: "x" } });
+  assert.notEqual(external.action, "serve");
+
+  // 3. כתובת פנימית שאינה לולאה (למשל קונטיינר אחר ברשת) — גם היא לא נהנית מההקלה
+  const internal = withFile({ path: "/", method: "GET", ip: "10.1.2.3", socketIp: "10.1.2.3", host: "x", headerMap: { host: "x" } });
+  assert.notEqual(internal.action, "serve");
+
+  saveStealth(baseConfig, configFile);
 });
 
 test("ניקוי: סגירת שרת הבדיקה", () => {

@@ -10,6 +10,7 @@
 
 import { test, before, after, describe } from "node:test";
 import { suiteIp } from "./helpers/suite-ip.mjs";
+import { stealthHeaders, CSRF_COOKIE, SESSION_COOKIE } from "./helpers/stealth-entry.mjs";
 import assert from "node:assert/strict";
 import { restoreSession, saveSecret, saveSession, savedSecret, stepUp, totpCode } from "./helpers/admin-login.mjs";
 import { ensureTestTitle, leftoverTestTitles, removeTestTitle } from "./helpers/test-catalog.mjs";
@@ -41,11 +42,11 @@ class Client {
   }
 
   csrf() {
-    return this.cookies.get("lt_csrf") ?? "";
+    return this.cookies.get(CSRF_COOKIE) ?? "";
   }
 
   async raw(path, options = {}) {
-    const headers = { ...(options.headers ?? {}), "x-forwarded-for": SUITE_IP };
+    const headers = { ...(options.headers ?? {}), "x-forwarded-for": SUITE_IP, ...stealthHeaders() };
     if (this.cookies.size) headers.cookie = this.cookieHeader();
     if (options.method && options.method !== "GET" && options.method !== "HEAD") {
       headers["x-csrf-token"] = options.csrf ?? this.csrf();
@@ -141,7 +142,7 @@ async function freshFreeUser() {
   if (res.body?.ok !== true) return null;
 
   // חלק מהתצורות יוצרות סשן כבר בהרשמה; אם לא — מתחברים עם אותו חשבון
-  if (!c.csrf() || !c.cookies.get("lt_session")) {
+  if (!c.csrf() || !c.cookies.get(SESSION_COOKIE)) {
     const login = await c.login(email, "Test-Pass-2026!Strong");
     if (login.body?.ok !== true) return null;
   }
@@ -513,7 +514,7 @@ describe("ניוזלטר", () => {
 describe("דגלי פיצ'רים", () => {
   maybe("רשימת הדגלים כוללת את הפיצ'רים החדשים", async () => {
     const res = await admin.get("/api/features");
-    assert.equal(res.body.ok, true);
+    assert.equal(res.body.ok, true, `GET /api/features → ${res.status} (${JSON.stringify(res.body).slice(0, 120)})`);
     const keys = res.body.data.flags.map((f) => f.key);
     for (const key of ["watch_party", "achievements", "developer_api", "newsletter", "badges"]) {
       assert.ok(keys.includes(key), `הדגל ${key} קיים`);
