@@ -50,6 +50,11 @@ const env = { ...loadEnvFile(), ...process.env };
  * ולכן הגיבוי יכול תמיד להיות מופק באותו מסלול. אין מצב שבו "יש סודות
  * אבל אי אפשר לגבות". אם אין BACKUP_KEY ייעודי — מדפיסים אזהרה מפורשת.
  */
+function deriveKey(raw) {
+  // גזירה דטרמיניסטית: אותו סוד ⇒ אותו מפתח, גם אחרי שחזור גיבוי
+  return crypto.createHash("sha256").update(`lemontank-backup-v1:${raw}`).digest();
+}
+
 function backupKey() {
   const dedicated = env.BACKUP_KEY || env.FIELD_ENCRYPTION_KEY;
   const raw = dedicated || env.APP_SECRET;
@@ -62,8 +67,45 @@ function backupKey() {
     console.error("⚠️  אין BACKUP_KEY ייעודי — המפתח נגזר מ-APP_SECRET.");
     console.error("   מומלץ להוסיף BACKUP_KEY נפרד, כדי שגיבוי לא ייפתח עם סוד האפליקציה בלבד.");
   }
-  // גזירה דטרמיניסטית: אותו סוד ⇒ אותו מפתח, גם אחרי שחזור גיבוי
-  return crypto.createHash("sha256").update(`lemontank-backup-v1:${raw}`).digest();
+  return deriveKey(raw);
+}
+
+/**
+ * כל המפתחות שבהם *ייתכן* שגיבוי הוצפן — לפי הסדר.
+ *
+ * למה זה קיים: אם מפתח הגיבוי משתנה (למשל מוסיפים BACKUP_KEY אחרי שהקובץ
+ * הופק בלי אחד, או מחליפים אותו), גיבויים קודמים היו נפתחים לשגיאת פענוח
+ * סתומה. עכשיו שחזור מנסה את כל המפתחות הקיימים בסביבה ומדווח באיזה מהם
+ * הקובץ נפתח — כך גיבוי ישן לא הופך לפסולת בגלל החלפת מפתח.
+ */
+function candidateKeys() {
+  const list = [];
+  const push = (label, raw) => {
+    if (raw && raw.length >= 24 && !list.some((item) => item.raw === raw)) list.push({ label, raw });
+  };
+  push("BACKUP_KEY", env.BACKUP_KEY);
+  push("FIELD_ENCRYPTION_KEY", env.FIELD_ENCRYPTION_KEY);
+  push("APP_SECRET", env.APP_SECRET);
+  return list.map((item) => ({ ...item, key: deriveKey(item.raw) }));
+}
+
+/** פענוח עם המפתח הנוכחי; אם נכשל — מנסה את שאר המפתחות ומחזיר מה עבד. */
+function decryptBackup(payload) {
+  const iv = payload.subarray(MAGIC.length, MAGIC.length + 12);
+  const tag = payload.subarray(MAGIC.length + 12, MAGIC.length + 28);
+  const body = payload.subarray(MAGIC.length + 28);
+  const errors = [];
+  for (const candidate of candidateKeys()) {
+    try {
+      const decipher = crypto.createDecipheriv("aes-256-gcm", candidate.key, iv);
+      decipher.setAuthTag(tag);
+      const plain = zlib.gunzipSync(Buffer.concat([decipher.update(body), decipher.final()]));
+      return { plain, keyLabel: candidate.label, errors };
+    } catch (error) {
+      errors.push(`${candidate.label}: ${error?.code ?? error?.message ?? "כשל"}`);
+    }
+  }
+  return { plain: null, keyLabel: null, errors };
 }
 
 const args = process.argv.slice(2);
@@ -105,13 +147,20 @@ if (flag("--restore")) {
     console.error("❌ הקובץ אינו גיבוי של LemonTank (חתימה שגויה)");
     process.exit(2);
   }
-  const iv = payload.subarray(MAGIC.length, MAGIC.length + 12);
-  const tag = payload.subarray(MAGIC.length + 12, MAGIC.length + 28);
-  const body = payload.subarray(MAGIC.length + 28);
-
-  const decipher = crypto.createDecipheriv("aes-256-gcm", backupKey(), iv);
-  decipher.setAuthTag(tag);
-  const plain = zlib.gunzipSync(Buffer.concat([decipher.update(body), decipher.final()]));
+  const { plain, keyLabel, errors } = decryptBackup(payload);
+  if (!plain) {
+    console.error("❌ לא הצלחתי לפענח את הגיבוי עם אף אחד מהמפתחות שבסביבה:");
+    for (const line of errors) console.error(`   · ${line}`);
+    console.error("   ודא ש-.env.local הוא מהמכונה שאיתה הופק הגיבוי (BACKUP_KEY / APP_SECRET).");
+    process.exit(2);
+  }
+  if (keyLabel !== "BACKUP_KEY" && env.BACKUP_KEY) {
+    console.error(`⚠️  הגיבוי הוצפן במפתח: ${keyLabel} — לא ב-BACKUP_KEY הנוכחי.`);
+    console.error("   זה קורה כשמוסיפים/מחליפים BACKUP_KEY אחרי הפקת הגיבוי. השחזור הצליח;");
+    console.error("   גיבויים חדשים ייצרו כבר עם BACKUP_KEY הנוכחי.");
+  } else {
+    console.log(`🔓 פענוח עם: ${keyLabel}`);
+  }
 
   fs.mkdirSync(path.dirname(target), { recursive: true });
   fs.writeFileSync(target, plain, { mode: 0o600 });
@@ -177,9 +226,13 @@ function backup() {
   console.log(`🔐 נוצר גיבוי מוצפן: ${path.basename(file)} (${(payload.length / 1024).toFixed(1)} KB)`);
 
   // אימות מיידי: מפענחים לזיכרון ובודקים שלמות — בלי לגעת בדיסק
-  const decipher = crypto.createDecipheriv("aes-256-gcm", backupKey(), iv);
-  decipher.setAuthTag(payload.subarray(MAGIC.length + 12, MAGIC.length + 28));
-  const verified = zlib.gunzipSync(Buffer.concat([decipher.update(encrypted), decipher.final()]));
+  const verifiedBackup = decryptBackup(payload);
+  if (!verifiedBackup.plain) {
+    console.error("❌ הגיבוי נוצר אך לא הצלחתי לפענח אותו חזרה — לא לשמור אותו.");
+    for (const line of verifiedBackup.errors) console.error(`   · ${line}`);
+    process.exit(1);
+  }
+  const verified = verifiedBackup.plain;
   const tempPath = path.join(BACKUP_DIR, `.verify-${stamp}.db`);
   fs.writeFileSync(tempPath, verified, { mode: 0o600 });
   const check = verify(tempPath);

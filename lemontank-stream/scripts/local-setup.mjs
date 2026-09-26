@@ -64,7 +64,6 @@ step("0️⃣  בדיקת גרסת Node.js");
 `);
     process.exit(1);
   }
-  ok(`Node v${process.versions.node}, npm ${spawnSync(npmCmd(), ["-v"], { encoding: "utf8" }).stdout?.trim() ?? "?"}`);
 }
 
 if (!fs.existsSync(path.join(ROOT, "package.json")) || !fs.existsSync(path.join(ROOT, "server.mjs"))) {
@@ -73,17 +72,67 @@ if (!fs.existsSync(path.join(ROOT, "package.json")) || !fs.existsSync(path.join(
   process.exit(1);
 }
 
-const run = (cmd, cmdArgs, label) => {
-  const res = spawnSync(cmd, cmdArgs, { stdio: "inherit", cwd: ROOT });
-  if (res.status !== 0) {
-    bad(`${label} נכשל (קוד ${res.status ?? "?"})`);
-    process.exit(res.status ?? 1);
-  }
-};
+/* ── הרצת npm בכל מערכת בלי להיתקל ב-spawn של קבצי ‎.cmd בווינדוס ──────────
+ * הבאג שתוקן כאן: `spawnSync("npm.cmd", …)` בווינדוס נכשל בשקט (EINVAL) מאז
+ * תיקון האבטחה של Node (CVE-2024-27980) — כלומר `npm run build` "נכשל" בלי
+ * שורה אחת של פלט, עם קוד יציאה לא ידוע. במקום זה מריצים את npm-cli.js ישירות
+ * עם ה-node עצמו (מה ש-npm עושה בעצמו כשמפעילים אותו מ-npm run), ורק אם לא
+ * מוצאים אותו — נופלים חזרה למעטפת.
+ */
+function npmInvocation(npmArgs) {
+  const fromNpm = process.env.npm_execpath; // מוגדר כשרצים דרך `npm run …`
+  if (fromNpm && fs.existsSync(fromNpm)) return { cmd: process.execPath, args: [fromNpm, ...npmArgs] };
 
-function npmCmd() {
-  return process.platform === "win32" ? "npm.cmd" : "npm";
+  const binDir = path.dirname(process.execPath);
+  for (const candidate of [
+    path.join(binDir, "node_modules", "npm", "bin", "npm-cli.js"), // Windows / macOS
+    path.join(binDir, "..", "lib", "node_modules", "npm", "bin", "npm-cli.js"), // Linux
+  ]) {
+    if (fs.existsSync(candidate)) return { cmd: process.execPath, args: [path.resolve(candidate), ...npmArgs] };
+  }
+
+  // אין npm-cli.js? מריצים את המעטפת. בווינדוס חובה shell עבור ‎.cmd.
+  const isWin = process.platform === "win32";
+  return { cmd: isWin ? "npm.cmd" : "npm", args: npmArgs, shell: isWin };
 }
+
+function npmRun(npmArgs, label, { quiet = false } = {}) {
+  const inv = npmInvocation(npmArgs);
+  const res = spawnSync(inv.cmd, inv.args, {
+    cwd: ROOT,
+    stdio: quiet ? ["ignore", "pipe", "inherit"] : "inherit",
+    shell: inv.shell ?? false,
+    encoding: "utf8",
+  });
+  if (res.error || res.status !== 0) {
+    bad(`${label} נכשל${res.status === null || res.status === undefined ? "" : ` (קוד ${res.status})`}`);
+    if (res.error) console.log(`     ${res.error.message}`);
+    console.log(`
+  מה עושים:  הרץ ידנית כדי לראות את השגיאה המלאה:
+               npm run build
+             ואם צריך עזרה — כל התקלות הנפוצות כאן: RUN-LOCALLY.md
+`);
+    process.exit(typeof res.status === "number" ? res.status || 1 : 1);
+  }
+  return res.stdout ?? "";
+}
+
+/** הרצת סקריפט Node מהפרויקט (למשל scripts/seed.mjs) */
+function runNode(scriptArgs, label) {
+  const res = spawnSync(process.execPath, scriptArgs, { cwd: ROOT, stdio: "inherit" });
+  if (res.error || res.status !== 0) {
+    bad(`${label} נכשל${typeof res.status === "number" ? ` (קוד ${res.status})` : ""}`);
+    if (res.error) console.log(`     ${res.error.message}`);
+    process.exit(typeof res.status === "number" ? res.status || 1 : 1);
+  }
+}
+
+{
+  const inv = npmInvocation(["-v"]);
+  const res = spawnSync(inv.cmd, inv.args, { encoding: "utf8", shell: inv.shell ?? false });
+  ok(`Node v${process.versions.node}, npm ${(res.stdout ?? "").trim() || "?"}`);
+}
+
 
 /* ── 1. תלויות ────────────────────────────────────────────────────────────── */
 step("1️⃣  חבילות (node_modules)");
@@ -93,55 +142,83 @@ if (fs.existsSync(path.join(ROOT, "node_modules", "next"))) {
   todo("node_modules — הרץ בלי --check כדי להתקין");
 } else {
   console.log("  מתקין… (בפעם הראשונה זה לוקח 1–3 דקות, צריך אינטרנט)");
-  run(npmCmd(), ["ci", "--no-fund", "--no-audit"], "התקנת חבילות");
+  npmRun(["ci", "--no-fund", "--no-audit"], "התקנת חבילות");
   ok("החבילות הותקנו");
 }
 
 /* ── 2. סודות ─────────────────────────────────────────────────────────────── */
 step("2️⃣  סודות (.env.local)");
 const envPath = path.join(ROOT, ".env.local");
+const dbPath = path.join(ROOT, "data", "lemontank.db");
+const freshInstall = !fs.existsSync(dbPath); // אין מסד = התקנה ראשונה
+
+let createdEnv = false;
 if (!fs.existsSync(envPath)) {
   if (CHECK_ONLY) {
     todo(".env.local — ייווצר אוטומטית");
   } else {
-    run(process.execPath, ["scripts/gen-secrets.mjs", "--write"], "יצירת סודות");
+    runNode(["scripts/gen-secrets.mjs", "--write"], "יצירת סודות");
+    createdEnv = true;
     ok(".env.local נוצר עם סודות אקראיים");
   }
 } else {
-  ok(".env.local קיים — הסודות לא נגעו");
+  ok(".env.local קיים — הסודות שלך לא נגעו");
 }
 
-/** ערכי פיתוח נוחים: סיסמת מנהל קבועה כדי שיהיה קל להיכנס, ומפתח גיבוי תקין. */
+/**
+ * ערכי נומחות לפיתוח — אבל **בלי לדרוס שום דבר קיים**.
+ *
+ * למה זה תוקן: הגרסה הקודמת דרסה תמיד את SEED_ADMIN_PASSWORD ואת BACKUP_KEY
+ * לערכי פיתוח קבועים. במחשב אישי שכבר יש בו תוכן זה מסוכן: החלפת BACKUP_KEY
+ * הופכת גיבויים קודמים לבלתי-ניתנים-לפתיחה (הם הוצפנו במפתח הישן).
+ * לכן הכלל עכשיו:
+ *   • BACKUP_KEY — נוסף רק אם הוא חסר. לעולם לא מוחלף.
+ *   • SEED_ADMIN_PASSWORD — נקבע לברירת המחדל הידועה רק בהתקנה **חדשה**
+ *     (כשאין מסד). אם המסב כבר קיים, הסיסמה שלך נשארת כפי שהיא.
+ */
 if (!CHECK_ONLY && fs.existsSync(envPath)) {
-  const PIN = {
-    SEED_ADMIN_PASSWORD: '"ChangeMe-Admin-2026!"',
-    BACKUP_KEY: "backup-key-for-local-dev-0123456789abcdef",
-  };
+  const DEV_PASSWORD = '"ChangeMe-Admin-2026!"';
+  const DEV_BACKUP_KEY = "backup-key-for-local-dev-0123456789abcdef";
   let txt = fs.readFileSync(envPath, "utf8");
-  let changed = 0;
-  for (const [k, v] of Object.entries(PIN)) {
-    const re = new RegExp("^" + k + "=.*$", "m");
-    if (re.test(txt)) {
-      if (!txt.includes(`${k}=${v}`)) {
-        txt = txt.replace(re, `${k}=${v}`);
-        changed++;
-      }
-    } else {
-      txt = txt.replace(/\n?$/, "\n") + `${k}=${v}\n`;
-      changed++;
-    }
+  const notes = [];
+
+  const readValue = (key) => {
+    const m = txt.match(new RegExp("^" + key + "=(.*)$", "m"));
+    return m ? m[1].trim() : null;
+  };
+  const writeValue = (key, value) => {
+    const re = new RegExp("^" + key + "=.*$", "m");
+    txt = re.test(txt) ? txt.replace(re, `${key}=${value}`) : txt.replace(/\n?$/, "\n") + `${key}=${value}\n`;
+  };
+
+  const backupKey = readValue("BACKUP_KEY");
+  if (!backupKey) {
+    writeValue("BACKUP_KEY", DEV_BACKUP_KEY);
+    notes.push("נוסף BACKUP_KEY לפיתוח (גיבויים ייפתחו איתו — שמור עליו)");
   }
-  if (changed) {
+
+  const adminPass = readValue("SEED_ADMIN_PASSWORD");
+  if (freshInstall && (createdEnv || !adminPass || adminPass === '""')) {
+    // התקנה חדשה (אין מסד) — הפעם היחידה שבה אנחנו קובעים סיסמה, כדי שהיא
+    // תהיה זו שכתובה במדריכים ובקובץ ההפעלה. אחרי שהמסד נוצר — לא נוגעים.
+    writeValue("SEED_ADMIN_PASSWORD", DEV_PASSWORD);
+    notes.push("סיסמת מנהל ראשונית: ChangeMe-Admin-2026! (החלף ב-/account/security)");
+  } else if (freshInstall && adminPass !== DEV_PASSWORD) {
+    notes.push("סיסמת המנהל תהיה זו שב-.env.local (SEED_ADMIN_PASSWORD)");
+  } else if (!freshInstall && adminPass === DEV_PASSWORD) {
+    notes.push("שים לב: סיסמת המנהל היא סיסמת פיתוח קבועה — החלף ב-/account/security");
+  }
+
+  if (notes.length) {
     fs.writeFileSync(envPath, txt, { mode: 0o600 });
-    ok("עודכנו ערכי פיתוח (סיסמת מנהל ידועה + מפתח גיבוי)");
+    for (const n of notes) ok(n);
   } else {
-    ok("ערכי הפיתוח כבר במקום");
+    ok("הגדרות הפיתוח כבר במקום — לא שונה כלום");
   }
 }
 
 /* ── 3. מסד נתונים ────────────────────────────────────────────────────────── */
 step("3️⃣  מסד נתונים (SQLite מקומי)");
-const dbPath = path.join(ROOT, "data", "lemontank.db");
 if (fs.existsSync(dbPath)) {
   ok("data/lemontank.db קיים — התוכן שלך לא נגע");
 } else if (CHECK_ONLY) {
@@ -149,7 +226,7 @@ if (fs.existsSync(dbPath)) {
 } else {
   const seedArgs = ["scripts/seed.mjs"];
   if (DEMO) seedArgs.push("--reset", "--demo");
-  run(process.execPath, seedArgs, "יצירת המסד");
+  runNode(seedArgs, "יצירת המסד");
   ok(DEMO ? "המסד נוצר עם תוכן לדוגמה" : "המסד נוצר — קטלוג ריק, התוכן הוא שלך");
 }
 
@@ -164,7 +241,7 @@ if (NO_BUILD) {
   todo(".next — האתר ייבנה");
 } else {
   console.log("  בונה… (1–2 דקות)");
-  run(npmCmd(), ["run", "build"], "בנייה");
+  npmRun(["run", "build"], "בנייה");
   ok("הבנייה הושלמה");
 }
 
