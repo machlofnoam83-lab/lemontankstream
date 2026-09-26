@@ -230,6 +230,18 @@ if (fs.existsSync(dbPath)) {
   ok(DEMO ? "המסד נוצר עם תוכן לדוגמה" : "המסד נוצר — קטלוג ריק, התוכן הוא שלך");
 }
 
+// השלמת הגירות סכימה (טבלאות שנוספו בגרסאות מאוחרות). בלעדיהן המסד טרי חסר
+// טבלאות עד העלייה הראשונה של השרת — ובדיקות/סקריפטים נכשלים בלי הסבר.
+if (!CHECK_ONLY) {
+  const migrate = spawnSync(process.execPath, ["scripts/apply-migrations.mjs", "--quiet"], { cwd: ROOT, encoding: "utf8" });
+  if (migrate.status === 0) {
+    const note = (migrate.stdout ?? "").trim();
+    ok(note.replace(/^✅\s*/, "") || "הסכימה מעודכנת");
+  } else {
+    warn("השלמת ההגירות לא הצליחה — הרץ: npm run db:migrate");
+  }
+}
+
 /* ── 4. בנייה ─────────────────────────────────────────────────────────────── */
 step("4️⃣  בנייה (.next)");
 const built = fs.existsSync(path.join(ROOT, ".next", "BUILD_ID"));

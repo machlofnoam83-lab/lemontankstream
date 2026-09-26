@@ -178,6 +178,26 @@ find "$DEST" -name 'storage-*.tar.gz' -mtime +7 -delete
 בנוסף, מהפאנל: `/admin/health` → "הורד גיבוי JSON מלא" (`/api/export?type=backup`,
 בעלים בלבד). שמור את הגיבוי **מחוץ לשרת** (S3/R2/דיסק חיצוני).
 
+### שחזור גיבוי
+
+```bash
+node scripts/backup-encrypted.mjs --list                              # מה יש
+node scripts/backup-encrypted.mjs --restore backups/<file>.ltbk --to data/restored.db
+```
+
+השחזור מפענח עם `BACKUP_KEY`, ואם צריך נופל ל-`FIELD_ENCRYPTION_KEY` ואז ל-`APP_SECRET`
+ומדווח **באיזה מפתח הקובץ נפתח** — כך גיבוי שהופק לפני שהוגדר `BACKUP_KEY` (או אחרי
+החלפתו) לא הופך לפסולת. **כלל אצבע:** קובעים `BACKUP_KEY` פעם אחת ושומרים אותו
+במנהל סיסמאות — החלפתו היא הדבר היחיד שהופך גיבוי ללא-פתיח.
+
+### הגירות סכימה
+
+ההגירות חיות ב-[`sql/migrations.json`](./sql/migrations.json) ומקור אמת אחד לשני העולמות:
+האפליקציה (`src/lib/migrations.ts`) רצה אותן בעלייה, והסקריפט
+`scripts/apply-migrations.mjs` מריץ אותן בלי להעלות את השרת (`npm run db:migrate`,
+מצב: `npm run db:status`). זה מה שמאפשר ל-`npm test` ולשאר הסקריפטים לעבוד מיד
+אחרי התקנה, בלי "אין טבלה כזו".
+
 ---
 
 ## 6. בדיקות אחרי העלייה
