@@ -28,7 +28,8 @@ npm run dev
 
 **מעדיף קליק כפול?** 🖱️
 Windows: `START-HERE-WINDOWS.cmd` · macOS: `START-HERE-MAC.command` —
-המדריך המלא (כולל טלפון באותה רשת, עדכונים ופתרון תקלות): **[RUN-LOCALLY.md](./RUN-LOCALLY.md)**
+**[START-HERE.md](./START-HERE.md)** = מדריך צעד-אחר-צעד (עם מה אמור להופיע בכל שלב) ·
+**[RUN-LOCALLY.md](./RUN-LOCALLY.md)** = המדריך המלא (טלפון באותה רשת, עדכונים, תקלות)
 
 <details>
 <summary>השלבים הידניים (אם אתה מעדיף שליטה מלאה)</summary>
