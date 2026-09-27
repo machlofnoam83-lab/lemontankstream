@@ -18,7 +18,8 @@
     "db:migrate": "node scripts/apply-migrations.mjs",
     "db:status": "node scripts/apply-migrations.mjs --status",
     "port": "node scripts/pick-port.mjs",
-    "status": "node scripts/status.mjs"
+    "status": "node scripts/status.mjs",
+    "doctor": "node scripts/doctor.mjs"
   },
   "dependencies": {
     "next": "^15.5.26",

@@ -31,3 +31,4 @@ npm-debug.log*
 *.tsbuildinfo
 next-env.d.ts
 coverage/
+lemontank-report.txt

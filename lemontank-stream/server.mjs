@@ -993,7 +993,34 @@ ${lines.join("\n")}
 `);
 });
 
-server.listen(PORT, HOST);
+/**
+ * האזנה בפועל — כפולה (IPv4 + IPv6) כשמבקשים "כל הכתובות".
+ *
+ * הבאג שזה מתקן: `listen(PORT, "0.0.0.0")` מאזין ל-IPv4 בלבד. בווינדוס, הדפדפן
+ * (וכלים אחרים) מתרגמים `localhost` קודם ל-`::1` — ואם אין מאזין על IPv6,
+ * מתקבלת שגיאה מטעה: **ERR_CONNECTION_REFUSED גם כשהשרת רץ**. לכן:
+ *   • HOST=0.0.0.0/:: → מאזינים על `::` עם dual-stack (מקבל גם IPv4 וגם IPv6)
+ *   • אם אין IPv6 במערכת — נופלים בחזרה ל-0.0.0.0 בלי לשבור כלום
+ *   • HOST מפורש אחר (למשל 127.0.0.1) — נשאר בדיוק כפי שביקשו
+ */
+function listen(server, port, host) {
+  const wantsAll = !host || host === "0.0.0.0" || host === "::";
+  if (!wantsAll) {
+    server.listen(port, host);
+    return;
+  }
+  server.once("error", (error) => {
+    if (error?.code === "EAFNOSUPPORT" || error?.code === "EADDRNOTAVAIL") {
+      console.warn("[net] אין IPv6 במערכת — מאזין על IPv4 בלבד (0.0.0.0)");
+      server.listen(port, "0.0.0.0");
+      return;
+    }
+    throw error;
+  });
+  server.listen({ port, host: "::", ipv6Only: false });
+}
+
+listen(server, PORT, HOST);
 
 /* סגירה מבוקרת */
 for (const signal of ["SIGINT", "SIGTERM"]) {
