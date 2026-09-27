@@ -27,6 +27,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
+import { explainEmptyDatabase, inspectDatabase } from "./lib/db.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 process.chdir(ROOT);
@@ -219,8 +220,13 @@ if (!CHECK_ONLY && fs.existsSync(envPath)) {
 
 /* ── 3. מסד נתונים ────────────────────────────────────────────────────────── */
 step("3️⃣  מסד נתונים (SQLite מקומי)");
-if (fs.existsSync(dbPath)) {
-  ok("data/lemontank.db קיים — התוכן שלך לא נגע");
+const dbInfo = inspectDatabase(dbPath);
+if (dbInfo.state === "empty" && !CHECK_ONLY) {
+  warn(explainEmptyDatabase(dbInfo));
+  bad("המסד לא שמיש — עצרתי כאן בלי לשנות כלום.");
+  process.exit(1);
+} else if (dbInfo.state === "ready") {
+  ok(`data/lemontank.db תקין — ${dbInfo.tables} טבלאות, התוכן שלך לא נגע`);
 } else if (CHECK_ONLY) {
   todo("data/lemontank.db — המסד ייווצר ריק (רק אתה מוסיף תוכן)");
 } else {

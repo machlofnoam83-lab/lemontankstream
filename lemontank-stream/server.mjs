@@ -75,6 +75,12 @@ const HOST = process.env.HOST ?? "0.0.0.0";
 /** האם להציג גם כתובות ברשת המקומית (כשמאזינים לכל כרטיסי הרשת) */
 const LAN_HINT = HOST === "0.0.0.0" || HOST === "::" || HOST === "";
 const PORT = Number(process.env.PORT ?? 3000);
+/** האם המשתמש ביקש פורט במפורש (PORT=…)? אם כן — לא מחפשים חלופות בשקט */
+const PORT_EXPLICIT = process.env.PORT !== undefined && process.env.PORT !== "";
+/** פורטים לניסיון כש-3000 תפוס — כדי שהאתר תמיד יעלה, ובאיזו כתובת לגלוש */
+const PORT_CANDIDATES = PORT_EXPLICIT
+  ? [PORT]
+  : [PORT, 3001, 3002, 3003, 3010, 3020, 8080].filter((p, i, all) => all.indexOf(p) === i);
 const INTERNAL_PORT = Number(process.env.INTERNAL_PORT ?? 3311);
 const APP_SECRET = process.env.APP_SECRET ?? "dev-secret-not-for-production";
 const TRUST_PROXY = process.env.TRUST_PROXY ?? "true";
@@ -968,10 +974,12 @@ server.on("listening", () => {
     .sort((x, y) => Number(y.startsWith("192.168.")) - Number(x.startsWith("192.168.")))
     .slice(0, 2);
 
-  const primary = `http://localhost:${PORT}`;
+  const primary = `http://localhost:${ACTUAL_PORT}`;
+  const fallback = `http://127.0.0.1:${ACTUAL_PORT}`;
   const lines = [`   🌐  האתר:              ${primary}`];
+  lines.push(`   🔁  אם localhost לא נפתח:  ${fallback}`);
   if (LAN_HINT && lanAddresses.length) {
-    lines.push(`   📱  מהטלפון/מהרשת הביתית:  ${lanAddresses.map((ip) => `http://${ip}:${PORT}`).join("  ·  ")}`);
+    lines.push(`   📱  מהטלפון/מהרשת הביתית:  ${lanAddresses.map((ip) => `http://${ip}:${ACTUAL_PORT}`).join("  ·  ")}`);
   }
 
   console.log(`
@@ -992,6 +1000,38 @@ ${lines.join("\n")}
    })()}
 `);
 });
+
+/**
+ * בחירת פורט פנוי — כדי ש-`npm run start` לא ימות מפורט תפוס.
+ *
+ * הסיבה: אם פורט 3000 תפוס (הרצה קודמת שלא נסגרה, אתר אחר, Docker/WSL),
+ * השרת היה נופל עם EADDRINUSE — החלון נסגר, והמשתמש גולש ל-localhost:3000
+ * ומקבל ERR_CONNECTION_REFUSED בלי לדעת למה. עכשיו: מחפשים פורט פנוי,
+ * מדפיסים אותו בבירור, וגולשים לכתובת שמוצגת.
+ * אם המשתמש ביקש פורט מפורש (PORT=3001) — מכבדים אותו בלי חיפושים.
+ */
+async function portIsFree(port, host) {
+  const net = await import("node:net");
+  return new Promise((resolve) => {
+    const probe = net.createServer();
+    probe.unref();
+    probe.once("error", () => resolve(false));
+    probe.once("listening", () => probe.close(() => resolve(true)));
+    probe.listen({ port, host, ipv6Only: false });
+  });
+}
+
+const ACTUAL_PORT = await (async () => {
+  for (let i = 0; i < PORT_CANDIDATES.length; i++) {
+    const candidate = PORT_CANDIDATES[i];
+    if (await portIsFree(candidate, "::")) return candidate;
+    if (i === 0 && !PORT_EXPLICIT) {
+      console.warn(`ℹ️  הפורט ${candidate} תפוס (תוכנית אחרת או הרצה קודמת) — מחפש פורט פנוי…`);
+    }
+  }
+  console.warn(`⚠️  כל הפורטים המוכרים תפוסים — מנסה בכל זאת את ${PORT}.`);
+  return PORT;
+})();
 
 /**
  * האזנה בפועל — כפולה (IPv4 + IPv6) כשמבקשים "כל הכתובות".
@@ -1020,7 +1060,7 @@ function listen(server, port, host) {
   server.listen({ port, host: "::", ipv6Only: false });
 }
 
-listen(server, PORT, HOST);
+listen(server, ACTUAL_PORT, HOST);
 
 /* סגירה מבוקרת */
 for (const signal of ["SIGINT", "SIGTERM"]) {

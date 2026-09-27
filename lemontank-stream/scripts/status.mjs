@@ -17,6 +17,7 @@ import fs from "node:fs";
 import path from "node:path";
 import os from "node:os";
 import { fileURLToPath } from "node:url";
+import { databaseFile, inspectDatabase } from "./lib/db.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const JSON_OUT = process.argv.includes("--json");
@@ -59,7 +60,8 @@ const running = results.filter((r) => r.up);
 const ourSite = running.find((r) => r.isLemonTank) ?? running[0] ?? null;
 
 const hasBuild = fs.existsSync(path.join(ROOT, ".next", "BUILD_ID"));
-const hasDb = fs.existsSync(path.join(ROOT, "data", "lemontank.db"));
+const dbInfo = inspectDatabase(databaseFile(ROOT));
+const hasDb = dbInfo.state === "ready";
 const hasEnv = fs.existsSync(path.join(ROOT, ".env.local"));
 const hasDeps = fs.existsSync(path.join(ROOT, "node_modules", "next"));
 
@@ -89,10 +91,15 @@ if (ourSite?.isLemonTank) {
   console.log(`      ${B}npm run start${OFF}     ואז לגלוש ל-http://localhost:3000`);
   console.log(`      או קליק כפול על ${B}START-HERE-WINDOWS.cmd${OFF} — הוא גם פותח את הדפדפן.`);
 
+  if (dbInfo.state === "empty") {
+    console.log(`\n  ${R}!${OFF} קובץ המסד קיים אבל חסר לו סכימת האפליקציה (users/titles) —`);
+    console.log(`      האתר לא יעלה במצב הזה. התיקון:`);
+    console.log(`        ${B}node scripts/seed.mjs --reset${OFF}   ואז  ${B}npm run setup${OFF}`);
+  }
   const missing = [];
   if (!hasDeps) missing.push("חבילות (node_modules)");
   if (!hasEnv) missing.push("סודות (.env.local)");
-  if (!hasDb) missing.push("מסד (data/lemontank.db)");
+  if (dbInfo.state === "missing") missing.push("מסד (data/lemontank.db)");
   if (!hasBuild) missing.push("בנייה (.next)");
   if (missing.length) console.log(`\n  חסר כרגע: ${missing.join(" · ")}`);
 }

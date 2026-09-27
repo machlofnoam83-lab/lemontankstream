@@ -23,6 +23,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { DatabaseSync } from "node:sqlite";
+import { explainEmptyDatabase, inspectDatabase } from "./lib/db.mjs";
 import { fileURLToPath } from "node:url";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
@@ -49,6 +50,13 @@ if (!fs.existsSync(manifestPath)) {
 }
 const manifest = JSON.parse(fs.readFileSync(manifestPath, "utf8"));
 const migrations = manifest?.migrations ?? [];
+
+// לפני שנוגעים במסד — בודקים שהוא בכלל של LemonTank
+const info = inspectDatabase(DB_FILE);
+if (info.state === "empty") {
+  console.error(explainEmptyDatabase(info));
+  process.exit(1);
+}
 
 const db = new DatabaseSync(DB_FILE);
 db.exec("PRAGMA journal_mode = WAL");

@@ -22,6 +22,7 @@ import os from "node:os";
 import path from "node:path";
 import { spawn, spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
+import { databaseFile, inspectDatabase } from "./lib/db.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 process.chdir(ROOT);
@@ -71,11 +72,17 @@ say(`     CPU: ${os.cpus()?.[0]?.model ?? "?"} · RAM: ${(os.totalmem() / 1024 *
 const files = {
   "חבילות (node_modules)": fs.existsSync(path.join(ROOT, "node_modules", "next")),
   "סודות (.env.local)": fs.existsSync(path.join(ROOT, ".env.local")),
-  "מסד (data/lemontank.db)": fs.existsSync(path.join(ROOT, "data", "lemontank.db")),
+  "מסד (data/lemontank.db)": inspectDatabase(databaseFile(ROOT)).state === "ready",
   "בנייה (.next)": fs.existsSync(path.join(ROOT, ".next", "BUILD_ID")),
 };
 step("2️⃣  קבצים נדרשים");
 for (const [label, present] of Object.entries(files)) (present ? ok : warn)(`${label}${present ? "" : " — חסר (npm run setup ישלים)"}`);
+
+const dbInfo = inspectDatabase(databaseFile(ROOT));
+if (dbInfo.state === "empty") {
+  warn(`קובץ המסד קיים אבל חסר לו סכימת האפליקציה (חסרות: ${dbInfo.missingCore.join(", ")}) — האתר לא יעלה כך`);
+  say(`     תיקון: ${B}node scripts/seed.mjs --reset${OFF}`);
+}
 
 /* ── 3. פורטים ────────────────────────────────────────────────────────────── */
 step("3️⃣  פורטים");
