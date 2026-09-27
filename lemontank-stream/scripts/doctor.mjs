@@ -167,6 +167,40 @@ if (listenOk) {
   say(`     ${B}npm run doctor -- --report${OFF}   → קובץ lemontank-report.txt`);
 }
 
+/* ── 5.5 דווקא כשהשרת תקין — מה בודקים בדפדפן ─────────────────────────────── */
+if (listenOk) {
+  step("6️⃣  אם דווקא מופיע 'לא ניתן להתחבר' בדפדפן — בדוק לפי הסדר");
+  say(`  א. הכי שכיח: השרת לא רץ באותו רגע. כל עוד החלון של ${B}npm run start${OFF} פתוח — הוא רץ.`);
+  say(`  ב. נסה בכתובת המפורשת במקום localhost:  ${B}http://127.0.0.1:3000${OFF}`);
+  say(`  ג. נסה דפדפן אחר או חלון פרטי (Ctrl+Shift+N) — לשלול הרחבת דפדפן/מטמון.`);
+
+  const proxyVars = ["HTTP_PROXY", "HTTPS_PROXY", "http_proxy", "https_proxy", "ALL_PROXY", "all_proxy"]
+    .filter((name) => process.env[name]);
+  if (proxyVars.length) {
+    warn(`מוגדר פרוקסי בסביבה: ${proxyVars.join(", ")}`);
+    say(`     פרוקסי/VPN עלולים לחסום גישה לכתובות מקומיות. אם אפשר — כבה אותו ונסה שוב.`);
+  } else {
+    say(`  ד. פרוקסי/VPN: אם יש VPN פעיל או פרוקסי ארגוני — כבה ונסה שוב (הם עלולים לחסום localhost).`);
+  }
+
+  if (process.platform === "win32") {
+    const proxyCheck = spawnSync("reg", [
+      "query",
+      "HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Internet Settings",
+      "/v", "ProxyEnable",
+    ], { encoding: "utf8" });
+    const enabled = /ProxyEnable\s+REG_DWORD\s+0x1/.test(proxyCheck.stdout ?? "");
+    if (enabled) {
+      warn("מוגדר פרוקסי ברמת ווינדוס (ProxyEnable=1)");
+      say(`     בוודאות: נסה לכבות אותו (הגדרות → רשת ואינטרנט → פרוקסי) ולגלוש שוב.`);
+    } else {
+      ok("אין פרוקסי מוגדר ברמת ווינדוס");
+    }
+    say(`  ה. אנטי-וירוס עם "הגנת אינטרנט"/Web Shield (קספרסקי, אווסט, ESET) עלול לחסום את הפורט.`);
+    say(`     בדיקה מהירה: כבה את ההגנה לבדיקה, נסה לגלוש, והדלק חזרה.`);
+  }
+}
+
 /* ── 6. דוח ───────────────────────────────────────────────────────────────── */
 if (WANT_REPORT) {
   const reportPath = path.join(ROOT, "lemontank-report.txt");
