@@ -11,6 +11,8 @@
  */
 
 import { all, get, run, tx } from "./db";
+import { checkEmailAuthenticity } from "./email-integrity";
+import { getSettings } from "./settings";
 import {
   decryptField, encryptField, hashPassword, randomCode, randomId, randomToken,
   sha256, verifyPassword, verifyTotp,
@@ -69,7 +71,19 @@ export async function registerUser(
   const emailNorm = normalizeEmail(input.email);
   const name = String(input.name ?? "").trim();
 
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(emailNorm)) throw new ApiError("BAD_REQUEST", 400, undefined, "כתובת אימייל לא תקינה");
+  // ── אמינות כתובת המייל ────────────────────────────────────────────────
+  // ארבע שכבות: תחביר, רשימת חסימה של דואר זמני, זיהוי התחזות, ובדיקת DNS.
+  // את ההגדרות קובע המנהל ב-/admin/settings (ר' email-integrity.ts).
+  const settings = getSettings();
+  const verdict = await checkEmailAuthenticity(emailNorm, {
+    blockDisposable: settings.block_disposable_email,
+    allowedDomains: settings.allowed_email_domains ?? [],
+    checkDns: settings.verify_email_domain,
+    blockSubaddress: true,
+  });
+  if (!verdict.ok) {
+    throw new ApiError("BAD_REQUEST", 400, { code: verdict.code, domain: verdict.domain }, verdict.message);
+  }
   if (name.length < 2 || name.length > 60) throw new ApiError("BAD_REQUEST", 400, undefined, "שם חייב להיות בין 2 ל-60 תווים");
 
   // מדיניות מלאה: מבנה + הקשר (אימייל/שם) + בדיקת דליפה מול HIBP

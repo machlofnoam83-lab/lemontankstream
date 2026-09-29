@@ -66,6 +66,37 @@ export function SettingsForm({ initial }: { initial: AppSettings }) {
           </Field>
           <Switch checked={values.registration_open} onChange={(v) => set("registration_open", v)} label="הרשמה פתוחה" description="כיבוי חוסם יצירת חשבונות חדשים (בדיקת השרת, לא רק UI)." />
           <Switch checked={values.require_email_verification} onChange={(v) => set("require_email_verification", v)} label="חובת אימות אימייל" description="המשתמש יקבל הוראה לאמת את כתובת המייל." />
+          <Switch
+            checked={values.block_disposable_email}
+            onChange={(v) => set("block_disposable_email", v)}
+            label="חסימת כתובות דואר זמני"
+            description="מונע הרשמה מ-tempmail, guerrillamail, yopmail וכל שירות חד־פעמי. כולל זיהוי תתי־דומיינים וניסיונות התחזות (g00gle.com)."
+          />
+          <Switch
+            checked={values.verify_email_domain}
+            onChange={(v) => set("verify_email_domain", v)}
+            label="בדיקת דומיין מול DNS"
+            description="מוודא שלדומיין של הכתובת יש רשומת דואר (MX) או כתובת (A) — כלומר אפשר לשלוח אליו באמת. אם אין רשת, הבדיקה לא חוסמת."
+          />
+          <Field label="הגבלת דומיינים מותרים (אופציונלי)" htmlFor="allowed_domains" hint="ריק = כל הדומיינים האמיתיים. לדוגמה: gmail.com, outlook.com, walla.co.il — מופרד בפסיקים. שימושי כשפותחים הרשמה בהזמנה בלבד.">
+            <Textarea
+              id="allowed_domains"
+              value={(values.allowed_email_domains ?? []).join(", ")}
+              onChange={(e) =>
+                set(
+                  "allowed_email_domains",
+                  e.target.value
+                    .split(",")
+                    .map((d) => d.trim().toLowerCase())
+                    .filter(Boolean)
+                    .slice(0, 50),
+                )
+              }
+              dir="ltr"
+              className="min-h-16 font-mono text-sm"
+              placeholder="gmail.com, outlook.com, icloud.com"
+            />
+          </Field>
           <Switch checked={values.force_2fa_for_admins} onChange={(v) => set("force_2fa_for_admins", v)} label="חובת 2FA למנהלים" description="מומלץ בחום — מונע השתלטות על חשבון ניהול גם אם הסיסמה נחשפה." />
           <Switch checked={values.comments_enabled} onChange={(v) => set("comments_enabled", v)} label="תגובות" description="הפעלה/כיבוי של תגובות בכל האתר." />
           <Switch checked={values.reviews_require_approval} onChange={(v) => set("reviews_require_approval", v)} label="ביקורות דורשות אישור" description="ביקורות יופיעו רק אחרי אישור מנהל." />

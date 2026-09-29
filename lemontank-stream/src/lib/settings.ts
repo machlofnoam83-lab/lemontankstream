@@ -12,6 +12,12 @@ export type AppSettings = {
   maintenance_message: string;
   registration_open: boolean;
   require_email_verification: boolean;
+  /** חוסם כתובות דואר זמני (tempmail וכדומה) בהרשמה */
+  block_disposable_email: boolean;
+  /** בודק שהדומיין של הכתובת באמת מקבל דואר (MX/A ב-DNS) */
+  verify_email_domain: boolean;
+  /** רשימת דומיינים מותרים להרשמה; ריק = כל הדומיינים האמיתיים */
+  allowed_email_domains: string[];
   force_2fa_for_admins: boolean;
   default_signup_plan: "free" | "plus";
   free_plan_has_ads: boolean;
@@ -43,6 +49,9 @@ export const DEFAULT_SETTINGS: AppSettings = {
   maintenance_message: "אנחנו משדרגים את המערכת — נחזור בעוד כמה דקות 🍋",
   registration_open: true,
   require_email_verification: false,
+  block_disposable_email: true,
+  verify_email_domain: true,
+  allowed_email_domains: [],
   force_2fa_for_admins: false,
   default_signup_plan: "free",
   free_plan_has_ads: true,

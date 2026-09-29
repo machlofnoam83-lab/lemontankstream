@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { apiCall } from "@/lib/client/api";
@@ -42,6 +42,42 @@ export function RegisterForm({
   const [loading, setLoading] = useState(false);
   const [shake, setShake] = useState(0);
   const [passwordOk, setPasswordOk] = useState(false);
+  /** מצב בדיקת המייל: idle → checking → ok / bad */
+  const [emailCheck, setEmailCheck] = useState<{ state: "idle" | "checking" | "ok" | "bad"; message: string }>({
+    state: "idle",
+    message: "",
+  });
+  const checkSeq = useRef(0);
+
+  /*
+   * בדיקת אמינות המייל בזמן הקלדה (עצירה קצרה = debounce). השרת הוא שקובע —
+   * אותו קוד בדיוק יחזור גם בשליחה, כדי שלא יהיו הפתעות בסוף הטופס.
+   */
+  useEffect(() => {
+    const value = email.trim();
+    if (value.length < 5 || !value.includes("@")) {
+      setEmailCheck({ state: "idle", message: "" });
+      return;
+    }
+    const mySeq = checkSeq.current + 1;
+    checkSeq.current = mySeq;
+    setEmailCheck({ state: "checking", message: "בודק את הכתובת…" });
+
+    const timer = setTimeout(async () => {
+      const res = await apiCall<{ ok: boolean; message: string }>("/api/auth/email-check", {
+        method: "POST",
+        body: { email: value },
+      });
+      if (checkSeq.current !== mySeq) return; // תשובה של הקלדה ישנה — מתעלמים
+      if (!res.ok) {
+        setEmailCheck({ state: "idle", message: "" });
+        return;
+      }
+      setEmailCheck(res.data.ok ? { state: "ok", message: "" } : { state: "bad", message: res.data.message });
+    }, 550);
+
+    return () => clearTimeout(timer);
+  }, [email]);
 
   const submit = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -53,6 +89,7 @@ export function RegisterForm({
       setShake((n) => n + 1);
     };
 
+    if (emailCheck.state === "bad") return stop(emailCheck.message);
     if (password !== confirm) return stop("הסיסמאות אינן זהות");
     if (password && !passwordOk) return stop("הסיסמה לא עומדת במדיניות האבטחה — ראו את ההערות מתחת לשדה הסיסמה");
     if (!accept) return stop("צריך לאשר את תנאי השימוש");
@@ -111,17 +148,49 @@ export function RegisterForm({
         </Field>
 
         <Field icon="mail" label="אימייל">
-          <input
-            id="email"
-            type="email"
-            value={email}
-            onChange={(event) => setEmail(event.target.value)}
-            placeholder="you@example.com"
-            dir="ltr"
-            autoComplete="email"
-            required
-            className="field-ink transition focus:field-ink-focus"
-          />
+          <span className="relative block">
+            <input
+              id="email"
+              type="email"
+              value={email}
+              onChange={(event) => setEmail(event.target.value)}
+              placeholder="you@example.com"
+              dir="ltr"
+              autoComplete="email"
+              required
+              aria-invalid={emailCheck.state === "bad" ? true : undefined}
+              className={`field-ink w-full pe-10 transition focus:field-ink-focus ${
+                emailCheck.state === "bad" ? "!border-oxblood-500/70" : emailCheck.state === "ok" ? "!border-verdigris-400/60" : ""
+              }`}
+            />
+            {/* סמן מצב בצד השדה: להבה מהבהבת / וי / אזהרה */}
+            <span className="absolute left-3 top-1/2 -translate-y-1/2" aria-hidden="true">
+              {emailCheck.state === "checking" ? (
+                <span className="flex gap-0.5">
+                  {[0, 1, 2].map((index) => (
+                    <span key={index} className="size-1 rounded-full bg-brass-300 animate-lamp" style={{ animationDelay: `${index * 140}ms` }} />
+                  ))}
+                </span>
+              ) : emailCheck.state === "ok" ? (
+                <Icon name="check" className="size-4 text-verdigris-400 animate-seal" strokeWidth={3} />
+              ) : emailCheck.state === "bad" ? (
+                <Icon name="warn" className="size-4 text-ember-400 animate-seal" />
+              ) : null}
+            </span>
+          </span>
+
+          {emailCheck.state === "bad" ? (
+            <span className="mt-1.5 flex items-start gap-1.5 border border-oxblood-500/50 bg-oxblood-600/15 px-3 py-2 text-[0.85rem] text-parchment-100 chamfer animate-ink-in" role="alert">
+              <Icon name="warn" className="mt-0.5 size-3.5 shrink-0 text-ember-400" />
+              {emailCheck.message}
+            </span>
+          ) : null}
+
+          {emailCheck.state === "ok" ? (
+            <span className="mt-1.5 block text-[0.82rem] text-verdigris-300 animate-ink-in">
+              כתובת אמיתית — אפשר להמשיך
+            </span>
+          ) : null}
         </Field>
 
         <Field icon="lock" label="סיסמה" hint="לפחות 10 תווים, עם ספרה ותו מיוחד. מומלץ גם אות גדולה.">
