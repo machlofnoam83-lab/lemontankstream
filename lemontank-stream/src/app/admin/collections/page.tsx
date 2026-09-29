@@ -28,7 +28,7 @@ export default function AdminCollectionsPage() {
         updateUrlTemplate="/api/collections/{id}"
         entityLabel="אוסף"
         rows={rows}
-        emptyIcon="🗂️"
+        emptyIcon="list"
         warning="סדר האוספים קובע את סדר השורות בעמוד הבית. אוסף 'top10' מוצג כתבנית דירוג מיוחדת."
         fields={[
           { name: "name_he", label: "שם האוסף", type: "text", required: true },

@@ -115,13 +115,13 @@ export function RequestsConsole({ initial, stats }: { initial: AdminRequestRow[]
                   <button type="button" onClick={() => { setNoteFor(row.id); setNote(row.admin_note ?? ""); }} className="rounded-lg bg-white/[0.08] px-3 py-1.5 text-[0.85rem] hover:bg-white/[0.14]">
                     הערת אדמין
                   </button>
-                  <button type="button" onClick={() => update(row, "planned")} className="rounded-lg bg-sky-500/20 px-3 py-1.5 text-[0.85rem] text-sky-100 hover:bg-sky-500/30">
+                  <button type="button" onClick={() => update(row, "planned")} className="rounded-lg bg-brass-500/20 px-3 py-1.5 text-[0.85rem] text-brass-100 hover:bg-brass-500/30">
                     בתכנון
                   </button>
-                  <button type="button" onClick={() => update(row, "added")} className="rounded-lg bg-emerald-500/20 px-3 py-1.5 text-[0.85rem] text-emerald-100 hover:bg-emerald-500/30">
+                  <button type="button" onClick={() => update(row, "added")} className="rounded-lg bg-verdigris-500/20 px-3 py-1.5 text-[0.85rem] text-verdigris-100 hover:bg-verdigris-500/30">
                     נוסף ✓
                   </button>
-                  <button type="button" onClick={() => update(row, "declined")} className="rounded-lg px-3 py-1.5 text-[0.85rem] text-red-300 hover:bg-red-500/10">
+                  <button type="button" onClick={() => update(row, "declined")} className="rounded-lg px-3 py-1.5 text-[0.85rem] text-ember-300 hover:bg-ember-500/10">
                     דחה
                   </button>
                 </div>

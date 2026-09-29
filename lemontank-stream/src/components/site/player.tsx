@@ -4,13 +4,13 @@ import { CSRF_COOKIE } from "@/lib/cookies";
 
 /**
  * נגן הווידאו של LemonTank — נגן מותאם אישית עם כל התכונות:
- *   ▶ ניהול מקלדת מלא (רווח, חצים, J/L, 0-9, F, M, K)
- *   ▶ שמירת התקדמות אוטומטית (כל 10 שניות + ביציאה מהדף עם sendBeacon)
- *   ▶ כתוביות מרובות שפות, בחירת איכות, מהירות נגינה, PiP, מסך מלא
- *   ▶ "דלג על פתיח" לפי סימוני פתיח שהוגדרו בפאנל
- *   ▶ חלונית "הפרק הבא" והפעלה אוטומטית
- *   ▶ מסך נעילה לתוכן פלוס (ההגנה האמיתית בשרת — הקישור לא נשלח בכלל)
- *   ▶ נגישות: כפתורים עם aria-label, כתוביות מוצהרות, מיקוד מקלדת
+ *    ניהול מקלדת מלא (רווח, חצים, J/L, 0-9, F, M, K)
+ *    שמירת התקדמות אוטומטית (כל 10 שניות + ביציאה מהדף עם sendBeacon)
+ *    כתוביות מרובות שפות, בחירת איכות, מהירות נגינה, PiP, מסך מלא
+ *    "דלג על פתיח" לפי סימוני פתיח שהוגדרו בפאנל
+ *    חלונית "הפרק הבא" והפעלה אוטומטית
+ *    מסך נעילה לתוכן פלוס (ההגנה האמיתית בשרת — הקישור לא נשלח בכלל)
+ *    נגישות: כפתורים עם aria-label, כתוביות מוצהרות, מיקוד מקלדת
  */
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
@@ -310,7 +310,7 @@ export function Player({
   if (locked) {
     return (
       <div className="player-wrap flex flex-col items-center justify-center gap-4 bg-gradient-to-br from-ink-900 via-ink-850 to-plus-600/20 p-6 text-center">
-        <div className="text-5xl" aria-hidden="true">⭐</div>
+        <div className="text-5xl" aria-hidden="true"></div>
         <h2 className="text-xl font-black">התוכן הזה זמין למנויי פלוס</h2>
         <p className="max-w-md text-sm text-ink-300">{lockReason ?? "שדרגו לפלוס כדי לצפות בסרטים ובסדרות הפרימיום, באיכות 4K וללא פרסומות."}</p>
         <div className="flex flex-wrap justify-center gap-2">
@@ -333,7 +333,7 @@ export function Player({
   if (!sources.length) {
     return (
       <div className="player-wrap flex flex-col items-center justify-center gap-3 bg-ink-900 p-6 text-center">
-        <div className="text-4xl" aria-hidden="true">🎬</div>
+        <div className="text-4xl" aria-hidden="true"></div>
         <h2 className="text-lg font-bold">הווידאו עוד לא הועלה</h2>
         <p className="max-w-md text-sm text-ink-400">
           מנהל המערכת צריך להעלות את קובץ הווידאו (או להדביק קישור) בדף הניהול של הכותר. בינתיים אפשר להתעדכן — נוסיף התראה כשיהיה זמין.
@@ -362,7 +362,7 @@ export function Player({
       {partyId && (
         <div className="pointer-events-none absolute inset-x-0 top-0 z-30 flex flex-wrap items-center gap-2 bg-gradient-to-b from-black/80 to-transparent px-3 py-2 text-[0.85rem]">
           <span className="rounded-full bg-plus-500/90 px-3 py-1 font-bold text-white">
-            🎉 צפייה משותפת
+             צפייה משותפת
           </span>
           {partyHost ? (
             <span className="rounded-full bg-black/60 px-3 py-1 text-ink-200">אתה המארח — כולם הולכים אחריך</span>
@@ -376,14 +376,14 @@ export function Player({
             </span>
           )}
           <span className="rounded-full bg-black/60 px-3 py-1 text-ink-300">
-            👥 {party.members.length} בחדר
+             {party.members.length} בחדר
           </span>
           {partyCode && partyHost && (
             <span className="rounded-full bg-black/60 px-3 py-1 text-ink-200">
               קוד הזמנה: <b className="font-mono text-lemon-300" dir="ltr">{partyCode}</b>
             </span>
           )}
-          {party.error && <span className="rounded-full bg-red-500/80 px-3 py-1 text-white">{party.error}</span>}
+          {party.error && <span className="rounded-full bg-ember-500/80 px-3 py-1 text-white">{party.error}</span>}
         </div>
       )}
       <video
@@ -447,7 +447,7 @@ export function Player({
 
       {error ? (
         <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-black/85 p-6 text-center">
-          <span className="text-3xl">⚠️</span>
+          <span className="text-3xl"></span>
           <p className="max-w-md text-sm text-ink-200">{error}</p>
           <button onClick={() => { setError(null); videoRef.current?.load(); }} className="rounded-xl bg-lemon-400 px-4 py-2 text-sm font-bold text-ink-900">
             נסה שוב
@@ -485,7 +485,7 @@ export function Player({
           </div>
           {nextEpisode.locked ? (
             <Link href="/plans" className="mt-2 block rounded-lg bg-plus-500 px-3 py-1.5 text-center text-xs font-bold">
-              הפרק הבא זמין בפלוס ⭐
+              הפרק הבא זמין בפלוס 
             </Link>
           ) : (
             <Link href={`/watch/${slug}?ep=${nextEpisode.id}`} className="mt-2 block rounded-lg bg-lemon-400 px-3 py-1.5 text-center text-xs font-bold text-ink-900">
@@ -596,7 +596,7 @@ export function Player({
                       {s.label}
                     </MenuItem>
                   ))}
-                  {isPlus ? null : <div className="px-3 py-1.5 text-[0.8rem] text-ink-400">איכות 4K זמינה בפלוס ⭐</div>}
+                  {isPlus ? null : <div className="px-3 py-1.5 text-[0.8rem] text-ink-400">איכות 4K זמינה בפלוס </div>}
                 </Menu>
               ) : null}
             </div>
@@ -637,7 +637,7 @@ export function Player({
                   ep.id === episodeId ? "border-lemon-400 bg-lemon-400/15 text-lemon-200" : "border-white/10 bg-black/40 text-ink-200 hover:bg-white/10"
                 }`}
               >
-                {ep.locked ? "⭐" : "▶"} {ep.label}
+                {ep.locked ? "" : ""} {ep.label}
               </Link>
             ))}
           </div>

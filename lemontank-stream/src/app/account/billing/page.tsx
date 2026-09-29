@@ -34,14 +34,14 @@ export default async function BillingPage() {
   return (
     <div className="space-y-5">
       <header>
-        <h1 className="text-2xl font-black md:text-3xl">💳 מנוי ותשלומים</h1>
+        <h1 className="text-2xl font-black md:text-3xl"> מנוי ותשלומים</h1>
         <p className="mt-1 text-sm text-ink-400">ניהול המנוי, חשבוניות והיסטוריית חיובים.</p>
       </header>
 
       <div className="grid grid-cols-2 gap-3 md:grid-cols-3">
         <StatCard
           label="המסלול הנוכחי"
-          value={user.effective_plan === "plus" ? "⭐ פלוס" : "חינם"}
+          value={user.effective_plan === "plus" ? " פלוס" : "חינם"}
           hint={subscription?.status ? `סטטוס: ${subscription.status}` : undefined}
         />
         <StatCard label="חיוב הבא" value={subscription?.cancel_at_period_end ? "—" : formatDate(subscription?.current_period_end)} hint={subscription?.cancel_at_period_end ? "המנוי יסתיים" : undefined} />
@@ -71,7 +71,7 @@ export default async function BillingPage() {
           </dl>
           <div className="mt-4 flex flex-wrap gap-2">
             <Link href="/plans" className="rounded-xl bg-lemon-400 px-4 py-2 text-xs font-bold text-ink-900">
-              {user.effective_plan === "plus" ? "ניהול המנוי" : "שדרג לפלוס ⭐"}
+              {user.effective_plan === "plus" ? "ניהול המנוי" : "שדרג לפלוס "}
             </Link>
             <Link href="/api/export?type=my-data" className="rounded-xl border border-white/15 px-4 py-2 text-xs">
               הורד את הנתונים שלי (JSON)
@@ -88,7 +88,7 @@ export default async function BillingPage() {
       )}
 
       <Card className="p-5">
-        <h2 className="text-sm font-bold">🧾 חשבוניות</h2>
+        <h2 className="text-sm font-bold"> חשבוניות</h2>
         {payments.length === 0 ? (
           <p className="mt-2 text-xs text-ink-400">אין חשבוניות עדיין.</p>
         ) : (
@@ -125,7 +125,7 @@ export default async function BillingPage() {
 
       {couponRedemptions.length ? (
         <Card className="p-5">
-          <h2 className="text-sm font-bold">🏷️ קופונים שנוצלו</h2>
+          <h2 className="text-sm font-bold"> קופונים שנוצלו</h2>
           <ul className="mt-2 space-y-1 text-xs">
             {couponRedemptions.map((c, i) => (
               <li key={i} className="flex items-center justify-between">

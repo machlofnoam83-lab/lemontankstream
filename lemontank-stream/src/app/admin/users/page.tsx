@@ -116,7 +116,7 @@ export default async function AdminUsersPage({
       </form>
 
       {items.length === 0 ? (
-        <EmptyState title="לא נמצאו משתמשים" icon="👥" />
+        <EmptyState title="לא נמצאו משתמשים" icon="users" />
       ) : (
         <>
           <DataTable head={["#", "שם", "אימייל", "תפקיד", "מנוי", "סטטוס", "2FA", "התחברות אחרונה", "סשנים", "נרשם", "פעולות"]}>

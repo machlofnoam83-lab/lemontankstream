@@ -237,7 +237,7 @@ export function GiftCardsConsole({ initial, canManage }: { initial: GiftCardsDat
       {issuedCodes.length ? (
         <Card className="p-4">
           <h2 className="text-lg font-bold">🔑 הקודים — מוצגים פעם אחת</h2>
-          <p className="mt-1 text-[0.88rem] text-amber-300">
+          <p className="mt-1 text-[0.88rem] text-brass-300">
             העתק אותם עכשיו ושלח ללקוחות. אחרי שתסגור את הדף הם לא יוצגו שוב (אפשר לחשוף אותם מהרשימה — פעולה שנרשמת ביומן).
           </p>
           <div className="mt-3 space-y-1">
@@ -286,7 +286,7 @@ export function GiftCardsConsole({ initial, canManage }: { initial: GiftCardsDat
         >
           {busy ? <Spinner /> : "הנפק כרטיסים"}
         </button>
-        {!canManage && <p className="mt-2 text-[0.85rem] text-amber-300">נדרשת הרשאת חיוב (admin/owner).</p>}
+        {!canManage && <p className="mt-2 text-[0.85rem] text-brass-300">נדרשת הרשאת חיוב (admin/owner).</p>}
       </Card>
 
       <Card className="p-4">
@@ -319,7 +319,7 @@ export function GiftCardsConsole({ initial, canManage }: { initial: GiftCardsDat
                     type="button"
                     disabled={busy || !canManage}
                     onClick={() => void decide(request.id, "approve")}
-                    className="rounded-lg bg-emerald-500/90 px-3 py-1.5 text-sm font-bold text-ink-950 disabled:opacity-50"
+                    className="rounded-lg bg-verdigris-500/90 px-3 py-1.5 text-sm font-bold text-ink-950 disabled:opacity-50"
                   >
                     אשר והפעל מנוי
                   </button>
@@ -367,7 +367,7 @@ export function GiftCardsConsole({ initial, canManage }: { initial: GiftCardsDat
               <li key={row.id} className="flex items-center gap-2">
                 <Badge tone={row.status === "sent" ? "success" : row.status === "skipped" ? "neutral" : "danger"}>{row.channel}</Badge>
                 <span>{row.title}</span>
-                {row.error ? <span className="text-red-300" dir="ltr">{row.error.slice(0, 60)}</span> : null}
+                {row.error ? <span className="text-ember-300" dir="ltr">{row.error.slice(0, 60)}</span> : null}
               </li>
             ))}
           </ul>
@@ -410,7 +410,7 @@ export function GiftCardsConsole({ initial, canManage }: { initial: GiftCardsDat
                         הצג קוד
                       </button>
                       {card.status === "active" ? (
-                        <button type="button" disabled={!canManage} onClick={() => void revoke(card.id)} className="text-xs text-red-300 disabled:opacity-40">
+                        <button type="button" disabled={!canManage} onClick={() => void revoke(card.id)} className="text-xs text-ember-300 disabled:opacity-40">
                           בטל
                         </button>
                       ) : null}
@@ -436,7 +436,7 @@ export function GiftCardsConsole({ initial, canManage }: { initial: GiftCardsDat
               className="mt-3 w-full rounded-xl border border-white/15 bg-black/40 px-3 py-2"
               placeholder="סיסמה"
             />
-            {stepError && <p className="mt-2 text-[0.88rem] text-red-300">{stepError}</p>}
+            {stepError && <p className="mt-2 text-[0.88rem] text-ember-300">{stepError}</p>}
             <div className="mt-4 flex gap-2">
               <button type="submit" disabled={busy} className="flex-1 rounded-xl bg-lemon-400 py-2 font-bold text-ink-950 disabled:opacity-60">
                 {busy ? <Spinner /> : "אשר"}

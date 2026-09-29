@@ -10,7 +10,7 @@ export default function SupportPage() {
   return (
     <div className="mx-auto grid max-w-5xl gap-6 md:grid-cols-[1.2fr_0.8fr]">
       <div>
-        <h1 className="text-2xl font-black md:text-3xl">🛟 תמיכה ופניות</h1>
+        <h1 className="text-2xl font-black md:text-3xl"> תמיכה ופניות</h1>
         <p className="mt-1 text-sm text-ink-400">
           נתקלת בבעיה בסטרימינג, בחיוב או בחשבון? שלח פנייה ונחזור אליך בהקדם (בדרך כלל תוך יום עסקים).
         </p>
@@ -23,9 +23,9 @@ export default function SupportPage() {
         <Card className="p-5">
           <h2 className="text-sm font-bold">יצירת קשר מהירה</h2>
           <ul className="mt-2 space-y-1.5 text-xs text-ink-300">
-            <li>📧 {SITE.supportEmail}</li>
-            <li>💬 צ׳אט חי — זמין למנויי פלוס, ראשון–חמישי 9:00–18:00</li>
-            <li>⏱️ זמן תגובה ממוצע: 6 שעות</li>
+            <li> {SITE.supportEmail}</li>
+            <li> צ׳אט חי — זמין למנויי פלוס, ראשון–חמישי 9:00–18:00</li>
+            <li>⏱ זמן תגובה ממוצע: 6 שעות</li>
           </ul>
         </Card>
 

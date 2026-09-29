@@ -75,16 +75,16 @@ export function UpgradePanel({
       <div className="space-y-2">
         {cancelAtPeriodEnd ? (
           <>
-            <p className="text-xs text-amber-300">
+            <p className="text-xs text-brass-300">
               המנוי יסתיים ב-{formatDate(periodEnd)} — אפשר לחזור בו בכל רגע.
             </p>
             <Button variant="primary" className="w-full" onClick={() => call("resume")} loading={loading === "resume"}>
-              חדש את המנוי 🔄
+              חדש את המנוי 
             </Button>
           </>
         ) : (
           <>
-            <p className="text-xs text-emerald-300">המנוי פעיל {periodEnd ? `עד ${formatDate(periodEnd)}` : ""}</p>
+            <p className="text-xs text-verdigris-300">המנוי פעיל {periodEnd ? `עד ${formatDate(periodEnd)}` : ""}</p>
             <Button variant="ghost" className="w-full" onClick={() => call("cancel")} loading={loading === "cancel"}>
               ביטול המנוי
             </Button>

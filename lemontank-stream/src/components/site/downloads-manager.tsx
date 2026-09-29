@@ -106,7 +106,7 @@ export function DownloadsManager({ initial, planLabel }: { initial: DownloadRow[
             {busy ? <Spinner /> : "רישום המכשיר"}
           </Button>
         </div>
-        {error && <p className="mt-2 text-[0.9rem] text-red-300">{error}</p>}
+        {error && <p className="mt-2 text-[0.9rem] text-ember-300">{error}</p>}
       </Card>
 
       <section>
@@ -119,7 +119,7 @@ export function DownloadsManager({ initial, planLabel }: { initial: DownloadRow[
               <li key={device.id} className="flex items-center justify-between gap-3 rounded-xl bg-white/[0.05] p-3">
                 <div>
                   <div className="font-bold">
-                    {device.label ?? "מכשיר"} {device.trusted ? <span className="text-emerald-300">✓ מהימן</span> : null}
+                    {device.label ?? "מכשיר"} {device.trusted ? <span className="text-verdigris-300">✓ מהימן</span> : null}
                   </div>
                   <div className="text-[0.82rem] text-ink-400">
                     {device.platform ?? "web"} · נראה לאחרונה {device.last_seen.slice(0, 16).replace("T", " ")}
@@ -129,7 +129,7 @@ export function DownloadsManager({ initial, planLabel }: { initial: DownloadRow[
                   <button type="button" onClick={() => toggleTrust(device)} className="rounded-lg bg-white/[0.08] px-3 py-1.5 text-[0.85rem] hover:bg-white/[0.14]">
                     {device.trusted ? "בטל אמון" : "סמן מהימן"}
                   </button>
-                  <button type="button" onClick={() => removeDevice(device)} className="rounded-lg px-3 py-1.5 text-[0.85rem] text-red-300 hover:bg-red-500/10">
+                  <button type="button" onClick={() => removeDevice(device)} className="rounded-lg px-3 py-1.5 text-[0.85rem] text-ember-300 hover:bg-ember-500/10">
                     הסר
                   </button>
                 </div>
@@ -153,7 +153,7 @@ export function DownloadsManager({ initial, planLabel }: { initial: DownloadRow[
                   // eslint-disable-next-line @next/next/no-img-element
                   <img src={row.poster_url} alt="" className="h-16 w-11 rounded-lg object-cover" />
                 ) : (
-                  <span className="flex h-16 w-11 items-center justify-center rounded-lg bg-white/10">🎬</span>
+                  <span className="flex h-16 w-11 items-center justify-center rounded-lg bg-white/10"></span>
                 )}
                 <div className="min-w-0 flex-1">
                   <div className="truncate font-bold">{row.title_name}</div>
@@ -162,11 +162,11 @@ export function DownloadsManager({ initial, planLabel }: { initial: DownloadRow[
                     {row.quality}
                     {row.device_label ? ` · ${row.device_label}` : ""}
                   </div>
-                  <div className={`text-[0.8rem] ${row.expired ? "text-red-300" : "text-ink-500"}`}>
+                  <div className={`text-[0.8rem] ${row.expired ? "text-ember-300" : "text-ink-500"}`}>
                     {row.expired ? "פג תוקף" : `בתוקף עד ${String(row.expires_at ?? "").slice(0, 16).replace("T", " ")}`}
                   </div>
                 </div>
-                <button type="button" onClick={() => remove(row)} disabled={busy} className="rounded-lg px-3 py-1.5 text-[0.85rem] text-red-300 hover:bg-red-500/10">
+                <button type="button" onClick={() => remove(row)} disabled={busy} className="rounded-lg px-3 py-1.5 text-[0.85rem] text-ember-300 hover:bg-ember-500/10">
                   מחק
                 </button>
               </li>

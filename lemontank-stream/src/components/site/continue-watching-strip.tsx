@@ -12,7 +12,7 @@ export function ContinueWatchingStrip({ items }: { items: Item[] }) {
 
   return (
     <section aria-labelledby="cw-heading">
-      <h2 id="cw-heading" className="mb-4 text-lg font-extrabold">▶️ המשך לצפות</h2>
+      <h2 id="cw-heading" className="mb-4 text-lg font-extrabold"> המשך לצפות</h2>
       <div className="row-scroll">
         {items.map((item) => {
           const href = item.episode_id ? `/watch/${item.slug}?ep=${item.episode_id}` : `/watch/${item.slug}`;
@@ -26,7 +26,7 @@ export function ContinueWatchingStrip({ items }: { items: Item[] }) {
                   <div className="poster-fallback h-full w-full" style={{ ["--poster-color" as string]: item.color }} />
                 )}
                 <div className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 transition group-hover:opacity-100">
-                  <span className="rounded-full bg-lemon-400 p-3 text-ink-900">▶</span>
+                  <span className="rounded-full bg-lemon-400 p-3 text-ink-900"></span>
                 </div>
                 {item.percent ? (
                   <div className="absolute inset-x-0 bottom-0 h-1.5 bg-white/25">

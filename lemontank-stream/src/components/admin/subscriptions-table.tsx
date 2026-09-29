@@ -59,7 +59,7 @@ export function SubscriptionsTable({ items }: { items: AdminSubscription[] }) {
     router.refresh();
   };
 
-  if (items.length === 0) return <EmptyState title="לא נמצאו מנויים" icon="💳" description="נסה לשנות את הסינון." />;
+  if (items.length === 0) return <EmptyState title="לא נמצאו מנויים" icon="wallet" description="נסה לשנות את הסינון." />;
 
   return (
     <DataTable head={["#", "משתמש", "מסלול", "סטטוס", "התחלה", "סוף תקופה", "ניסיון", "ספק", "שולם", "פעולות"]}>
@@ -77,7 +77,7 @@ export function SubscriptionsTable({ items }: { items: AdminSubscription[] }) {
             <Badge tone={sub.status === "active" ? "success" : sub.status === "trialing" ? "info" : sub.status === "past_due" ? "warn" : "danger"}>
               {STATUS_LABEL[sub.status] ?? sub.status}
             </Badge>
-            {sub.cancel_at_period_end ? <span className="ms-1 text-[0.8rem] text-amber-300">(יסתיים)</span> : null}
+            {sub.cancel_at_period_end ? <span className="ms-1 text-[0.8rem] text-brass-300">(יסתיים)</span> : null}
           </td>
           <td className="px-3 py-2 text-[0.85rem] text-ink-400">{formatDate(sub.started_at)}</td>
           <td className="px-3 py-2 text-[0.85rem] text-ink-400">{sub.current_period_end ? formatDate(sub.current_period_end) : "—"}</td>

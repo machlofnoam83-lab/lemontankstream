@@ -9,14 +9,14 @@ import { formatRelative } from "@/lib/format";
 type Item = { id: number; kind: string; title: string; body: string | null; link: string | null; read_at: string | null; created_at: string };
 
 const ICONS: Record<string, string> = {
-  welcome: "🎉",
-  plan: "⭐",
-  billing: "💳",
-  content: "🎬",
-  episode: "📺",
-  security: "🔐",
-  info: "ℹ️",
-  promo: "🏷️",
+  welcome: "",
+  plan: "",
+  billing: "",
+  content: "",
+  episode: "",
+  security: "",
+  info: "ℹ",
+  promo: "",
 };
 
 export function NotificationsList({ items: initial }: { items: Item[] }) {
@@ -49,7 +49,7 @@ export function NotificationsList({ items: initial }: { items: Item[] }) {
             className={`rounded-2xl border p-4 transition ${n.read_at ? "border-white/8 bg-white/[0.02]" : "border-lemon-400/25 bg-lemon-400/[0.06]"}`}
           >
             <div className="flex items-start gap-3">
-              <span className="text-xl" aria-hidden="true">{ICONS[n.kind] ?? "🔔"}</span>
+              <span className="text-xl" aria-hidden="true">{ICONS[n.kind] ?? ""}</span>
               <div className="min-w-0 flex-1">
                 <h2 className="text-sm font-bold">{n.title}</h2>
                 {n.body ? <p className="mt-1 text-xs text-ink-300">{n.body}</p> : null}

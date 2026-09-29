@@ -87,7 +87,7 @@ export function UserEditorButton({ user, actorRole }: { user: AdminUser; actorRo
           </>
         }
       >
-        {error ? <p className="rounded-xl border border-red-500/30 bg-red-500/10 px-3 py-2 text-sm text-red-200">{error}</p> : null}
+        {error ? <p className="rounded-xl border border-ember-500/30 bg-ember-500/10 px-3 py-2 text-sm text-ember-200">{error}</p> : null}
 
         <div className="grid gap-3 md:grid-cols-2">
           <Field label="שם" htmlFor="u-name">

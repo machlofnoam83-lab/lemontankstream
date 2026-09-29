@@ -56,7 +56,7 @@ export default function AdminImportPage() {
                   </Badge>
                 </td>
                 <td className="px-3 py-2 text-xs">{formatNumber(Number(job.total))}</td>
-                <td className="px-3 py-2 text-xs text-emerald-300">{formatNumber(Number(job.processed))}</td>
+                <td className="px-3 py-2 text-xs text-verdigris-300">{formatNumber(Number(job.processed))}</td>
                 <td className="px-3 py-2 text-xs text-ink-400">{formatNumber(Number(job.failed))}</td>
                 <td className="px-3 py-2 text-[0.85rem] text-ink-400" dir="ltr">{job.started_by_email ?? "—"}</td>
                 <td className="px-3 py-2 text-[0.85rem] text-ink-400">{formatRelative(job.finished_at ?? job.created_at)}</td>

@@ -18,7 +18,7 @@ export default async function RedeemPage() {
   return (
     <div className="mx-auto max-w-5xl space-y-6">
       <header>
-        <h1 className="text-3xl font-black">🎁 גיפט קארד</h1>
+        <h1 className="text-3xl font-black"> גיפט קארד</h1>
         <p className="mt-1 text-ink-300">
           שילמת בכרטיס מתנה? הזן את הקוד כאן ותקבל מנוי פלוס. אפשר לשלם גם בכרטיס שנקנה בחנות —
           הקוד עובר לאישור אנושי כדי שאף אחד לא ינצל כרטיס שכבר נוצל.

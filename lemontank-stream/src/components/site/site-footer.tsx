@@ -47,10 +47,10 @@ export function SiteFooter() {
         <div className="md:col-span-1">
           <div className="flex items-center gap-2.5">
             <span
-              className="flex h-10 w-10 items-center justify-center rounded-xl border border-lemon-400/30 bg-lemon-400/10 text-xl shadow-[0_0_24px_-8px_rgba(247,194,43,0.8)]"
+              className="flex h-10 w-10 items-center justify-center rounded-xl border border-lemon-400/30 bg-lemon-400/10 text-xl shadow-[0_0_24px_-8px_rgba(201,154,74,0.8)]"
               aria-hidden="true"
             >
-              🍋
+              
             </span>
             <span className="text-xl font-black tracking-tight">
               Lemon<span className="text-gradient">Tank</span>
@@ -60,7 +60,7 @@ export function SiteFooter() {
             פלטפורמת סטרימינג ישראלית — סרטים, סדרות ושידורים חיים בעברית. מנוי חינם לכל, ומנוי פלוס לאיכות 4K ולהורדות.
           </p>
           <div className="mt-5">
-            <div className="text-[0.9rem] font-bold text-ink-200">📬 עדכון שבועי — מה חדש בקטלוג</div>
+            <div className="text-[0.9rem] font-bold text-ink-200"> עדכון שבועי — מה חדש בקטלוג</div>
             <div className="mt-2">
               <NewsletterSignup compact />
             </div>
@@ -69,10 +69,10 @@ export function SiteFooter() {
 
           <div className="mt-4 flex flex-wrap gap-2">
             <span className="rounded-full border border-white/10 bg-white/[0.04] px-2.5 py-1 text-[0.85rem] font-semibold text-ink-300">
-              🔒 scrypt + CSP
+               scrypt + CSP
             </span>
             <span className="rounded-full border border-white/10 bg-white/[0.04] px-2.5 py-1 text-[0.85rem] font-semibold text-ink-300">
-              ⚡ 4K · Dolby
+               4K · Dolby
             </span>
           </div>
         </div>

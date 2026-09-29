@@ -31,7 +31,7 @@ export default async function PartyPage({ params }: { params: Promise<{ id: stri
     return (
       <div className="mx-auto flex min-h-[70vh] max-w-xl flex-col justify-center px-4">
         <Card className="p-6 text-center">
-          <div className="text-5xl" aria-hidden="true">🎉</div>
+          <div className="text-5xl" aria-hidden="true"></div>
           <h1 className="mt-3 text-2xl font-black">{preview.host_name} מזמין אותך לצפייה משותפת</h1>
           <p className="mt-2 text-ink-300">
             יחד צופים ב<b> {preview.title_name}</b>
@@ -64,7 +64,7 @@ export default async function PartyPage({ params }: { params: Promise<{ id: stri
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h1 className="text-2xl font-black">
-            🎉 {party.title_name}
+             {party.title_name}
             {party.episode_label ? <span className="text-ink-400"> · {party.episode_label}</span> : null}
           </h1>
           <p className="text-[0.9rem] text-ink-400">

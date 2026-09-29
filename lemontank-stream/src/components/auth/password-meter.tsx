@@ -71,7 +71,7 @@ export function PasswordMeter({
   const score = verdict?.score ?? 0;
   const steps = Math.max(1, Math.round(score / 20));
   const color =
-    score < 25 ? "bg-red-500" : score < 45 ? "bg-orange-500" : score < 70 ? "bg-amber-400" : "bg-emerald-500";
+    score < 25 ? "bg-ember-500" : score < 45 ? "bg-ember-500" : score < 70 ? "bg-brass-400" : "bg-verdigris-500";
 
   return (
     <div className="mt-2 space-y-1">
@@ -83,20 +83,20 @@ export function PasswordMeter({
       <p className="text-[0.85rem] text-ink-400">
         חוזק סיסמה:{" "}
         <span className="font-bold text-ink-200">{verdict ? verdict.level : checking ? "בודק…" : "—"}</span>
-        {verdict?.breach.pwned ? <span className="mr-2 text-red-400">· נמצאה בהדלפת מידע!</span> : null}
+        {verdict?.breach.pwned ? <span className="mr-2 text-ember-400">· נמצאה בהדלפת מידע!</span> : null}
         {verdict?.breach.pwned === false && verdict.breach.mode !== "off" ? (
-          <span className="mr-2 text-emerald-400">· לא נמצאה בהדלפות ידועות</span>
+          <span className="mr-2 text-verdigris-400">· לא נמצאה בהדלפות ידועות</span>
         ) : null}
       </p>
       {verdict?.problems.length ? (
-        <ul className="list-inside list-disc space-y-0.5 text-xs text-amber-300">
+        <ul className="list-inside list-disc space-y-0.5 text-xs text-brass-300">
           {verdict.problems.map((problem) => (
             <li key={problem}>{problem}</li>
           ))}
         </ul>
       ) : null}
       {verdict && !verdict.problems.length && verdict.suggestions.length ? (
-        <p className="text-xs text-ink-500">💡 {verdict.suggestions[0]}</p>
+        <p className="text-xs text-ink-500"> {verdict.suggestions[0]}</p>
       ) : null}
     </div>
   );

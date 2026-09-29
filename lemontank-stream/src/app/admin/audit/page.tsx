@@ -36,7 +36,7 @@ export default async function AdminAuditPage({
       <Card className="p-4">
         <div className="flex flex-wrap gap-3 text-xs">
           <span className="rounded-xl bg-white/[0.04] px-3 py-2">אירועי אבטחה ב-24ש׳: <b>{formatNumber(summary.byKind.reduce((s, k) => s + Number(k.c), 0))}</b></span>
-          <span className="rounded-xl bg-white/[0.04] px-3 py-2">התחברויות כושלות ב-24ש׳: <b className="text-amber-300">{formatNumber(summary.failedLogins)}</b></span>
+          <span className="rounded-xl bg-white/[0.04] px-3 py-2">התחברויות כושלות ב-24ש׳: <b className="text-brass-300">{formatNumber(summary.failedLogins)}</b></span>
           <span className="rounded-xl bg-white/[0.04] px-3 py-2">סשנים פעילים: <b>{formatNumber(summary.activeSessions)}</b></span>
         </div>
       </Card>

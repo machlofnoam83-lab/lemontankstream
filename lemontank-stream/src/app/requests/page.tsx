@@ -18,7 +18,7 @@ export default async function RequestsPage() {
   return (
     <div className="mx-auto w-full max-w-6xl space-y-6 px-4 py-8">
       <header className="text-center">
-        <h1 className="text-3xl font-black md:text-4xl">🗳️ בקשו כותר</h1>
+        <h1 className="text-3xl font-black md:text-4xl"> בקשו כותר</h1>
         <p className="mt-2 text-ink-300">
           הספרייה נבנית לפי מה שאתם רוצים לראות. בקשו תוכן, חזקו בקשות של אחרים — ואנחנו עובדים לפי סדר הביקוש.
         </p>

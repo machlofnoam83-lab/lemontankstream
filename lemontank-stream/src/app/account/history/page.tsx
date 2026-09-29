@@ -31,7 +31,7 @@ export default async function HistoryPage() {
       <EmptyState
         title="היסטוריית הצפייה ריקה"
         description="ברגע שתתחיל לצפות — כל ההתקדמות תישמר כאן ותוכל להמשיך מכל מכשיר."
-        icon="🕘"
+        icon="clock"
         action={<Link href="/" className="rounded-xl bg-lemon-400 px-4 py-2 text-sm font-bold text-ink-900">לדף הבית</Link>}
       />
     );
@@ -41,7 +41,7 @@ export default async function HistoryPage() {
     <div className="space-y-5">
       <header className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-black md:text-3xl">🕘 היסטוריית צפייה</h1>
+          <h1 className="text-2xl font-black md:text-3xl"> היסטוריית צפייה</h1>
           <p className="mt-1 text-sm text-ink-400">{items.length} כותרים שנצפו לאחרונה</p>
         </div>
         <Link href="/account/privacy" className="rounded-xl border border-white/15 px-4 py-2 text-xs">
@@ -69,14 +69,14 @@ export default async function HistoryPage() {
                   <span>{Math.round(Number(row.percent) * 100)}%</span>
                   <span>{formatRelative(row.updated_at)}</span>
                   {row.duration_sec ? <span>{formatDuration(row.duration_sec)}</span> : null}
-                  {row.completed ? <span className="text-emerald-400">הושלם ✓</span> : null}
+                  {row.completed ? <span className="text-verdigris-400">הושלם ✓</span> : null}
                 </div>
                 <div className="mt-1.5 h-1 w-full max-w-md rounded-full bg-white/10">
                   <div className="h-full rounded-full bg-lemon-400" style={{ width: `${Math.min(100, Number(row.percent) * 100)}%` }} />
                 </div>
               </div>
               <Link href={href} className="shrink-0 rounded-xl bg-lemon-400 px-3 py-2 text-xs font-bold text-ink-900">
-                המשך ▶
+                המשך 
               </Link>
             </li>
           );

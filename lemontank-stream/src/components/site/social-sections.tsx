@@ -67,7 +67,7 @@ export function CommentsSection({ titleId, episodeId, enabled = true }: { titleI
 
   return (
     <section aria-labelledby="comments-heading" className="space-y-4">
-      <h2 id="comments-heading" className="text-lg font-extrabold">💬 תגובות ({items.length})</h2>
+      <h2 id="comments-heading" className="text-lg font-extrabold"> תגובות ({items.length})</h2>
 
       <div className="space-y-2">
         <label htmlFor="comment-body" className="sr-only">כתוב תגובה</label>
@@ -146,13 +146,13 @@ export function ReviewsSection({ titleId, canReview }: { titleId: number; canRev
     setBody("");
     setStars(null);
     setSpoilers(false);
-    toast.push("הביקורת נשלחה — תודה! 🎉", "success");
+    toast.push("הביקורת נשלחה — תודה! ", "success");
     void load();
   };
 
   return (
     <section aria-labelledby="reviews-heading" className="space-y-4">
-      <h2 id="reviews-heading" className="text-lg font-extrabold">⭐ ביקורות ({items.length})</h2>
+      <h2 id="reviews-heading" className="text-lg font-extrabold"> ביקורות ({items.length})</h2>
 
       {canReview ? (
         <div className="space-y-3 rounded-2xl border border-white/10 bg-white/[0.02] p-4">
@@ -168,7 +168,7 @@ export function ReviewsSection({ titleId, canReview }: { titleId: number; canRev
                   onClick={() => setStars(n)}
                   className={`text-lg ${n <= (stars ?? 0) ? "text-lemon-400" : "text-ink-600 hover:text-lemon-600"}`}
                 >
-                  ★
+                  
                 </button>
               ))}
             </div>
@@ -182,7 +182,7 @@ export function ReviewsSection({ titleId, canReview }: { titleId: number; canRev
       ) : null}
 
       {items.length === 0 ? (
-        <EmptyState title="עוד אין ביקורות" description="היה הראשון לכתוב ביקורת על הכותר הזה." icon="✍️" />
+        <EmptyState title="עוד אין ביקורות" description="היה הראשון לכתוב ביקורת על הכותר הזה." icon="feather" />
       ) : (
         <ul className="space-y-3">
           {items.map((r) => (
@@ -190,13 +190,13 @@ export function ReviewsSection({ titleId, canReview }: { titleId: number; canRev
               <div className="flex items-center gap-2">
                 <span className="text-sm font-bold">{r.user_name}</span>
                 {r.user_plan === "plus" ? <span className="badge-plus">פלוס</span> : null}
-                {r.stars ? <span className="text-xs text-lemon-300">★ {r.stars}/10</span> : null}
+                {r.stars ? <span className="text-xs text-lemon-300"> {r.stars}/10</span> : null}
                 <span className="ms-auto text-[0.85rem] text-ink-400">{formatRelative(r.created_at)}</span>
               </div>
               {r.headline ? <h3 className="mt-2 font-bold">{r.headline}</h3> : null}
               {r.has_spoilers && !revealed[r.id] ? (
-                <button onClick={() => setRevealed((prev) => ({ ...prev, [r.id]: true }))} className="mt-2 rounded-lg bg-red-500/15 px-3 py-2 text-xs text-red-300">
-                  ⚠️ הביקורת מכילה ספוילרים — לחץ להצגה
+                <button onClick={() => setRevealed((prev) => ({ ...prev, [r.id]: true }))} className="mt-2 rounded-lg bg-ember-500/15 px-3 py-2 text-xs text-ember-300">
+                   הביקורת מכילה ספוילרים — לחץ להצגה
                 </button>
               ) : (
                 <p className="mt-2 whitespace-pre-wrap text-sm text-ink-200">{r.body}</p>

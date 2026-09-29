@@ -51,7 +51,7 @@ export default async function PlansPage() {
     <div className="space-y-8">
       <header className="text-center">
         <h1 className="text-3xl font-black tracking-tight md:text-5xl">
-          בחר את <span className="text-gradient">המסלול</span> שלך 🍋
+          בחר את <span className="text-gradient">המסלול</span> שלך 
         </h1>
         <p className="mx-auto mt-3 max-w-2xl text-sm leading-relaxed text-ink-300 md:text-base">
           מתחילים בחינם, משדרגים כשבא לכם. בלי התחייבות, ביטול בכל רגע בלחיצה.
@@ -76,7 +76,7 @@ export default async function PlansPage() {
               key={plan.code}
               className={`relative flex flex-col overflow-hidden rounded-[24px] p-7 transition-transform duration-300 [transition-timing-function:var(--ease-cinema)] hover:-translate-y-1 ${
                 isPlus
-                  ? "border border-plus-500/40 bg-gradient-to-b from-plus-600/20 to-ink-900/70 shadow-[0_40px_90px_-50px_rgba(139,92,246,0.95)]"
+                  ? "border border-plus-500/40 bg-gradient-to-b from-plus-600/20 to-ink-900/70 shadow-[0_40px_90px_-50px_rgba(124,36,48,0.95)]"
                   : "card-surface"
               }`}
               aria-label={`מסלול ${plan.name_he}`}
@@ -84,7 +84,7 @@ export default async function PlansPage() {
               {isPlus ? (
                 <>
                   <div className="pointer-events-none absolute -right-20 -top-24 h-56 w-56 rounded-full bg-plus-500/25 blur-3xl" aria-hidden="true" />
-                  <span className="absolute -top-0.5 right-7 rounded-b-xl bg-gradient-to-b from-plus-500 to-plus-600 px-3.5 py-1.5 text-[0.85rem] font-black text-white shadow-[0_10px_30px_-12px_rgba(139,92,246,1)]">
+                  <span className="absolute -top-0.5 right-7 rounded-b-xl bg-gradient-to-b from-plus-500 to-plus-600 px-3.5 py-1.5 text-[0.85rem] font-black text-white shadow-[0_10px_30px_-12px_rgba(124,36,48,1)]">
                     הפופולרי ביותר
                   </span>
                 </>
@@ -92,7 +92,7 @@ export default async function PlansPage() {
 
               <div className="flex items-start justify-between">
                 <div>
-                  <h2 className={`text-2xl font-black ${isPlus ? "text-plus-300" : "text-white"}`}>{isPlus ? "⭐ " : ""}{plan.name_he}</h2>
+                  <h2 className={`text-2xl font-black ${isPlus ? "text-plus-300" : "text-white"}`}>{isPlus ? " " : ""}{plan.name_he}</h2>
                   {plan.tagline ? <p className="mt-1 text-sm text-ink-300">{plan.tagline}</p> : null}
                 </div>
                 {isCurrent ? <Badge tone="success">המסלול הנוכחי שלך</Badge> : null}
@@ -126,7 +126,7 @@ export default async function PlansPage() {
                           item.ok
                             ? isPlus
                               ? "bg-plus-500/25 text-plus-300"
-                              : "bg-emerald-500/20 text-emerald-300"
+                              : "bg-verdigris-500/20 text-verdigris-300"
                             : "bg-white/[0.07] text-ink-400"
                         }`}
                         aria-hidden="true"
@@ -168,7 +168,7 @@ export default async function PlansPage() {
               <tr>
                 <th className="px-5 py-3 text-right font-bold">תכונה</th>
                 <th className="px-4 py-3 font-bold">חינם</th>
-                <th className="px-4 py-3 font-bold text-plus-400">פלוס ⭐</th>
+                <th className="px-4 py-3 font-bold text-plus-400">פלוס </th>
               </tr>
             </thead>
             <tbody className="divide-y divide-white/[0.06] [&>tr:hover]:bg-white/[0.03]">
@@ -240,7 +240,7 @@ export default async function PlansPage() {
 
 /** סימון ✓ / ✗ בטבלת ההשוואה — עם טון צבע תואם */
 function FeatureMark({ value }: { value: string }) {
-  if (value === "✓") return <span className="text-emerald-400">✓</span>;
+  if (value === "✓") return <span className="text-verdigris-400">✓</span>;
   if (value === "✗") return <span className="text-ink-500">✗</span>;
   return <span>{value}</span>;
 }

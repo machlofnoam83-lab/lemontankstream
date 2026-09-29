@@ -9,7 +9,7 @@ export const dynamic = "force-dynamic";
 export default function PopularPage() {
   return (
     <Suspense>
-      <CatalogBrowser title="🔥 הנצפים ביותר" defaultSort="popular" catalogEmpty={isCatalogEmpty()} />
+      <CatalogBrowser title=" הנצפים ביותר" defaultSort="popular" catalogEmpty={isCatalogEmpty()} />
     </Suspense>
   );
 }

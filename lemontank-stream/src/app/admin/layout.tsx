@@ -54,8 +54,8 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   ].filter(Boolean) as { label: string; tone: "warn" | "neutral" | "danger" }[];
 
   const TONES = {
-    warn: "bg-amber-500/15 text-amber-300 border-amber-500/30",
-    danger: "bg-red-500/15 text-red-300 border-red-500/30",
+    warn: "bg-brass-500/15 text-brass-300 border-brass-500/30",
+    danger: "bg-ember-500/15 text-ember-300 border-ember-500/30",
     neutral: "bg-white/[0.07] text-ink-200 border-white/10",
   };
 
@@ -67,7 +67,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
           <div className="h-px w-full bg-gradient-to-l from-transparent via-lemon-400/60 to-transparent" aria-hidden="true" />
           <div className="mx-auto flex max-w-[1600px] flex-wrap items-center gap-x-3 gap-y-2 px-4 py-3">
             <Link href="/admin" className="group flex items-center gap-2.5" aria-label="פאנל הניהול">
-              <span className="flex h-9 w-9 items-center justify-center rounded-xl border border-lemon-400/30 bg-lemon-400/10 text-lg shadow-[0_0_22px_-6px_rgba(247,194,43,0.7)]" aria-hidden="true">
+              <span className="flex h-9 w-9 items-center justify-center rounded-xl border border-lemon-400/30 bg-lemon-400/10 text-lg shadow-[0_0_22px_-6px_rgba(201,154,74,0.7)]" aria-hidden="true">
                 🍋
               </span>
               <span className="flex flex-col leading-none">

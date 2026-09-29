@@ -60,7 +60,7 @@ export default async function LiveChannelPage({ params }: { params: Promise<{ id
   return (
     <div className="mx-auto max-w-5xl space-y-6 px-4 py-8">
       <nav className="text-xs text-ink-400">
-        <Link href="/live" className="hover:text-white">📡 שידור חי</Link>
+        <Link href="/live" className="hover:text-white"> שידור חי</Link>
         <span className="mx-2">/</span>
         <span className="text-ink-200">{channel.name_he}</span>
       </nav>
@@ -71,7 +71,7 @@ export default async function LiveChannelPage({ params }: { params: Promise<{ id
             // eslint-disable-next-line @next/next/no-img-element
             <img src={channel.logo_url} alt="" className="h-14 w-14 rounded-2xl border border-white/10 object-contain p-1" />
           ) : (
-            <span className="flex h-14 w-14 items-center justify-center rounded-2xl bg-white/5 text-2xl" aria-hidden="true">📺</span>
+            <span className="flex h-14 w-14 items-center justify-center rounded-2xl bg-white/5 text-2xl" aria-hidden="true"></span>
           )}
           <div>
             <h1 className="text-2xl font-black">{channel.name_he}</h1>
@@ -79,8 +79,8 @@ export default async function LiveChannelPage({ params }: { params: Promise<{ id
               {channel.number ? <Badge tone="neutral">ערוץ {channel.number}</Badge> : null}
               <Badge tone="info">{channel.category}</Badge>
               {channel.plan_access === "plus" ? <Badge tone="plus">פלוס</Badge> : <Badge tone="free">חינם</Badge>}
-              <span className="inline-flex items-center gap-1 text-red-400">
-                <span className="h-2 w-2 animate-pulse rounded-full bg-red-500" aria-hidden="true" /> שידור חי
+              <span className="inline-flex items-center gap-1 text-ember-400">
+                <span className="h-2 w-2 animate-pulse rounded-full bg-ember-500" aria-hidden="true" /> שידור חי
               </span>
             </p>
           </div>
@@ -90,7 +90,7 @@ export default async function LiveChannelPage({ params }: { params: Promise<{ id
 
       {locked ? (
         <Card className="p-8 text-center">
-          <p className="text-lg font-bold">הערוץ הזה זמין למנויי פלוס ⭐</p>
+          <p className="text-lg font-bold">הערוץ הזה זמין למנויי פלוס </p>
           <p className="mt-2 text-sm text-ink-400">שדר חי, ללא פרסומות, בכל המכשירים.</p>
           <Link href="/plans" className="mt-4 inline-block rounded-xl bg-lemon-400 px-6 py-3 font-bold text-ink-900">
             שדרג לפלוס
@@ -126,7 +126,7 @@ export default async function LiveChannelPage({ params }: { params: Promise<{ id
 
       {epg.length ? (
         <Card className="p-5">
-          <h2 className="text-sm font-bold">🗓️ לוח שידורים</h2>
+          <h2 className="text-sm font-bold"> לוח שידורים</h2>
           <ul className="mt-3 divide-y divide-white/5 text-xs">
             {epg.slice(0, 20).map((entry, i) => (
               <li key={`${entry.time ?? i}-${entry.title ?? ""}`} className="flex items-center justify-between gap-3 py-2">

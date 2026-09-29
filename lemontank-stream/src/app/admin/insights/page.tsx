@@ -72,7 +72,7 @@ export default async function InsightsPage() {
             <div className="mt-1 text-[0.85rem] text-ink-400">
               חודש קודם {money(revenue.revenuePrevMonth)}
               {revenue.growthPct !== null && (
-                <span className={revenue.growthPct >= 0 ? " text-emerald-300" : " text-red-300"}>
+                <span className={revenue.growthPct >= 0 ? " text-verdigris-300" : " text-ember-300"}>
                   {" "}
                   ({revenue.growthPct >= 0 ? "+" : ""}
                   {revenue.growthPct}%)
@@ -239,7 +239,7 @@ export default async function InsightsPage() {
                 <div key={row.hour} className="flex items-center gap-2 text-[0.78rem]">
                   <span className="w-10 text-ink-500">{HOUR_LABEL(row.hour)}</span>
                   <span className="h-2 flex-1 overflow-hidden rounded-full bg-white/10">
-                    <span className="block h-full rounded-full bg-sky-400/80" style={{ width: `${(row.events / maxHour) * 100}%` }} />
+                    <span className="block h-full rounded-full bg-brass-400/80" style={{ width: `${(row.events / maxHour) * 100}%` }} />
                   </span>
                 </div>
               ))}
@@ -279,7 +279,7 @@ export default async function InsightsPage() {
         <Card className="mt-4 p-5">
           <h3 className="font-bold">מה כדאי להשלים (ממוין לפי כמות)</h3>
           {health.issues.length === 0 ? (
-            <p className="mt-2 text-emerald-300">הכל מלא — כל הכותרות עם מטא-דאטה מלא 🎉</p>
+            <p className="mt-2 text-verdigris-300">הכל מלא — כל הכותרות עם מטא-דאטה מלא 🎉</p>
           ) : (
             <ul className="mt-3 divide-y divide-white/10">
               {health.issues.map((issue) => (

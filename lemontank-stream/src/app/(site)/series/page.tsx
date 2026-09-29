@@ -15,7 +15,7 @@ export default async function SeriesPage({ searchParams }: { searchParams: Promi
       <CatalogBrowser
         kind="series"
         catalogEmpty={empty}
-        title="📺 סדרות"
+        title=" סדרות"
         initialGenre={params.genre}
         initialPlan={params.plan === "free" || params.plan === "plus" ? params.plan : undefined}
       />

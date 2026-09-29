@@ -15,7 +15,7 @@ export default async function MoviesPage({ searchParams }: { searchParams: Promi
       <CatalogBrowser
         kind="movie"
         catalogEmpty={empty}
-        title="🎬 סרטים"
+        title=" סרטים"
         initialGenre={params.genre}
         initialPlan={params.plan === "free" || params.plan === "plus" ? params.plan : undefined}
       />

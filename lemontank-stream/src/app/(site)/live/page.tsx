@@ -22,13 +22,13 @@ export default async function LivePage() {
   return (
     <div className="space-y-8">
       <header className="flex flex-col gap-2">
-        <h1 className="text-2xl font-black md:text-3xl">📡 שידורים חיים</h1>
+        <h1 className="text-2xl font-black md:text-3xl"> שידורים חיים</h1>
         <p className="text-sm text-ink-400">
           ערוצים בזמן אמת. ערוצי פרימיום (ספורט/סרטים ב-4K) זמינים למנויי פלוס.
         </p>
         {!isPlus ? (
           <Link href="/plans" className="w-fit rounded-xl bg-gradient-to-l from-plus-500 to-plus-600 px-4 py-2 text-xs font-bold text-white">
-            ⭐ שדרג לפלוס לפתיחת כל הערוצים
+             שדרג לפלוס לפתיחת כל הערוצים
           </Link>
         ) : null}
       </header>
@@ -37,7 +37,7 @@ export default async function LivePage() {
         <EmptyState
           title="עוד אין ערוצים חיים"
           description="אדמין המערכת יכול להוסיף ערוצים בפאנל הניהול (ניהול תוכן → שידורים חיים)."
-          icon="📡"
+          icon="wifi"
         />
       ) : (
         categories.map((cat) => (
@@ -59,13 +59,13 @@ export default async function LivePage() {
                           // eslint-disable-next-line @next/next/no-img-element
                           <img src={c.logo_url} alt="" className="h-full w-full object-contain" loading="lazy" />
                         ) : (
-                          "📺"
+                          ""
                         )}
                       </span>
                       <span className="text-center text-sm font-bold">{c.name_he}</span>
                       <span className="flex items-center gap-1 text-[0.8rem] text-ink-400">
                         {c.number ? <span>ערוץ {c.number}</span> : null}
-                        {locked ? <span className="badge-plus">פלוס</span> : <span className="live-dot inline-block h-1.5 w-1.5 rounded-full bg-red-500" />}
+                        {locked ? <span className="badge-plus">פלוס</span> : <span className="live-dot inline-block h-1.5 w-1.5 rounded-full bg-ember-500" />}
                       </span>
                     </Link>
                   );

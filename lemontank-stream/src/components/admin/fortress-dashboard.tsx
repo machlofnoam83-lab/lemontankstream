@@ -34,8 +34,8 @@ const BREACH_LABEL: Record<"off" | "warn" | "enforce", string> = {
 };
 
 const SEVERITY_STYLE: Record<string, string> = {
-  critical: "border-red-500/40 bg-red-500/10 text-red-200",
-  warning: "border-amber-500/40 bg-amber-500/10 text-amber-200",
+  critical: "border-ember-500/40 bg-ember-500/10 text-ember-200",
+  warning: "border-brass-500/40 bg-brass-500/10 text-brass-200",
   info: "border-white/12 bg-white/[0.05] text-ink-200",
 };
 
@@ -157,16 +157,16 @@ export function FortressDashboard({ initial, canManage }: { initial: FortressDat
             {report.staff.with2fa}/{report.staff.total}
           </div>
           {masked.missing2fa.length > 0 ? (
-            <div className="mt-1 truncate text-[0.82rem] text-amber-300" title={masked.missing2fa.join(", ")}>
+            <div className="mt-1 truncate text-[0.82rem] text-brass-300" title={masked.missing2fa.join(", ")}>
               חסר: {masked.missing2fa.join(", ")}
             </div>
           ) : (
-            <div className="mt-1 text-[0.82rem] text-emerald-300">כל הסגל מוגן ✓</div>
+            <div className="mt-1 text-[0.82rem] text-verdigris-300">כל הסגל מוגן ✓</div>
           )}
         </Card>
         <Card className="p-4">
           <div className="text-[0.85rem] text-ink-400">שלמות יומן הביקורת</div>
-          <div className={`mt-1 text-2xl font-black ${auditChain.ok ? "text-emerald-300" : "text-red-300"}`}>
+          <div className={`mt-1 text-2xl font-black ${auditChain.ok ? "text-verdigris-300" : "text-ember-300"}`}>
             {auditChain.ok ? "תקין ✓" : "נשבר!"}
           </div>
           <div className="mt-1 text-[0.82rem] text-ink-500">
@@ -188,7 +188,7 @@ export function FortressDashboard({ initial, canManage }: { initial: FortressDat
           </button>
         </div>
         {report.anomalies.length === 0 ? (
-          <p className="mt-2 text-emerald-300">לא זוהו חריגות ב-24 השעות האחרונות.</p>
+          <p className="mt-2 text-verdigris-300">לא זוהו חריגות ב-24 השעות האחרונות.</p>
         ) : (
           <ul className="mt-3 space-y-2">
             {report.anomalies.map((anomaly) => (
@@ -211,7 +211,7 @@ export function FortressDashboard({ initial, canManage }: { initial: FortressDat
           <div className="truncate">חתימה: {auditChain.head.entryHash ?? "—"}</div>
         </div>
         {!auditChain.ok && (
-          <ul className="mt-3 space-y-1 text-[0.88rem] text-red-200">
+          <ul className="mt-3 space-y-1 text-[0.88rem] text-ember-200">
             {auditChain.broken.slice(0, 10).map((entry) => (
               <li key={`${entry.id}-${entry.reason}`}>
                 רשומה #{entry.id} (seq {entry.seq}): {entry.reason}
@@ -248,7 +248,7 @@ export function FortressDashboard({ initial, canManage }: { initial: FortressDat
             מצב נוכחי: {report.allowlist.enabled ? `${report.allowlist.entries} כתובות מורשות` : "פתוח"}
           </span>
         </div>
-        {!canManage && <p className="mt-2 text-[0.85rem] text-amber-300">רק בעל המערכת יכול לשנות את הרשימה.</p>}
+        {!canManage && <p className="mt-2 text-[0.85rem] text-brass-300">רק בעל המערכת יכול לשנות את הרשימה.</p>}
         {status && <p className="mt-2 text-[0.9rem] text-lemon-300">{status}</p>}
       </Card>
 
@@ -296,7 +296,7 @@ export function FortressDashboard({ initial, canManage }: { initial: FortressDat
               </button>
             ))}
           </div>
-          <p className="mt-2 text-[0.85rem] text-amber-300">
+          <p className="mt-2 text-[0.85rem] text-brass-300">
             החיווי כאן משקף את בחירתך במסך — מצב החובה בפועל נשמר בשרת ונבדק בכל בקשה לניהול.
           </p>
         </div>
@@ -329,7 +329,7 @@ export function FortressDashboard({ initial, canManage }: { initial: FortressDat
               className="mt-3 w-full rounded-xl border border-white/15 bg-black/40 px-3 py-2"
               placeholder="סיסמה"
             />
-            {stepError && <p className="mt-2 text-[0.88rem] text-red-300">{stepError}</p>}
+            {stepError && <p className="mt-2 text-[0.88rem] text-ember-300">{stepError}</p>}
             <div className="mt-4 flex gap-2">
               <button type="submit" disabled={busy} className="flex-1 rounded-xl bg-lemon-400 py-2 font-bold text-ink-950 disabled:opacity-60">
                 {busy ? <Spinner /> : "אשר"}

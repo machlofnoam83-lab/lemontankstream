@@ -88,8 +88,8 @@ export function NewsletterBroadcast({ counts }: { counts: { confirmed: number; u
           שליחה לבדיקה
         </Button>
       ) : (
-        <div className="flex flex-wrap items-center gap-3 rounded-xl border border-amber-400/40 bg-amber-500/10 p-3">
-          <span className="text-[0.9rem] text-amber-200">
+        <div className="flex flex-wrap items-center gap-3 rounded-xl border border-brass-400/40 bg-brass-500/10 p-3">
+          <span className="text-[0.9rem] text-brass-200">
             לשלוח עכשיו? אי אפשר לבטל שליחה שכבר יצאה.
           </span>
           <Button onClick={send} disabled={busy}>

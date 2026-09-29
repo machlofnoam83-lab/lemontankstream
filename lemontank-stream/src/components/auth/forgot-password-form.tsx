@@ -46,7 +46,7 @@ export function ForgotPasswordForm() {
             <p className="mt-1 break-all font-mono text-[0.85rem]" dir="ltr">{devToken}</p>
             <button
               onClick={() => router.push(`/reset-password?token=${encodeURIComponent(devToken)}`)}
-              className="mt-2 rounded-lg bg-amber-400 px-3 py-1.5 text-xs font-bold text-black"
+              className="mt-2 rounded-lg bg-brass-400 px-3 py-1.5 text-xs font-bold text-black"
             >
               עבור לעמוד האיפוס עם הטוקן
             </button>

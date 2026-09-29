@@ -40,7 +40,7 @@ export function PrivacyControls({ marketingOptIn }: { marketingOptIn: boolean })
   return (
     <div className="space-y-4">
       <Card className="p-5">
-        <h2 className="text-sm font-bold">📦 ייצוא הנתונים שלי</h2>
+        <h2 className="text-sm font-bold"> ייצוא הנתונים שלי</h2>
         <p className="mt-1 text-xs text-ink-400">
           קובץ JSON מלא: פרטי חשבון, פרופילים, היסטוריית צפייה, רשימות, דירוגים, תשלומים וסשנים. בלי סיסמאות או סודות.
         </p>
@@ -50,7 +50,7 @@ export function PrivacyControls({ marketingOptIn }: { marketingOptIn: boolean })
       </Card>
 
       <Card className="p-5">
-        <h2 className="text-sm font-bold">🧹 מחיקת היסטוריית צפייה</h2>
+        <h2 className="text-sm font-bold"> מחיקת היסטוריית צפייה</h2>
         <p className="mt-1 text-xs text-ink-400">
           מוחק את כל רשומות ההתקדמות — ההמלצות שלך יתאפסו, אבל החשבון עצמו נשאר.
         </p>
@@ -60,7 +60,7 @@ export function PrivacyControls({ marketingOptIn }: { marketingOptIn: boolean })
       </Card>
 
       <Card className="p-5">
-        <h2 className="text-sm font-bold">📬 הסכמה לדיוור</h2>
+        <h2 className="text-sm font-bold"> הסכמה לדיוור</h2>
         <p className="mt-1 text-xs text-ink-400">אנחנו שולחים עדכוני תוכן בלבד, בלי ספאם. אפשר להסיר בכל רגע.</p>
         <Checkbox
           className="mt-3"
@@ -70,8 +70,8 @@ export function PrivacyControls({ marketingOptIn }: { marketingOptIn: boolean })
         />
       </Card>
 
-      <Card className="border-red-500/30 p-5">
-        <h2 className="text-sm font-bold text-red-300">🗑️ מחיקת חשבון לצמיתות</h2>
+      <Card className="border-ember-500/30 p-5">
+        <h2 className="text-sm font-bold text-ember-300"> מחיקת חשבון לצמיתות</h2>
         <p className="mt-1 text-xs text-ink-400">
           הפעולה בלתי הפיכה: החשבון, הפרופילים, ההיסטוריה והרשימות יימחקו. חשבוניות נשמרות בהתאם לדרישות חוק.
           אם יש לך מנוי פלוס פעיל — יש לבטל אותו קודם.
@@ -95,7 +95,7 @@ export function PrivacyControls({ marketingOptIn }: { marketingOptIn: boolean })
                 toast.push(res.error.message, "error");
                 return;
               }
-              toast.push("החשבון נמחק. להתראות 👋", "info");
+              toast.push("החשבון נמחק. להתראות ", "info");
               router.push("/");
               router.refresh();
             }}

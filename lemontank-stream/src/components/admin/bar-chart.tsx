@@ -21,7 +21,7 @@ export function BarChart({
   const colors: Record<string, string> = {
     lemon: "bg-lemon-400",
     plus: "bg-plus-400",
-    emerald: "bg-emerald-400",
+    emerald: "bg-verdigris-400",
   };
 
   return (

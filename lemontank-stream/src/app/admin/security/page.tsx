@@ -101,7 +101,7 @@ export default async function AdminSecurityPage() {
         <ul className="grid gap-2 md:grid-cols-2">
           {protections.map(([name, detail, ok]) => (
             <li key={name} className="flex items-start gap-2 rounded-xl border border-white/8 bg-white/[0.02] p-2.5">
-              <span className={ok ? "text-emerald-400" : "text-amber-300"} aria-hidden="true">{ok ? "✓" : "!"}</span>
+              <span className={ok ? "text-verdigris-400" : "text-brass-300"} aria-hidden="true">{ok ? "✓" : "!"}</span>
               <span className="text-xs">
                 <b className="text-ink-100">{name}</b>
                 <span className="block text-ink-400">{detail}</span>
@@ -161,7 +161,7 @@ export default async function AdminSecurityPage() {
                 {lockedAccounts.map((a) => (
                   <li key={a.id} className="flex items-center justify-between gap-2">
                     <span dir="ltr" className="truncate">{a.email}</span>
-                    <span className="text-amber-300">{a.failed_logins} ניסיונות</span>
+                    <span className="text-brass-300">{a.failed_logins} ניסיונות</span>
                     <span className="text-ink-500">עד {formatRelative(a.locked_until)}</span>
                   </li>
                 ))}
@@ -192,11 +192,11 @@ export default async function AdminSecurityPage() {
         <ul className="grid gap-2 text-xs md:grid-cols-4">
           <li className="rounded-xl bg-white/[0.03] p-3">
             <span className="block text-ink-400">integrity_check</span>
-            <b className={stats.integrity === "ok" ? "text-emerald-400" : "text-red-400"}>{stats.integrity}</b>
+            <b className={stats.integrity === "ok" ? "text-verdigris-400" : "text-ember-400"}>{stats.integrity}</b>
           </li>
           <li className="rounded-xl bg-white/[0.03] p-3">
             <span className="block text-ink-400">הפרות מפתח זר</span>
-            <b className={stats.fkViolations === 0 ? "text-emerald-400" : "text-red-400"}>{stats.fkViolations}</b>
+            <b className={stats.fkViolations === 0 ? "text-verdigris-400" : "text-ember-400"}>{stats.fkViolations}</b>
           </li>
           <li className="rounded-xl bg-white/[0.03] p-3">
             <span className="block text-ink-400">מצב יומן</span>
@@ -204,7 +204,7 @@ export default async function AdminSecurityPage() {
           </li>
           <li className="rounded-xl bg-white/[0.03] p-3">
             <span className="block text-ink-400">אכיפת מפתחות זרים</span>
-            <b className={stats.foreignKeys ? "text-emerald-400" : "text-red-400"}>{stats.foreignKeys ? "מופעל" : "כבוי"}</b>
+            <b className={stats.foreignKeys ? "text-verdigris-400" : "text-ember-400"}>{stats.foreignKeys ? "מופעל" : "כבוי"}</b>
           </li>
         </ul>
         <p className="mt-3 text-xs text-ink-400">

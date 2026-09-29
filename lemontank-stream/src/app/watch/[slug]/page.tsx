@@ -105,7 +105,7 @@ export default async function WatchPage({
               עונה {playback.episode.season_number} · פרק {playback.episode.number}
             </span>
           ) : null}
-          {playback.access === "plus" ? <span className="badge-plus">⭐ תוכן פלוס</span> : <span className="badge-free">חינם</span>}
+          {playback.access === "plus" ? <span className="badge-plus"> תוכן פלוס</span> : <span className="badge-free">חינם</span>}
           {playback.episode?.runtime_sec ? <span>{formatRuntime(playback.episode.runtime_sec)}</span> : null}
         </div>
 

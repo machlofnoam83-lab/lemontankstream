@@ -1,5 +1,7 @@
 "use client";
 
+import type { IconName } from "@/components/ui/icons";
+
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
@@ -49,7 +51,7 @@ export function CrudManager({
   rows,
   fields,
   columns,
-  emptyIcon = "📄",
+  emptyIcon = "scroll",
   warning,
 }: {
   endpoint: string;
@@ -58,7 +60,7 @@ export function CrudManager({
   rows: Row[];
   fields: CrudField[];
   columns: CrudColumn[];
-  emptyIcon?: string;
+  emptyIcon?: IconName;
   warning?: string;
 }) {
   const router = useRouter();
@@ -155,7 +157,7 @@ export function CrudManager({
     const value = row[col.key];
     switch (col.kind) {
       case "bool":
-        return value ? <span className="text-emerald-400">✓</span> : <span className="text-ink-500">—</span>;
+        return value ? <span className="text-verdigris-400">✓</span> : <span className="text-ink-500">—</span>;
       case "badge": {
         const label = col.badgeMap?.[String(value)] ?? String(value ?? "—");
         return <Badge tone={col.tone?.[String(value)] ?? "neutral"}>{label}</Badge>;
@@ -197,7 +199,7 @@ export function CrudManager({
         <Button onClick={startCreate}>+ {entityLabel} חדש</Button>
       </div>
 
-      {warning ? <p className="mt-3 rounded-xl border border-amber-400/25 bg-amber-400/10 px-3 py-2 text-xs text-amber-200">{warning}</p> : null}
+      {warning ? <p className="mt-3 rounded-xl border border-brass-400/25 bg-brass-400/10 px-3 py-2 text-xs text-brass-200">{warning}</p> : null}
 
       <div className="mt-4">
         {filtered.length === 0 ? (
@@ -233,7 +235,7 @@ export function CrudManager({
           </>
         }
       >
-        {error ? <p className="mb-3 rounded-xl border border-red-500/30 bg-red-500/10 px-3 py-2 text-sm text-red-200">{error}</p> : null}
+        {error ? <p className="mb-3 rounded-xl border border-ember-500/30 bg-ember-500/10 px-3 py-2 text-sm text-ember-200">{error}</p> : null}
 
         <div className="grid gap-3 md:grid-cols-2">
           {fields.map((f) => (

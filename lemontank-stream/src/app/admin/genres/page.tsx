@@ -26,7 +26,7 @@ export default function AdminGenresPage() {
         endpoint="/api/genres"
         entityLabel="ז'אנר"
         rows={rows as unknown as Array<Record<string, unknown> & { id: number }>}
-        emptyIcon="🏷️"
+        emptyIcon="tag"
         fields={[
           { name: "name_he", label: "שם בעברית", type: "text", required: true, placeholder: "לדוגמה: מתח" },
           { name: "slug", label: "מזהה בכתובת (slug)", type: "text", placeholder: "מותאם אוטומטית מהשם אם ריק" },

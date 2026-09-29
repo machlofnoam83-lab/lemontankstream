@@ -109,7 +109,7 @@ export default async function AdminTitlesPage({
         <EmptyState
           title="לא נמצאו כותרים"
           description="אפשר ליצור סרט או סדרה חדשים — ומשם להעלות פוסטר, פרקים ווידאו."
-          icon="🎬"
+          icon="film"
           action={<Link href="/admin/titles/new" className="rounded-xl bg-lemon-400 px-4 py-2 text-sm font-bold text-ink-900">צור כותר ראשון</Link>}
         />
       ) : (

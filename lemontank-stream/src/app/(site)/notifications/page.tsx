@@ -14,7 +14,7 @@ export default async function NotificationsPage() {
     return (
       <EmptyState
         title="צריך להתחבר"
-        icon="🔔"
+        icon="key"
         action={<Link href="/login?next=/notifications" className="rounded-xl bg-lemon-400 px-4 py-2 text-sm font-bold text-ink-900">התחברות</Link>}
       />
     );
@@ -30,7 +30,7 @@ export default async function NotificationsPage() {
       <EmptyState
         title="אין התראות חדשות"
         description="כשנוסיף תוכן חדש, פרק חדש לסדרה שאתה עוקב אחריה או שינוי במנוי — תקבל התראה כאן."
-        icon="🔔"
+        icon="bell"
         action={<Link href="/new" className="rounded-xl bg-lemon-400 px-4 py-2 text-sm font-bold text-ink-900">גלה מה חדש</Link>}
       />
     );
@@ -38,7 +38,7 @@ export default async function NotificationsPage() {
 
   return (
     <div className="mx-auto max-w-3xl space-y-4">
-      <h1 className="text-2xl font-black md:text-3xl">🔔 התראות</h1>
+      <h1 className="text-2xl font-black md:text-3xl"> התראות</h1>
       <NotificationsList items={items} />
     </div>
   );

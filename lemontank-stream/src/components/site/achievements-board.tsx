@@ -17,8 +17,8 @@ type Badge = {
 };
 
 const TIER_STYLE: Record<Badge["tier"], { ring: string; chip: string; label: string }> = {
-  bronze: { ring: "border-orange-400/40 bg-orange-500/10", chip: "text-orange-300", label: "ארד" },
-  silver: { ring: "border-slate-300/40 bg-slate-300/10", chip: "text-slate-200", label: "כסף" },
+  bronze: { ring: "border-ember-400/40 bg-ember-500/10", chip: "text-ember-300", label: "ארד" },
+  silver: { ring: "border-obsidian-300/40 bg-obsidian-300/10", chip: "text-obsidian-200", label: "כסף" },
   gold: { ring: "border-lemon-400/50 bg-lemon-400/10", chip: "text-lemon-300", label: "זהב" },
   legend: { ring: "border-plus-400/60 bg-plus-500/15", chip: "text-plus-300", label: "אגדה" },
 };
@@ -78,7 +78,7 @@ export function AchievementsBoard({ initial }: { initial?: { earnedCount: number
     <div className="space-y-6">
       {newly.length > 0 && (
         <div className="card-surface flex items-center gap-3 rounded-2xl border-lemon-400/40 p-4">
-          <span className="text-2xl">🎉</span>
+          <span className="text-2xl"></span>
           <div>
             <div className="font-black text-lemon-300">הרווחת {newly.length} תגים חדשים!</div>
             <div className="text-[0.85rem] text-ink-300">
@@ -106,7 +106,7 @@ export function AchievementsBoard({ initial }: { initial?: { earnedCount: number
         <Card className="p-4">
           <div className="text-[0.85rem] text-ink-400">רצף צפייה</div>
           <div className="mt-1 text-3xl font-black">
-            🔥 {meta.streak}
+             {meta.streak}
             <span className="text-lg text-ink-400"> ימים</span>
           </div>
           {meta.rank && <div className="mt-1 text-[0.85rem] text-ink-400">מקום {meta.rank} בטבלה</div>}

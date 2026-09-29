@@ -108,7 +108,7 @@ export function AdminNav({ role }: { role: string }) {
                         }`}
                       >
                         {active ? (
-                          <span className="absolute inset-y-1.5 right-0 w-[3px] rounded-full bg-gradient-to-b from-lemon-300 to-lemon-500 shadow-[0_0_14px_1px_rgba(247,194,43,0.7)]" aria-hidden="true" />
+                          <span className="absolute inset-y-1.5 right-0 w-[3px] rounded-full bg-gradient-to-b from-lemon-300 to-lemon-500 shadow-[0_0_14px_1px_rgba(201,154,74,0.7)]" aria-hidden="true" />
                         ) : null}
                         <span
                           className={`flex h-7 w-7 items-center justify-center rounded-lg text-[0.95rem] transition-colors ${

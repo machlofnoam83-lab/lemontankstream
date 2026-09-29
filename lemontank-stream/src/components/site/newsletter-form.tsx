@@ -26,7 +26,7 @@ export function NewsletterSignup({ compact = false }: { compact?: boolean }) {
         setState("error");
         return;
       }
-      setMessage("נשלח אליך מייל אישור — לחיצה אחת ואתה בפנים 📬");
+      setMessage("נשלח אליך מייל אישור — לחיצה אחת ואתה בפנים ");
       setState("done");
       setEmail("");
     } catch {
@@ -53,7 +53,7 @@ export function NewsletterSignup({ compact = false }: { compact?: boolean }) {
       <Button type="submit" disabled={state === "loading"}>
         {state === "loading" ? "רושם…" : "קבל עדכונים"}
       </Button>
-      {state === "error" && <span className="text-[0.85rem] text-red-300">{message}</span>}
+      {state === "error" && <span className="text-[0.85rem] text-ember-300">{message}</span>}
     </form>
   );
 }
@@ -148,7 +148,7 @@ export function NewsletterPreferences({
           {saving ? "שומר…" : "שמור העדפות"}
         </Button>
         {saved && <span className="text-[0.9rem] text-free-400">✓ נשמר</span>}
-        {error && <span className="text-[0.9rem] text-red-300">{error}</span>}
+        {error && <span className="text-[0.9rem] text-ember-300">{error}</span>}
       </div>
     </Card>
   );

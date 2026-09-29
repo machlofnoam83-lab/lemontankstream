@@ -132,7 +132,7 @@ export function DeveloperKeys({ initial }: { initial: KeyRow[] }) {
             {busy ? <Spinner /> : "צור מפתח"}
           </Button>
         </form>
-        {error && <p className="mt-2 text-[0.9rem] text-red-300">{error}</p>}
+        {error && <p className="mt-2 text-[0.9rem] text-ember-300">{error}</p>}
       </Card>
 
       <Card className="p-4">
@@ -166,9 +166,9 @@ export function DeveloperKeys({ initial }: { initial: KeyRow[] }) {
                     <td className="p-2 text-ink-300">{fmt(key.created_at)}</td>
                     <td className="p-2 text-end">
                       {key.revoked_at ? (
-                        <span className="text-[0.85rem] text-red-300">בוטל</span>
+                        <span className="text-[0.85rem] text-ember-300">בוטל</span>
                       ) : (
-                        <button type="button" onClick={() => revoke(key.id)} className="text-[0.85rem] text-red-300 hover:underline">
+                        <button type="button" onClick={() => revoke(key.id)} className="text-[0.85rem] text-ember-300 hover:underline">
                           בטל
                         </button>
                       )}

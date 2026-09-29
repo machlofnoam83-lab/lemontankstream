@@ -77,8 +77,8 @@ export default async function AdminTitleEditPage({ params }: { params: Promise<{
       </header>
 
       {videoCount === 0 ? (
-        <Card className="border-amber-500/30 bg-amber-500/[0.06] p-4">
-          <p className="text-sm text-amber-200">
+        <Card className="border-brass-500/30 bg-brass-500/[0.06] p-4">
+          <p className="text-sm text-brass-200">
             ⚠️ עוד לא הועלה וידאו{title.kind === "series" ? " לאף פרק" : " לסרט הזה"}. גולשים שיפתחו את הנגן יראו הודעה שהווידאו בהכנה.
           </p>
         </Card>

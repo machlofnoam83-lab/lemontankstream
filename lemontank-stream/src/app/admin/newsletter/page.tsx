@@ -47,7 +47,7 @@ export default function AdminNewsletterPage() {
                 </td>
                 <td className="px-3 py-2 text-ink-300">{row.source ?? "—"}</td>
                 <td className="px-3 py-2">
-                  {row.confirmed ? <span className="text-free-400">מאושר ✓</span> : <span className="text-amber-300">ממתין</span>}
+                  {row.confirmed ? <span className="text-free-400">מאושר ✓</span> : <span className="text-brass-300">ממתין</span>}
                 </td>
                 <td className="px-3 py-2 text-ink-400">{new Date(row.created_at).toLocaleDateString("he-IL")}</td>
               </tr>

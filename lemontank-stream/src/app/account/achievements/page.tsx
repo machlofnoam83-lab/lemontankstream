@@ -18,7 +18,7 @@ export default async function AchievementsPage() {
   return (
     <div className="space-y-6">
       <header>
-        <h1 className="text-3xl font-black">🏆 ההישגים שלי</h1>
+        <h1 className="text-3xl font-black"> ההישגים שלי</h1>
         <p className="mt-1 text-ink-300">
           כל צפייה, דירוג וביקורת מקדמים אותך. {earned} מתוך {badges.length} תגים הושגו · {userPoints(user.id).toLocaleString("he-IL")} נקודות
         </p>
@@ -33,7 +33,7 @@ export default async function AchievementsPage() {
           {top.map((row, index) => (
             <tr key={row.user_id} className={row.user_id === user.id ? "bg-lemon-400/10" : undefined}>
               <td className="px-3 py-2 font-black text-ink-400">
-                {index === 0 ? "🥇" : index === 1 ? "🥈" : index === 2 ? "🥉" : index + 1}
+                {index === 0 ? "" : index === 1 ? "" : index === 2 ? "" : index + 1}
               </td>
               <td className="px-3 py-2 font-bold">
                 {row.name}

@@ -41,7 +41,7 @@ export default async function SharedListPage({ params }: { params: Promise<{ cod
             <div key={(item as { item_id: number }).item_id}>
               <TitleCard item={item as never} />
               {(item as { note?: string | null }).note && (
-                <p className="mt-1 truncate text-[0.8rem] text-lemon-300/90">📝 {(item as { note?: string }).note}</p>
+                <p className="mt-1 truncate text-[0.8rem] text-lemon-300/90"> {(item as { note?: string }).note}</p>
               )}
             </div>
           ))}

@@ -53,7 +53,7 @@ export function RequestsBoard({ initial, loggedIn }: { initial: RequestRow[]; lo
     setName("");
     setYear("");
     setNote("");
-    setFlash("הבקשה נשלחה! אחרים יכולים לחזק אותה 👍");
+    setFlash("הבקשה נשלחה! אחרים יכולים לחזק אותה ");
     window.setTimeout(() => setFlash(""), 4000);
     await refresh();
   };
@@ -89,7 +89,7 @@ export function RequestsBoard({ initial, loggedIn }: { initial: RequestRow[]; lo
               }`}
               aria-label={`חזק את הבקשה ${row.name}`}
             >
-              <span className="text-xl">▲</span>
+              <span className="text-xl"></span>
               <span className="text-[0.95rem] font-bold">{row.votes}</span>
             </button>
             <div className="min-w-0 flex-1">
@@ -167,8 +167,8 @@ export function RequestsBoard({ initial, loggedIn }: { initial: RequestRow[]; lo
             <Button type="submit" disabled={busy || name.trim().length < 2} className="w-full">
               {busy ? <Spinner /> : "שלח בקשה"}
             </Button>
-            {error && <p className="text-[0.88rem] text-red-300">{error}</p>}
-            {flash && <p className="text-[0.88rem] text-emerald-300">{flash}</p>}
+            {error && <p className="text-[0.88rem] text-ember-300">{error}</p>}
+            {flash && <p className="text-[0.88rem] text-verdigris-300">{flash}</p>}
           </form>
         ) : (
           <Link href="/login?next=/requests" className="mt-3 block rounded-xl bg-lemon-400 px-4 py-2 text-center font-bold text-ink-950">

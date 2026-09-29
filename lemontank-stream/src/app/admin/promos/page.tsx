@@ -32,7 +32,7 @@ export default function AdminPromosPage() {
         endpoint="/api/promos"
         entityLabel="קמפיין"
         rows={rows}
-        emptyIcon="📣"
+        emptyIcon="bell"
         warning="שימוש ב-CTA מוביל לכתובת חיצונית — ודא שהכתובת מתחילה ב-https:// או בנתיב פנימי שמתחיל ב-/."
         fields={[
           { name: "title", label: "כותרת", type: "text", required: true, colSpan: 2 },

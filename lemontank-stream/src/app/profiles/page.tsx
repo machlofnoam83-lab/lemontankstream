@@ -36,7 +36,7 @@ export default async function ProfilesChooserPage() {
       <div className="mt-8 w-full max-w-3xl">
         {profiles.length === 0 ? (
           <Card className="p-6 text-center">
-            <div className="text-4xl">👋</div>
+            <div className="text-4xl"></div>
             <h2 className="mt-2 text-xl font-bold">עוד אין פרופילים</h2>
             <p className="mt-1 text-ink-300">
               פרופיל מאפשר לכל אחד במשפחה לקבל היסטוריה, המלצות ושפה משלו — ופרופיל ילדים מוגבל לגילים מתאימים.
@@ -58,7 +58,7 @@ export default async function ProfilesChooserPage() {
           href="/account/profiles"
           className="mt-8 rounded-xl border border-white/15 bg-white/[0.05] px-4 py-2 text-[0.95rem] hover:bg-white/[0.1]"
         >
-          ➕ הוספת פרופיל ({profiles.length}/{maxProfilesFor(session.user.effective_plan)})
+           הוספת פרופיל ({profiles.length}/{maxProfilesFor(session.user.effective_plan)})
         </Link>
       )}
 

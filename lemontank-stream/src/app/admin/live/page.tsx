@@ -32,7 +32,7 @@ export default function AdminLivePage() {
         endpoint="/api/live"
         entityLabel="ערוץ"
         rows={rows}
-        emptyIcon="📡"
+        emptyIcon="wifi"
         warning="אל תזין כאן כתובות פיראטיות — האחריות על תוכן הערוצים היא על המפעיל. השתמש בסטרימינג שקיבלת רישיון אליו."
         fields={[
           { name: "name_he", label: "שם הערוץ", type: "text", required: true },

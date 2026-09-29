@@ -92,10 +92,10 @@ export function EpisodePicker({
                     // eslint-disable-next-line @next/next/no-img-element
                     <img src={ep.thumb_url} alt="" loading="lazy" className="h-full w-full object-cover" />
                   ) : (
-                    <span className="flex h-full w-full items-center justify-center text-2xl" aria-hidden="true">▶</span>
+                    <span className="flex h-full w-full items-center justify-center text-2xl" aria-hidden="true"></span>
                   )}
                   <span className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 transition group-hover:opacity-100">
-                    <span className="rounded-full bg-lemon-400 p-2 text-ink-900">{locked ? "⭐" : "▶"}</span>
+                    <span className="rounded-full bg-lemon-400 p-2 text-ink-900">{locked ? "" : ""}</span>
                   </span>
                   {percent > 0 ? (
                     <span className="absolute inset-x-0 bottom-0 h-1 bg-white/25">
@@ -108,7 +108,7 @@ export function EpisodePicker({
                   <span className="flex items-center gap-2">
                     <span className="text-xs text-ink-400">פרק {ep.number}</span>
                     {ep.is_premiere ? <span className="rounded bg-lemon-400/20 px-1.5 text-[0.8rem] text-lemon-300">בכורה</span> : null}
-                    {ep.is_finale ? <span className="rounded bg-red-500/20 px-1.5 text-[0.8rem] text-red-300">סיום עונה</span> : null}
+                    {ep.is_finale ? <span className="rounded bg-ember-500/20 px-1.5 text-[0.8rem] text-ember-300">סיום עונה</span> : null}
                     {ep.effective_access === "plus" ? <span className="badge-plus">פלוס</span> : <span className="badge-free">חינם</span>}
                   </span>
                   <span className="mt-1 block truncate font-bold">{ep.name_he}</span>
@@ -121,10 +121,10 @@ export function EpisodePicker({
                 </span>
 
                 {locked ? (
-                  <span className="shrink-0 rounded-xl bg-plus-500/20 px-3 py-2 text-xs font-bold text-plus-400">שדרג ⭐</span>
+                  <span className="shrink-0 rounded-xl bg-plus-500/20 px-3 py-2 text-xs font-bold text-plus-400">שדרג </span>
                 ) : (
                   <span className="shrink-0 rounded-xl bg-white/10 px-3 py-2 text-xs font-bold text-white group-hover:bg-lemon-400 group-hover:text-ink-900">
-                    צפה ▶
+                    צפה 
                   </span>
                 )}
               </Link>

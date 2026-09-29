@@ -18,7 +18,7 @@ export default async function PartyHubPage() {
   return (
     <div className="space-y-6">
       <header>
-        <h1 className="text-3xl font-black">🎉 צפייה משותפת</h1>
+        <h1 className="text-3xl font-black"> צפייה משותפת</h1>
         <p className="mt-1 text-ink-300">
           צופים יחד, מסונכרנים לאותה שנייה. אחד מארח, כולם הולכים אחריו — מושלם לסרט עם חברים או לפרק עם המשפחה.
         </p>
@@ -56,7 +56,7 @@ export default async function PartyHubPage() {
         <h2 className="text-xl font-bold">איך פותחים חדר?</h2>
         <ol className="mt-2 space-y-2 text-[0.95rem] text-ink-300">
           <li>1. נכנסים לדף של סרט או פרק.</li>
-          <li>2. לוחצים על <b className="text-plus-200">🎉 ארח צפייה משותפת</b>.</li>
+          <li>2. לוחצים על <b className="text-plus-200"> ארח צפייה משותפת</b>.</li>
           <li>3. שולחים לחברים את הקישור או הקוד שקיבלתם.</li>
           <li>4. לוחצים Play — ומכאן כולם מסונכרנים איתך.</li>
         </ol>

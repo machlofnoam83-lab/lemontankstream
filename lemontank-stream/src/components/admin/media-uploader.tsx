@@ -142,7 +142,7 @@ export function MediaUploader({
           <button
             type="button"
             onClick={() => { setUrl(null); onUploaded?.({ id: 0, url: "" }); }}
-            className="text-[0.85rem] text-red-300 hover:underline"
+            className="text-[0.85rem] text-ember-300 hover:underline"
           >
             הסר
           </button>

@@ -17,7 +17,7 @@ export default async function MyListPage() {
       <EmptyState
         title="צריך להתחבר"
         description="הרשימה האישית נשמרת בחשבון שלך וזמינה בכל מכשיר."
-        icon="🔐"
+        icon="key"
         action={<Link href="/login?next=/my-list" className="rounded-xl bg-lemon-400 px-4 py-2 text-sm font-bold text-ink-900">התחברות</Link>}
       />
     );
@@ -46,7 +46,7 @@ export default async function MyListPage() {
 
   return (
     <div className="space-y-10">
-      <h1 className="text-2xl font-black md:text-3xl">🔖 הרשימה שלי</h1>
+      <h1 className="text-2xl font-black md:text-3xl"> הרשימה שלי</h1>
 
       {continueItems.length ? <ContinueWatchingStrip items={continueItems} /> : null}
 
@@ -56,7 +56,7 @@ export default async function MyListPage() {
           <EmptyState
             title="הרשימה ריקה"
             description="לחץ על 'הוסף לרשימה' בכל סרט או סדרה כדי לשמור אותם כאן."
-            icon="📌"
+            icon="tag"
             action={<Link href="/movies" className="rounded-xl bg-lemon-400 px-4 py-2 text-sm font-bold text-ink-900">גלה סרטים</Link>}
           />
         ) : (
@@ -72,7 +72,7 @@ export default async function MyListPage() {
 
       {liked.length ? (
         <section aria-labelledby="liked-heading">
-          <h2 id="liked-heading" className="mb-4 text-lg font-extrabold">👍 אהבתי</h2>
+          <h2 id="liked-heading" className="mb-4 text-lg font-extrabold"> אהבתי</h2>
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
             {liked.map((item) => (
               <div key={`like-${item.id}`} className="flex justify-center">
@@ -84,7 +84,7 @@ export default async function MyListPage() {
       ) : null}
 
       <section aria-labelledby="rec-heading">
-        <h2 id="rec-heading" className="mb-4 text-lg font-extrabold">✨ אולי יעניין אותך</h2>
+        <h2 id="rec-heading" className="mb-4 text-lg font-extrabold"> אולי יעניין אותך</h2>
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
           {recommended.map((item) => (
             <div key={`rec-${item.id}`} className="flex justify-center">

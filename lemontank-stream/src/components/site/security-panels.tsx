@@ -96,7 +96,7 @@ export function SecurityPanels({
     setBackupCodes(res.data.backupCodes);
     setSetup(null);
     setCode("");
-    toast.push("2FA הופעל! שמור את קודי הגיבוי 🎉", "success");
+    toast.push("2FA הופעל! שמור את קודי הגיבוי ", "success");
     router.refresh();
   };
 
@@ -137,7 +137,7 @@ export function SecurityPanels({
     <div className="space-y-4">
       {/* ── סיסמה ── */}
       <Card className="p-5">
-        <h2 className="text-sm font-bold">🔑 החלפת סיסמה</h2>
+        <h2 className="text-sm font-bold"> החלפת סיסמה</h2>
         <p className="mt-1 text-xs text-ink-400">
           {passwordChangedAt ? `הסיסמה שונתה לאחרונה ${formatRelative(passwordChangedAt)}.` : "מומלץ להחליף סיסמה אחת לכמה חודשים."}
         </p>
@@ -159,15 +159,15 @@ export function SecurityPanels({
       </Card>
 
       {/* ── 2FA ── */}
-      <Card className={`p-5 ${twoFactorEnabled ? "border-emerald-500/25" : "border-amber-500/25"}`}>
+      <Card className={`p-5 ${twoFactorEnabled ? "border-verdigris-500/25" : "border-brass-500/25"}`}>
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
-            <h2 className="text-sm font-bold">📱 אימות דו-שלבי (2FA)</h2>
+            <h2 className="text-sm font-bold"> אימות דו-שלבי (2FA)</h2>
             <p className="mt-1 max-w-2xl text-xs text-ink-400">
               שכבת הגנה שנייה עם אפליקציית Authenticator. מומלץ בחום — במיוחד לחשבונות מנהל.
             </p>
           </div>
-          <span className={twoFactorEnabled ? "badge-free" : "rounded-full border border-amber-500/40 bg-amber-500/15 px-2 py-0.5 text-[0.85rem] font-bold text-amber-300"}>
+          <span className={twoFactorEnabled ? "badge-free" : "rounded-full border border-brass-500/40 bg-brass-500/15 px-2 py-0.5 text-[0.85rem] font-bold text-brass-300"}>
             {twoFactorEnabled ? "פעיל ✓" : "לא פעיל"}
           </span>
         </div>
@@ -226,7 +226,7 @@ export function SecurityPanels({
       {/* ── מכשירים ── */}
       <Card className="p-5">
         <div className="flex flex-wrap items-center justify-between gap-3">
-          <h2 className="text-sm font-bold">💻 מכשירים מחוברים ({sessions.length})</h2>
+          <h2 className="text-sm font-bold"> מכשירים מחוברים ({sessions.length})</h2>
           {sessions.length > 1 ? (
             <Button size="sm" variant="ghost" onClick={revokeAll}>נתק את כל שאר המכשירים</Button>
           ) : null}
@@ -249,15 +249,15 @@ export function SecurityPanels({
 
       {/* ── מידע אבטחה ── */}
       <Card className="p-5">
-        <h2 className="text-sm font-bold">📊 מצב אבטחה</h2>
+        <h2 className="text-sm font-bold"> מצב אבטחה</h2>
         <ul className="mt-3 space-y-2 text-xs">
           <li className="flex items-center justify-between">
             <span className="text-ink-400">אימות דו-שלבי</span>
-            <span className={twoFactorEnabled ? "text-emerald-400" : "text-amber-300"}>{twoFactorEnabled ? "✓ מופעל" : "מומלץ להפעיל"}</span>
+            <span className={twoFactorEnabled ? "text-verdigris-400" : "text-brass-300"}>{twoFactorEnabled ? "✓ מופעל" : "מומלץ להפעיל"}</span>
           </li>
           <li className="flex items-center justify-between">
             <span className="text-ink-400">אימות כתובת אימייל</span>
-            <span className={emailVerified ? "text-emerald-400" : "text-ink-300"}>{emailVerified ? "✓ מאומת" : "לא מאומת"}</span>
+            <span className={emailVerified ? "text-verdigris-400" : "text-ink-300"}>{emailVerified ? "✓ מאומת" : "לא מאומת"}</span>
           </li>
           <li className="flex items-center justify-between">
             <span className="text-ink-400">אירועי התחברות ב-30 יום</span>
@@ -265,7 +265,7 @@ export function SecurityPanels({
           </li>
           <li className="flex items-center justify-between">
             <span className="text-ink-400">הצפנת סיסמה</span>
-            <span className="text-emerald-400">scrypt (N=32768) ✓</span>
+            <span className="text-verdigris-400">scrypt (N=32768) ✓</span>
           </li>
         </ul>
       </Card>

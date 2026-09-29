@@ -50,22 +50,22 @@ export default async function AccountPage() {
   return (
     <div className="space-y-6">
       <header>
-        <h1 className="text-2xl font-black md:text-3xl">שלום, {user.name.split(" ")[0]} 👋</h1>
+        <h1 className="text-2xl font-black md:text-3xl">שלום, {user.name.split(" ")[0]} </h1>
         <p className="mt-1 text-sm text-ink-400">הנה סיכום הפעילות שלך ב-LemonTank.</p>
       </header>
 
       <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
-        <StatCard label="כותרים שנצפו" value={stats.watched} icon={<span aria-hidden="true">🎬</span>} />
-        <StatCard label="הושלמו" value={stats.completed} tone="success" icon={<span aria-hidden="true">✅</span>} />
-        <StatCard label="ברשימה שלי" value={stats.inList} icon={<span aria-hidden="true">🔖</span>} />
-        <StatCard label="זמן צפייה" value={formatMinutes(stats.minutes)} icon={<span aria-hidden="true">⏱️</span>} />
+        <StatCard label="כותרים שנצפו" value={stats.watched} icon={<span aria-hidden="true"></span>} />
+        <StatCard label="הושלמו" value={stats.completed} tone="success" icon={<span aria-hidden="true"></span>} />
+        <StatCard label="ברשימה שלי" value={stats.inList} icon={<span aria-hidden="true"></span>} />
+        <StatCard label="זמן צפייה" value={formatMinutes(stats.minutes)} icon={<span aria-hidden="true">⏱</span>} />
       </div>
 
       {/* ── הישגים: כמה הושג, כמה נקודות, ומה הצעד הבא ── */}
       <Card className="p-4">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div>
-            <h2 className="text-xl font-black">🏆 ההישגים שלי</h2>
+            <h2 className="text-xl font-black"> ההישגים שלי</h2>
             <p className="mt-1 text-[0.9rem] text-ink-300">
               {earnedBadges.length} מתוך {badges.length} תגים · {userPoints(user.id).toLocaleString("he-IL")} נקודות
             </p>
@@ -97,15 +97,15 @@ export default async function AccountPage() {
       </Card>
 
       {!security?.twofa_enabled ? (
-        <Card className="border-amber-500/30 bg-amber-500/[0.06] p-4">
+        <Card className="border-brass-500/30 bg-brass-500/[0.06] p-4">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div>
-              <h2 className="text-sm font-bold text-amber-200">🔐 החשבון שלך לא מוגן באימות דו-שלבי</h2>
-              <p className="mt-1 text-xs text-amber-200/80">
+              <h2 className="text-sm font-bold text-brass-200"> החשבון שלך לא מוגן באימות דו-שלבי</h2>
+              <p className="mt-1 text-xs text-brass-200/80">
                 הפעלת 2FA מוסיפה שכבת הגנה קריטית — גם אם הסיסמה תיחשף, אף אחד לא יוכל להתחבר.
               </p>
             </div>
-            <Link href="/account/security" className="rounded-xl bg-amber-400 px-4 py-2 text-xs font-bold text-black">
+            <Link href="/account/security" className="rounded-xl bg-brass-400 px-4 py-2 text-xs font-bold text-black">
               הפעל 2FA עכשיו
             </Link>
           </div>
@@ -119,7 +119,7 @@ export default async function AccountPage() {
 
       <div className="grid gap-4 md:grid-cols-2">
         <Card className="p-5">
-          <h2 className="mb-3 text-sm font-bold">🕘 צפיות אחרונות</h2>
+          <h2 className="mb-3 text-sm font-bold"> צפיות אחרונות</h2>
           {recent.length === 0 ? (
             <p className="text-xs text-ink-400">עוד לא צפית בכלום. אפשר להתחיל מהקטלוג.</p>
           ) : (
@@ -139,7 +139,7 @@ export default async function AccountPage() {
         </Card>
 
         <Card className="p-5">
-          <h2 className="mb-3 text-sm font-bold">🔔 עדכונים</h2>
+          <h2 className="mb-3 text-sm font-bold"> עדכונים</h2>
           {notifications.length === 0 ? (
             <p className="text-xs text-ink-400">אין התראות חדשות.</p>
           ) : (
@@ -160,11 +160,11 @@ export default async function AccountPage() {
       </div>
 
       <Card className="p-5">
-        <h2 className="mb-3 text-sm font-bold">🔐 מצב האבטחה</h2>
+        <h2 className="mb-3 text-sm font-bold"> מצב האבטחה</h2>
         <dl className="grid gap-3 text-xs md:grid-cols-3">
           <div>
             <dt className="text-ink-400">אימות דו-שלבי</dt>
-            <dd className={security?.twofa_enabled ? "font-bold text-emerald-400" : "font-bold text-amber-300"}>
+            <dd className={security?.twofa_enabled ? "font-bold text-verdigris-400" : "font-bold text-brass-300"}>
               {security?.twofa_enabled ? "פעיל ✓" : "לא פעיל"}
             </dd>
           </div>

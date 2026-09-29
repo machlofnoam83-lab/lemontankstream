@@ -20,7 +20,7 @@ export default async function SecurityPage() {
   return (
     <div className="space-y-6">
       <header>
-        <h1 className="text-2xl font-black md:text-3xl">🔐 אבטחה ומכשירים</h1>
+        <h1 className="text-2xl font-black md:text-3xl"> אבטחה ומכשירים</h1>
         <p className="mt-1 text-sm text-ink-400">
           כאן מנהלים סיסמה, אימות דו-שלבי ומכשירים מחוברים. כל פעולה רגישה נרשמת ביומן האבטחה.
         </p>

@@ -35,17 +35,17 @@ export function LikeButtons({ titleId, initialLike = false, initialDislike = fal
         onClick={() => send("like")}
         aria-pressed={like}
         aria-label="אהבתי"
-        className={`px-3 py-2.5 text-sm transition ${like ? "bg-emerald-500/25 text-emerald-300" : "bg-white/5 text-white hover:bg-white/15"}`}
+        className={`px-3 py-2.5 text-sm transition ${like ? "bg-verdigris-500/25 text-verdigris-300" : "bg-white/5 text-white hover:bg-white/15"}`}
       >
-        👍 <span className="hidden sm:inline">אהבתי</span>
+         <span className="hidden sm:inline">אהבתי</span>
       </button>
       <button
         onClick={() => send("dislike")}
         aria-pressed={dislike}
         aria-label="לא אהבתי"
-        className={`border-r border-white/15 px-3 py-2.5 text-sm transition ${dislike ? "bg-red-500/25 text-red-300" : "bg-white/5 text-white hover:bg-white/15"}`}
+        className={`border-r border-white/15 px-3 py-2.5 text-sm transition ${dislike ? "bg-ember-500/25 text-ember-300" : "bg-white/5 text-white hover:bg-white/15"}`}
       >
-        👎
+        
       </button>
     </div>
   );
@@ -61,7 +61,7 @@ export function StarRating({ titleId, initial }: { titleId: number; initial?: nu
     setValue(stars);
     const res = await apiCall("/api/ratings", { method: "POST", body: { title_id: titleId, stars } });
     if (!res.ok) toast.push(res.error.message, "error");
-    else toast.push(`דירגת ${stars}/10 ⭐`, "success");
+    else toast.push(`דירגת ${stars}/10 `, "success");
   };
 
   const shown = hover ?? value ?? 0;
@@ -79,7 +79,7 @@ export function StarRating({ titleId, initial }: { titleId: number; initial?: nu
           onClick={() => set(n)}
           className={`text-lg leading-none transition ${n <= shown ? "text-lemon-400" : "text-ink-600 hover:text-lemon-600"}`}
         >
-          ★
+          
         </button>
       ))}
       {value ? <span className="ms-2 text-xs text-ink-300">{value}/10</span> : null}
@@ -107,7 +107,7 @@ export function ShareButton({ title, slug }: { title: string; slug: string }) {
 
   return (
     <button onClick={share} className="inline-flex items-center gap-2 rounded-xl border border-white/15 bg-white/5 px-3 py-2.5 text-sm hover:bg-white/15" aria-label="שיתוף">
-      🔗 <span className="hidden sm:inline">שיתוף</span>
+       <span className="hidden sm:inline">שיתוף</span>
     </button>
   );
 }
@@ -123,7 +123,7 @@ export function DownloadButton({ titleId, episodeId, allowed }: { titleId: numbe
 
   const start = async () => {
     if (!allowed) {
-      toast.push("הורדות זמינות למנויי פלוס בלבד ⭐", "info");
+      toast.push("הורדות זמינות למנויי פלוס בלבד ", "info");
       return;
     }
     setBusy(true);
@@ -155,7 +155,7 @@ export function DownloadButton({ titleId, episodeId, allowed }: { titleId: numbe
       } disabled:opacity-50`}
       aria-label="הורדה לצפייה אופליין"
     >
-      {saved ? "✓ בהורדות" : "⬇️"}
+      {saved ? "✓ בהורדות" : ""}
       <span className="hidden sm:inline">{saved ? "נשמר" : allowed ? "הורדה" : "הורדה (פלוס)"}</span>
     </button>
   );

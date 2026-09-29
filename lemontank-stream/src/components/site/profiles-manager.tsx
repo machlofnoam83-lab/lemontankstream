@@ -20,7 +20,7 @@ type Profile = {
 };
 
 const COLORS = ["#f5b301", "#8b5cf6", "#4ade80", "#38bdf8", "#fb7185", "#f97316", "#a78bfa", "#22d3ee"];
-const AVATARS = ["🦁", "🐼", "🐧", "🦊", "🐨", "🐸", "🦉", "🐙", "🦄", "🐳", "🚀", "⭐"];
+const AVATARS = ["", "", "", "", "", "", "", "", "", "", "", ""];
 
 /** ניהול פרופילים — יצירה, עריכה, PIN ופרופיל ילדים */
 export function ProfilesManager({ initialProfiles, maxProfiles, isPlus }: { initialProfiles: Profile[]; maxProfiles: number; isPlus: boolean }) {
@@ -121,10 +121,10 @@ export function ProfilesManager({ initialProfiles, maxProfiles, isPlus }: { init
               <div className="min-w-0">
                 <div className="truncate font-bold">{p.name}</div>
                 <div className="text-[0.85rem] text-ink-400">
-                  {p.is_kid ? `🧸 פרופיל ילדים · עד ${p.maturity_limit}` : `גיל מותר: ${p.maturity_limit}`}
+                  {p.is_kid ? ` פרופיל ילדים · עד ${p.maturity_limit}` : `גיל מותר: ${p.maturity_limit}`}
                 </div>
                 <div className="mt-1 flex flex-wrap gap-1">
-                  {p.has_pin ? <span className="rounded bg-white/10 px-1.5 py-0.5 text-[0.8rem]">🔒 PIN</span> : null}
+                  {p.has_pin ? <span className="rounded bg-white/10 px-1.5 py-0.5 text-[0.8rem]"> PIN</span> : null}
                   <span className="rounded bg-white/10 px-1.5 py-0.5 text-[0.8rem]">אודיו: {p.lang_audio}</span>
                   <span className="rounded bg-white/10 px-1.5 py-0.5 text-[0.8rem]">כתוביות: {p.lang_subs}</span>
                 </div>
@@ -187,7 +187,7 @@ export function ProfilesManager({ initialProfiles, maxProfiles, isPlus }: { init
           </div>
         </div>
 
-        <Checkbox label="🧸 פרופיל ילדים (מוגבל לתכנים לילדים)" checked={isKid} onChange={(e) => { setIsKid(e.target.checked); if (e.target.checked) setMaturity("7+"); }} />
+        <Checkbox label=" פרופיל ילדים (מוגבל לתכנים לילדים)" checked={isKid} onChange={(e) => { setIsKid(e.target.checked); if (e.target.checked) setMaturity("7+"); }} />
 
         <Field label="הגבלת גיל" htmlFor="maturity">
           <Select id="maturity" value={maturity} onChange={(e) => setMaturity(e.target.value)} disabled={isKid}>

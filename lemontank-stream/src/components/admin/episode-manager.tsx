@@ -356,7 +356,7 @@ export function EpisodeManager({
             <Input id="ep-video" value={videoUrl} onChange={(e) => setVideoUrl(e.target.value)} dir="ltr" placeholder="https://cdn.example.com/episode01.mp4" />
           </Field>
 
-          {videoAssetId ? <p className="text-[0.85rem] text-emerald-400">✓ הקובץ שהועלה ישויך לפרק בעת השמירה (נכס #{videoAssetId})</p> : null}
+          {videoAssetId ? <p className="text-[0.85rem] text-verdigris-400">✓ הקובץ שהועלה ישויך לפרק בעת השמירה (נכס #{videoAssetId})</p> : null}
         </div>
 
         <MediaUploader

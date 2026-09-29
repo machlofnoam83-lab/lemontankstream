@@ -38,10 +38,10 @@ export function PartyJoinCard({ partyId }: { partyId: string }) {
 
   return (
     <div className="flex flex-col items-center gap-2">
-      <Button onClick={join} disabled={state === "loading"} icon={state === "loading" ? <Spinner /> : "🎬"}>
+      <Button onClick={join} disabled={state === "loading"} icon={state === "loading" ? <Spinner /> : ""}>
         {state === "loading" ? "מצטרף…" : "הצטרף לצפייה"}
       </Button>
-      {state === "error" && <p className="text-[0.9rem] text-red-300">{error}</p>}
+      {state === "error" && <p className="text-[0.9rem] text-ember-300">{error}</p>}
     </div>
   );
 }
@@ -96,10 +96,10 @@ export function StartPartyButton({
         disabled={state === "loading"}
         className="inline-flex items-center gap-2 rounded-xl border border-plus-400/40 bg-plus-500/15 px-3.5 py-2 text-[0.95rem] font-bold text-plus-200 transition hover:bg-plus-500/25 disabled:opacity-60"
       >
-        {state === "loading" ? <Spinner /> : <span aria-hidden="true">🎉</span>}
+        {state === "loading" ? <Spinner /> : <span aria-hidden="true"></span>}
         {label}
       </button>
-      {state === "error" && <span className="mt-1 text-[0.8rem] text-red-300">{error}</span>}
+      {state === "error" && <span className="mt-1 text-[0.8rem] text-ember-300">{error}</span>}
     </div>
   );
 }
@@ -259,7 +259,7 @@ export function JoinByCode() {
       <Button type="submit" disabled={joining}>
         {joining ? "מצטרף…" : "הצטרף לחדר"}
       </Button>
-      {error && <span className="text-[0.85rem] text-red-300">{error}</span>}
+      {error && <span className="text-[0.85rem] text-ember-300">{error}</span>}
     </form>
   );
 }

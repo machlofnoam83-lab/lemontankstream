@@ -152,9 +152,9 @@ export default async function TitlePage({ params }: { params: Promise<{ slug: st
           <div className="min-w-0 space-y-4">
             <div className="flex flex-wrap items-center gap-2">
               <span className="rounded-full bg-white/10 px-3 py-1 text-[0.85rem] font-bold">{title.kind === "movie" ? "סרט" : "סדרה"}</span>
-              {title.plan_access === "plus" ? <span className="badge-plus">⭐ פלוס בלבד</span> : <span className="badge-free">זמין בחינם</span>}
+              {title.plan_access === "plus" ? <span className="badge-plus"> פלוס בלבד</span> : <span className="badge-free">זמין בחינם</span>}
               {title.is_original ? <span className="rounded-full border border-lemon-400/40 px-3 py-1 text-[0.85rem] font-bold text-lemon-300">מקורי LemonTank</span> : null}
-              {title.status !== "published" ? <span className="rounded-full bg-amber-500/20 px-3 py-1 text-[0.85rem] font-bold text-amber-300">טיוטה (לא מפורסם)</span> : null}
+              {title.status !== "published" ? <span className="rounded-full bg-brass-500/20 px-3 py-1 text-[0.85rem] font-bold text-brass-300">טיוטה (לא מפורסם)</span> : null}
             </div>
 
             <h1 className="text-3xl font-black leading-[1.05] tracking-tight drop-shadow-[0_6px_30px_rgba(0,0,0,0.9)] md:text-6xl">{title.name_he}</h1>
@@ -169,10 +169,10 @@ export default async function TitlePage({ params }: { params: Promise<{ slug: st
               {title.kind === "movie" ? (
                 <span className="chip-meta">⏱ {formatRuntime((title.runtime_min ?? 0) * 60)}</span>
               ) : (
-                <span className="chip-meta">📺 {title.seasons_count} עונות · {title.episodes_count} פרקים</span>
+                <span className="chip-meta"> {title.seasons_count} עונות · {title.episodes_count} פרקים</span>
               )}
-              {title.rating_imdb ? <span className="chip-meta text-lemon-300">★ {title.rating_imdb.toFixed(1)}</span> : null}
-              {title.rating_site ? <span className="chip-meta text-lemon-300">דירוג האתר ★ {Number(title.rating_site).toFixed(1)}</span> : null}
+              {title.rating_imdb ? <span className="chip-meta text-lemon-300"> {title.rating_imdb.toFixed(1)}</span> : null}
+              {title.rating_site ? <span className="chip-meta text-lemon-300">דירוג האתר  {Number(title.rating_site).toFixed(1)}</span> : null}
               <span className="chip-meta">{formatNumber(title.views_count)} צפיות</span>
             </div>
 
@@ -183,9 +183,9 @@ export default async function TitlePage({ params }: { params: Promise<{ slug: st
                 <>
                   <Link
                     href="/plans"
-                    className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-l from-plus-500 to-plus-600 px-6 py-3.5 text-sm font-black text-white shadow-[0_18px_44px_-16px_rgba(139,92,246,1)] transition hover:-translate-y-0.5 hover:brightness-110"
+                    className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-l from-plus-500 to-plus-600 px-6 py-3.5 text-sm font-black text-white shadow-[0_18px_44px_-16px_rgba(124,36,48,1)] transition hover:-translate-y-0.5 hover:brightness-110"
                   >
-                    ⭐ שדרג לפלוס כדי לצפות
+                     שדרג לפלוס כדי לצפות
                   </Link>
                   {title.trailer_url ? (
                     <a
@@ -194,7 +194,7 @@ export default async function TitlePage({ params }: { params: Promise<{ slug: st
                       rel="noreferrer"
                       className="rounded-xl border border-white/20 bg-white/10 px-5 py-3.5 text-sm font-bold backdrop-blur-md transition hover:bg-white/20"
                     >
-                      ▶ צפה בטריילר
+                       צפה בטריילר
                     </a>
                   ) : null}
                 </>
@@ -202,7 +202,7 @@ export default async function TitlePage({ params }: { params: Promise<{ slug: st
                 <>
                   <Link
                     href={playHref}
-                    className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-b from-lemon-300 to-lemon-400 px-7 py-3.5 text-sm font-black text-ink-950 shadow-[0_18px_44px_-16px_rgba(247,194,43,0.95)] transition hover:-translate-y-0.5 hover:brightness-105"
+                    className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-b from-lemon-300 to-lemon-400 px-7 py-3.5 text-sm font-black text-ink-950 shadow-[0_18px_44px_-16px_rgba(201,154,74,0.95)] transition hover:-translate-y-0.5 hover:brightness-105"
                   >
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" className="flip-rtl"><path d="M8 5v14l11-7z" /></svg>
                     {resumeTitlePercent > 0.02 ? `המשך לצפות (${Math.round(resumeTitlePercent * 100)}%)` : title.kind === "series" ? "צפה בפרק הראשון" : "צפה עכשיו"}
@@ -287,7 +287,7 @@ export default async function TitlePage({ params }: { params: Promise<{ slug: st
             ) : null}
 
             {title.awards ? (
-              <p className="text-xs text-lemon-300">🏆 {title.awards}</p>
+              <p className="text-xs text-lemon-300"> {title.awards}</p>
             ) : null}
           </div>
         </div>
@@ -296,7 +296,7 @@ export default async function TitlePage({ params }: { params: Promise<{ slug: st
       {/* ── פרקים (סדרות) ── */}
       {title.kind === "series" ? (
         <section aria-labelledby="episodes-heading">
-          <h2 id="episodes-heading" className="mb-4 text-lg font-extrabold md:text-2xl">📺 פרקים</h2>
+          <h2 id="episodes-heading" className="mb-4 text-lg font-extrabold md:text-2xl"> פרקים</h2>
           <EpisodePicker slug={title.slug} seasons={seasons} episodes={episodes} isPlus={isPlus || staff} progressByEpisode={progressByEpisode} />
         </section>
       ) : null}
@@ -307,15 +307,15 @@ export default async function TitlePage({ params }: { params: Promise<{ slug: st
       {/* ── תוכן משני ── */}
       {title.trivia ? (
         <section className="card-surface rounded-2xl p-5">
-          <h2 className="mb-2 text-lg font-bold">🔎 מאחורי הקלעים</h2>
+          <h2 className="mb-2 text-lg font-bold"> מאחורי הקלעים</h2>
           <p className="text-sm leading-relaxed text-ink-200">{title.trivia}</p>
         </section>
       ) : null}
 
       {title.content_warnings ? (
-        <section className="rounded-2xl border border-amber-500/25 bg-amber-500/5 p-4">
-          <h2 className="text-sm font-bold text-amber-300">⚠️ אזהרות תוכן</h2>
-          <p className="mt-1 text-sm text-amber-200/80">{title.content_warnings}</p>
+        <section className="rounded-2xl border border-brass-500/25 bg-brass-500/5 p-4">
+          <h2 className="text-sm font-bold text-brass-300"> אזהרות תוכן</h2>
+          <p className="mt-1 text-sm text-brass-200/80">{title.content_warnings}</p>
         </section>
       ) : null}
 

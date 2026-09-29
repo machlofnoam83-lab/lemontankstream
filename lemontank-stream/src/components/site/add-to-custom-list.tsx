@@ -73,7 +73,7 @@ export function AddToCustomList({ titleId, compact = false }: { titleId: number;
         }
         aria-expanded={open}
       >
-        📚 הוסף לרשימה
+         הוסף לרשימה
       </button>
 
       {open && (
@@ -89,7 +89,7 @@ export function AddToCustomList({ titleId, compact = false }: { titleId: number;
                   onClick={() => add(list.id, list.name)}
                   className="w-full rounded-lg px-2 py-1.5 text-right text-[0.9rem] hover:bg-white/[0.08] disabled:opacity-60"
                 >
-                  {list.is_public ? "🔗 " : "🔒 "}
+                  {list.is_public ? " " : " "}
                   {list.name}
                   <span className="mr-1 text-[0.78rem] text-ink-500">({list.item_count})</span>
                 </button>

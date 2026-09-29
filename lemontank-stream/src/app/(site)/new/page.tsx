@@ -10,7 +10,7 @@ export default function NewPage() {
   const empty = isCatalogEmpty();
   return (
     <Suspense>
-      <CatalogBrowser title="🆕 חדש בפלטפורמה" defaultSort="added" catalogEmpty={empty} />
+      <CatalogBrowser title=" חדש בפלטפורמה" defaultSort="added" catalogEmpty={empty} />
     </Suspense>
   );
 }

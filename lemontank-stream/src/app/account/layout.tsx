@@ -10,16 +10,16 @@ import { formatDate } from "@/lib/format";
 export const dynamic = "force-dynamic";
 
 const NAV = [
-  { href: "/account", label: "סקירה", icon: "🏠" },
-  { href: "/account/profiles", label: "פרופילים", icon: "👨‍👩‍👧" },
-  { href: "/account/security", label: "אבטחה ומכשירים", icon: "🔐" },
-  { href: "/account/billing", label: "מנוי ותשלומים", icon: "💳" },
-  { href: "/account/history", label: "היסטוריית צפייה", icon: "🕘" },
-  { href: "/account/achievements", label: "הישגים", icon: "🏆" },
-  { href: "/account/party", label: "צפייה משותפת", icon: "🎉" },
-  { href: "/account/developer", label: "מפתחים ו-API", icon: "🔑" },
-  { href: "/account/newsletter", label: "עדכונים במייל", icon: "📬" },
-  { href: "/account/privacy", label: "פרטיות ונתונים", icon: "🛡️" },
+  { href: "/account", label: "סקירה", icon: "" },
+  { href: "/account/profiles", label: "פרופילים", icon: "" },
+  { href: "/account/security", label: "אבטחה ומכשירים", icon: "" },
+  { href: "/account/billing", label: "מנוי ותשלומים", icon: "" },
+  { href: "/account/history", label: "היסטוריית צפייה", icon: "" },
+  { href: "/account/achievements", label: "הישגים", icon: "" },
+  { href: "/account/party", label: "צפייה משותפת", icon: "" },
+  { href: "/account/developer", label: "מפתחים ו-API", icon: "" },
+  { href: "/account/newsletter", label: "עדכונים במייל", icon: "" },
+  { href: "/account/privacy", label: "פרטיות ונתונים", icon: "" },
 ];
 
 /** פריסת האזור האישי — דורשת התחברות */
@@ -51,7 +51,7 @@ export default async function AccountLayout({ children }: { children: React.Reac
                 </div>
                 <div className="mt-3 flex items-center justify-between text-xs">
                   <span className={user.effective_plan === "plus" ? "badge-plus" : "badge-free"}>
-                    {user.effective_plan === "plus" ? "⭐ מנוי פלוס" : "מנוי חינם"}
+                    {user.effective_plan === "plus" ? " מנוי פלוס" : "מנוי חינם"}
                   </span>
                   {user.effective_plan === "plus" ? (
                     <span className="text-ink-400">{formatDate(subscription?.current_period_end)}</span>

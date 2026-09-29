@@ -223,9 +223,9 @@ export function SecurityCenter({ canManage }: { canManage: boolean }) {
                 <li key={ban.id} className="rounded-xl border border-white/8 bg-white/[0.02] p-3">
                   <div className="flex flex-wrap items-center justify-between gap-2">
                     <div className="flex items-center gap-2">
-                      <code dir="ltr" className="rounded-md bg-ink-900 px-2 py-0.5 text-[0.92rem] text-red-300">{ban.ip}</code>
+                      <code dir="ltr" className="rounded-md bg-ink-900 px-2 py-0.5 text-[0.92rem] text-ember-300">{ban.ip}</code>
                       <Badge tone={ban.severity === "critical" ? "danger" : "warn"}>{CATEGORY_LABELS[ban.category] ?? ban.category}</Badge>
-                      {ban.strikes > 1 && <span className="text-[0.85rem] text-amber-300">החמרה ×{ban.strikes}</span>}
+                      {ban.strikes > 1 && <span className="text-[0.85rem] text-brass-300">החמרה ×{ban.strikes}</span>}
                       {ban.permanent ? <Badge tone="danger">קבוע</Badge> : null}
                     </div>
                     {canManage && (
@@ -327,7 +327,7 @@ export function SecurityCenter({ canManage }: { canManage: boolean }) {
                   <li key={o.ip} className="flex items-center justify-between gap-2">
                     <code dir="ltr" className="text-ink-200">{o.ip}</code>
                     <span className="text-ink-400">{CATEGORY_LABELS[o.category] ?? o.category}</span>
-                    <b className="text-red-300">{o.hits}</b>
+                    <b className="text-ember-300">{o.hits}</b>
                   </li>
                 ))}
               </ul>
@@ -343,7 +343,7 @@ export function SecurityCenter({ canManage }: { canManage: boolean }) {
                 {data.recentBlocks.map((e, i) => (
                   <li key={`${e.created_at}-${i}`} className="rounded-lg bg-white/[0.03] px-2.5 py-1.5">
                     <div className="flex items-center justify-between gap-2">
-                      <span className={e.severity === "critical" ? "text-red-300" : "text-amber-300"}>{e.kind}</span>
+                      <span className={e.severity === "critical" ? "text-ember-300" : "text-brass-300"}>{e.kind}</span>
                       <span className="text-ink-500">{new Date(e.created_at).toLocaleTimeString("he-IL")}</span>
                     </div>
                     {e.ip && <code dir="ltr" className="text-ink-400">{e.ip}</code>}
@@ -360,7 +360,7 @@ export function SecurityCenter({ canManage }: { canManage: boolean }) {
 }
 
 function Stat({ label, value, tone }: { label: string; value: number; tone: "neutral" | "warn" | "danger" }) {
-  const color = tone === "danger" ? "text-red-300" : tone === "warn" ? "text-amber-300" : "text-white";
+  const color = tone === "danger" ? "text-ember-300" : tone === "warn" ? "text-brass-300" : "text-white";
   return (
     <div className="rounded-xl border border-white/8 bg-white/[0.02] p-3">
       <span className="block text-[0.85rem] text-ink-400">{label}</span>

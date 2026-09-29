@@ -107,8 +107,8 @@ export function ProfilePicker({
             </span>
             <span className="text-[0.95rem] font-bold">{profile.name}</span>
             <span className="flex items-center gap-1 text-[0.8rem] text-ink-400">
-              {profile.is_kid ? "🧒 ילדים" : "👤 רגיל"}
-              {profile.has_pin ? <span title="מוגן בקוד">🔒</span> : null}
+              {profile.is_kid ? " ילדים" : " רגיל"}
+              {profile.has_pin ? <span title="מוגן בקוד"></span> : null}
               {isActive ? <span className="text-lemon-300">· פעיל</span> : null}
             </span>
           </button>
@@ -120,7 +120,7 @@ export function ProfilePicker({
           onSubmit={submitPin}
           className="w-full rounded-2xl border border-lemon-400/30 bg-ink-900/80 p-4 text-center"
         >
-          <div className="font-bold">🔒 הקוד של {pinFor.name}</div>
+          <div className="font-bold"> הקוד של {pinFor.name}</div>
           <p className="mt-1 text-[0.85rem] text-ink-400">הזן קוד בן 4 ספרות כדי לעבור</p>
           <input
             value={pin}
@@ -147,11 +147,11 @@ export function ProfilePicker({
               ביטול
             </Button>
           </div>
-          {error && <p className="mt-2 text-[0.9rem] text-red-300">{error}</p>}
+          {error && <p className="mt-2 text-[0.9rem] text-ember-300">{error}</p>}
         </form>
       )}
 
-      {!pinFor && error && <p className="w-full text-center text-[0.9rem] text-red-300">{error}</p>}
+      {!pinFor && error && <p className="w-full text-center text-[0.9rem] text-ember-300">{error}</p>}
     </div>
   );
 }

@@ -41,7 +41,7 @@ export default async function DeveloperPage() {
   return (
     <div className="space-y-6">
       <header>
-        <h1 className="text-3xl font-black">🔑 מפתחים ו-API</h1>
+        <h1 className="text-3xl font-black"> מפתחים ו-API</h1>
         <p className="mt-1 text-ink-300">
           גישה לקטלוג שלך מתוכניות חיצוניות, בוטים או אתרים — עם מפתח אישי, מכסה משלו וביטול מיידי.
         </p>

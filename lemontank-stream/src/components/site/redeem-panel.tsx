@@ -81,7 +81,7 @@ export function RedeemPanel({ initial, signedIn }: { initial: Redemption[]; sign
   return (
     <div className="grid gap-5 lg:grid-cols-[1.1fr_1fr]">
       <Card className="p-5">
-        <h2 className="text-lg font-bold">🎁 מימוש כרטיס מתנה</h2>
+        <h2 className="text-lg font-bold"> מימוש כרטיס מתנה</h2>
         <p className="mt-1 text-sm text-ink-400">
           הזן את הקוד שקיבלת. כרטיס שהנפקנו כאן נדלק מיד; כרטיס שנקנה בחנות עובר לאישור שלנו
           (בדרך כלל תוך כמה דקות בשעות הפעילות).
@@ -136,9 +136,9 @@ export function RedeemPanel({ initial, signedIn }: { initial: Redemption[]; sign
         </form>
 
         <div className="mt-5 space-y-2 border-t border-white/10 pt-4 text-[0.85rem] text-ink-400">
-          <p>🔒 אנחנו לא שומרים את הקוד בטקסט גלוי — נשמר Hash ועותק מוצפן בלבד.</p>
-          <p>⏱️ אחרי כמה ניסיונות כושלים החשבון נחסם זמנית ממימוש — הגנה מניחוש קודים.</p>
-          <p>🧾 מימוש מוצלח מנפיק רשומת תשלום ומאריך את המנוי בלי לאבד את הימים שנשארו.</p>
+          <p> אנחנו לא שומרים את הקוד בטקסט גלוי — נשמר Hash ועותק מוצפן בלבד.</p>
+          <p>⏱ אחרי כמה ניסיונות כושלים החשבון נחסם זמנית ממימוש — הגנה מניחוש קודים.</p>
+          <p> מימוש מוצלח מנפיק רשומת תשלום ומאריך את המנוי בלי לאבד את הימים שנשארו.</p>
         </div>
       </Card>
 
@@ -161,7 +161,7 @@ export function RedeemPanel({ initial, signedIn }: { initial: Redemption[]; sign
           </ul>
         )}
         {rows.some((row) => row.status === "pending") ? (
-          <p className="mt-3 text-[0.85rem] text-amber-300">
+          <p className="mt-3 text-[0.85rem] text-brass-300">
             יש בקשה שממתינה לאישור. אם היא דחופה — כתוב לנו עם הקידומת שמופיעה למעלה.
           </p>
         ) : null}

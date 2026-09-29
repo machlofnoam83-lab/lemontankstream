@@ -23,7 +23,7 @@ export default async function PrivacyPage() {
   return (
     <div className="space-y-5">
       <header>
-        <h1 className="text-2xl font-black md:text-3xl">🛡️ פרטיות ונתונים</h1>
+        <h1 className="text-2xl font-black md:text-3xl"> פרטיות ונתונים</h1>
         <p className="mt-1 text-sm text-ink-400">
           זכות העיון, התיקון והמחיקה שלך. אנחנו אוספים את המינימום הנדרש להפעלת השירות.
         </p>

@@ -156,7 +156,7 @@ export default async function AdminDashboard() {
           <dl className="mt-3 grid grid-cols-2 gap-3 text-xs">
             <div className="rounded-xl bg-white/[0.03] p-3">
               <dt className="text-ink-400">ניסיונות התחברות כושלים</dt>
-              <dd className="mt-1 text-lg font-bold text-amber-300">{formatNumber(security.failedLogins)}</dd>
+              <dd className="mt-1 text-lg font-bold text-brass-300">{formatNumber(security.failedLogins)}</dd>
             </div>
             <div className="rounded-xl bg-white/[0.03] p-3">
               <dt className="text-ink-400">סשנים פעילים</dt>
@@ -168,7 +168,7 @@ export default async function AdminDashboard() {
             </div>
             <div className="rounded-xl bg-white/[0.03] p-3">
               <dt className="text-ink-400">חסימות תקיפה</dt>
-              <dd className="mt-1 text-lg font-bold text-red-300">{formatNumber(Number(get<{ c: number }>("SELECT COUNT(*) c FROM security_events WHERE kind LIKE 'attack_pattern%' AND created_at > datetime('now','-1 day')")?.c ?? 0))}</dd>
+              <dd className="mt-1 text-lg font-bold text-ember-300">{formatNumber(Number(get<{ c: number }>("SELECT COUNT(*) c FROM security_events WHERE kind LIKE 'attack_pattern%' AND created_at > datetime('now','-1 day')")?.c ?? 0))}</dd>
             </div>
           </dl>
           <div className="mt-3 flex flex-wrap gap-2 text-[0.85rem]">

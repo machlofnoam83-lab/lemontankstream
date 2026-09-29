@@ -111,7 +111,7 @@ export function ListsManager({ initial }: { initial: UserListRow[] }) {
   return (
     <div className="space-y-4">
       {!creating ? (
-        <Button onClick={() => setCreating(true)}>➕ רשימה חדשה</Button>
+        <Button onClick={() => setCreating(true)}> רשימה חדשה</Button>
       ) : (
         <Card className="p-4">
           <form onSubmit={create} className="space-y-3">
@@ -147,7 +147,7 @@ export function ListsManager({ initial }: { initial: UserListRow[] }) {
                 ביטול
               </Button>
             </div>
-            {error && <p className="text-[0.9rem] text-red-300">{error}</p>}
+            {error && <p className="text-[0.9rem] text-ember-300">{error}</p>}
           </form>
         </Card>
       )}
@@ -163,7 +163,7 @@ export function ListsManager({ initial }: { initial: UserListRow[] }) {
               <div className="flex flex-wrap items-center gap-2">
                 <h2 className="text-lg font-bold">{list.name}</h2>
                 {list.is_public ? (
-                  <span className="rounded-full bg-plus-500/20 px-2.5 py-1 text-[0.8rem] text-plus-300">משותפת 🔗</span>
+                  <span className="rounded-full bg-plus-500/20 px-2.5 py-1 text-[0.8rem] text-plus-300">משותפת </span>
                 ) : (
                   <span className="rounded-full bg-white/10 px-2.5 py-1 text-[0.8rem] text-ink-300">פרטית</span>
                 )}
@@ -187,7 +187,7 @@ export function ListsManager({ initial }: { initial: UserListRow[] }) {
               <Link href={`/movies`} className="rounded-xl bg-white/[0.07] px-3 py-2 text-[0.9rem] hover:bg-white/[0.12]">
                 הוסף כותרים
               </Link>
-              <button type="button" onClick={() => remove(list)} className="rounded-xl px-3 py-2 text-[0.9rem] text-red-300 hover:bg-red-500/10">
+              <button type="button" onClick={() => remove(list)} className="rounded-xl px-3 py-2 text-[0.9rem] text-ember-300 hover:bg-ember-500/10">
                 מחק
               </button>
             </div>
@@ -209,7 +209,7 @@ export function ListsManager({ initial }: { initial: UserListRow[] }) {
                         // eslint-disable-next-line @next/next/no-img-element
                         <img src={item.poster_url} alt="" className="h-14 w-10 rounded-lg object-cover" />
                       ) : (
-                        <span className="flex h-14 w-10 items-center justify-center rounded-lg bg-white/10">🎬</span>
+                        <span className="flex h-14 w-10 items-center justify-center rounded-lg bg-white/10"></span>
                       )}
                       <div className="min-w-0 flex-1">
                         <Link href={`/title/${item.slug}`} className="block truncate font-bold hover:text-lemon-300">
@@ -218,12 +218,12 @@ export function ListsManager({ initial }: { initial: UserListRow[] }) {
                         <div className="text-[0.8rem] text-ink-400">
                           {item.year} · {item.kind === "series" ? "סדרה" : "סרט"}
                         </div>
-                        {item.note && <div className="truncate text-[0.8rem] text-lemon-300/90">📝 {item.note}</div>}
+                        {item.note && <div className="truncate text-[0.8rem] text-lemon-300/90"> {item.note}</div>}
                       </div>
                       <button
                         type="button"
                         onClick={() => removeItem(list.id, item.id)}
-                        className="rounded-lg px-2 py-1 text-[0.85rem] text-red-300 hover:bg-red-500/10"
+                        className="rounded-lg px-2 py-1 text-[0.85rem] text-ember-300 hover:bg-ember-500/10"
                         aria-label={`הסר את ${item.name_he}`}
                       >
                         הסר

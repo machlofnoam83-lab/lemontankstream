@@ -48,7 +48,7 @@ export default function AdminCouponsPage() {
         endpoint="/api/coupons"
         entityLabel="קופון"
         rows={rows}
-        emptyIcon="🎟️"
+        emptyIcon="tag"
         warning="קופון 'ימי מתנה' מאריך את תקופת המנוי בלי לחייב. קופון אחוז מחושב על המחיר לפני מע״מ (המע״מ 18% כלול)."
         fields={[
           { name: "code", label: "קוד", type: "text", required: true, placeholder: "LEMON20" },

@@ -18,7 +18,7 @@ export default async function NewsletterPage() {
   return (
     <div className="space-y-6">
       <header>
-        <h1 className="text-3xl font-black">📬 עדכונים במייל</h1>
+        <h1 className="text-3xl font-black"> עדכונים במייל</h1>
         <p className="mt-1 text-ink-300">מה חדש בקטלוג, בכותרות מקוריות ובתכונות חדשות — פעם בשבוע, בלי ספאם.</p>
       </header>
 
@@ -32,10 +32,10 @@ export default async function NewsletterPage() {
       <Card className="p-4">
         <h2 className="text-lg font-bold">מה נשלח?</h2>
         <ul className="mt-2 space-y-1.5 text-[0.95rem] text-ink-300">
-          <li>· 🎬 כותרים חדשים שנוספו השבוע</li>
-          <li>· ⭐ המלצות אישיות לפי מה שצפית</li>
-          <li>· 🎁 הטבות ומבצעים לחברי פלוס</li>
-          <li>· 🚀 תכונות חדשות באתר</li>
+          <li>·  כותרים חדשים שנוספו השבוע</li>
+          <li>·  המלצות אישיות לפי מה שצפית</li>
+          <li>·  הטבות ומבצעים לחברי פלוס</li>
+          <li>·  תכונות חדשות באתר</li>
         </ul>
         <p className="mt-3 text-[0.85rem] text-ink-400">
           אפשר להסיר בכל רגע, בלחיצה אחת — בלי לשאול שאלות ובלי לפגוע בחשבון.

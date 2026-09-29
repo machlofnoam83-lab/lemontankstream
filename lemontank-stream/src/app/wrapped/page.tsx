@@ -44,7 +44,7 @@ export default async function WrappedPage({ searchParams }: { searchParams: Prom
 
       {!wrap.hasData ? (
         <Card className="p-8 text-center">
-          <div className="text-4xl">🎬</div>
+          <div className="text-4xl"></div>
           <h2 className="mt-3 text-2xl font-black">עוד אין נתוני צפייה ל-{year}</h2>
           <p className="mt-2 text-ink-300">צפו במשהו, ותוך דקות תתחילו לראות כאן את הסיכום האישי שלכם.</p>
           <Link href="/movies" className="mt-4 inline-block rounded-xl bg-lemon-400 px-5 py-2.5 font-bold text-ink-950">

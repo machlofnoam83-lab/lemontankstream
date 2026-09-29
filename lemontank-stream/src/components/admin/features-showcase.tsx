@@ -31,7 +31,7 @@ export function CardsShowcase({ flags }: { flags: Array<{ key: string; enabled: 
             <ul className="mt-3 space-y-1.5">
               {items.map((item) => (
                 <li key={item.key} className="flex items-start gap-2 text-[0.85rem]">
-                  <span className={item.enabled ? "text-emerald-400" : "text-ink-600"} aria-hidden="true">{item.enabled ? "●" : "○"}</span>
+                  <span className={item.enabled ? "text-verdigris-400" : "text-ink-600"} aria-hidden="true">{item.enabled ? "●" : "○"}</span>
                   <span className={item.enabled ? "text-ink-200" : "text-ink-500"} title={item.key}>{item.description}</span>
                 </li>
               ))}
