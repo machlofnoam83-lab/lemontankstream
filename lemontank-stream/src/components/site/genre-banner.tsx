@@ -33,9 +33,9 @@ const CORE_GENRES: GenreArt[] = [
   { slug: "romance", name: "רומנטיקה", blurb: "גשר באפלה, שתי ידיים שמחזיקות", icon: "heart", art: true },
   { slug: "animation", name: "אנימציה", blurb: "צבע, תנועה, ולב שנפתח לאט", icon: "feather", art: true },
   { slug: "kids", name: "ילדים", blurb: "בית קטן ביער, ומנורה שמחכה", icon: "lantern", art: true },
-  { slug: "documentary", name: "דוקומנטרי", blurb: "מציאות, מסודרת בסבלנות", icon: "scroll", art: false },
-  { slug: "israeli", name: "ישראלית", blurb: "כאן. בשפה שלנו, ברחוב שלנו", icon: "knot", art: false },
-  { slug: "anime", name: "אנימה", blurb: "קו חד, רגש גדול, עולם שלם", icon: "dragon", art: false },
+  { slug: "documentary", name: "דוקומנטרי", blurb: "מציאות, מסודרת בסבלנות", icon: "scroll", art: true },
+  { slug: "israeli", name: "ישראלית", blurb: "כאן. בשפה שלנו, ברחוב שלנו", icon: "knot", art: true },
+  { slug: "anime", name: "אנימה", blurb: "קו חד, רגש גדול, עולם שלם", icon: "dragon", art: true },
 ];
 
 /** מחזיר את נתוני האמנות לז'אנר לפי slug (או undefined אם אין) */
