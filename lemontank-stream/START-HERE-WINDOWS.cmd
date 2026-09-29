@@ -10,6 +10,7 @@ echo    LemonTank Stream  -  מתקין ומפעיל את האתר שלך
 echo  ============================================================
 echo.
 echo  הפעם הזו: 3 פעולות אוטומטיות ואז הדפדפן ייפתח לבד.
+echo  אם האתר ייפול באמצע - הוא יחזור לבד. בלי שתיגע בכלום.
 echo.
 
 where node >nul 2>nul
@@ -20,6 +21,10 @@ echo.
 node scripts\local-setup.mjs
 if errorlevel 1 goto FAILED
 
+:: אם האתר כבר רץ - לא מפעילים שוב, רק מרעננים את הדפדפן.
+node scripts\watchdog.mjs --once >nul 2>nul
+if not errorlevel 1 goto ALREADY_RUNNING
+
 echo.
 echo  [2/3] בוחר פורט פנוי...
 set PORT=
@@ -28,8 +33,10 @@ if "!PORT!"=="" set PORT=3000
 echo       פורט: !PORT!
 
 echo.
-echo  [3/3] מפעיל את השרת בחלון נפרד...
-start "LemonTank Server" cmd /k "set PORT=!PORT!&& npm run start"
+echo  [3/3] מפעיל את האתר בחלון נפרד עם שומר סף...
+:: שומר הסף (watchdog) מרים את השרת, דופק לו כל 10 שניות,
+:: ומחזיר אותו לחיים לבד אם הוא נופל או נסגר בטעות.
+start "LemonTank Server" cmd /k "set PORT=!PORT!&& node scripts\watchdog.mjs --port !PORT!"
 
 echo       ממתין שהאתר יעלה (עד 90 שניות)...
 node scripts\open-later.mjs http://localhost:!PORT!
@@ -45,14 +52,35 @@ echo.
 echo    כניסת מנהל:  admin@lemontank.local  /  ChangeMe-Admin-2026!
 echo    הוספת תוכן:  http://localhost:!PORT!/admin/titles/new
 echo.
-echo    חשוב מאוד:
-echo      * נפתח חלון נוסף בשם "LemonTank Server" - הוא האתר עצמו.
-echo        כל עוד הוא פתוח האתר חי. סגירה שלו = האתר נופל.
-echo        אם האתר לא עולה, השגיאה מופיעה בחלון הזה.
-echo      * אל תגלוש ל-localhost:!PORT! לפני שהשרת רץ.
+echo    חשוב לדעת:
+echo      * נפתח חלון בשם "LemonTank Server" - הוא האתר עצמו.
+echo        כל עוד הוא פתוח האתר חי. גם אם הוא נסגר - הוא חוזר לבד.
+echo      * אם הדפדפן מראה שגיאה - חכה 10 שניות ורענן עם Ctrl+F5.
+echo      * רוצה שהאתר יעלה לבד בכל הדלקת מחשב?  הרץ פעם אחת:
+echo            npm run autostart
+echo      * משהו עדיין לא עובד?  הרץ:
+echo            npm run doctor -- --report
+echo        ואז שלח לי את הקובץ lemontank-report.txt
 echo.
 echo    אפשר לסגור את החלון הזה (הנוכחי) - הוא סיים את עבודתו.
 echo  ------------------------------------------------------------
+echo.
+pause
+exit /b 0
+
+:ALREADY_RUNNING
+echo.
+echo  ------------------------------------------------------------
+echo    האתר כבר רץ. לא מפעיל שוב - רק פותח לך את הדפדפן.
+node scripts\status.mjs
+echo  ------------------------------------------------------------
+echo.
+echo    ^>^>^>  האתר שלך:  http://localhost:3000
+echo.
+echo    אם הדפדפן מראה שגיאה - רענן עם Ctrl+F5.
+echo    אם האתר עדיין לא נפתח - הרץ:  npm run status
+echo  ------------------------------------------------------------
+start "" http://localhost:3000
 echo.
 pause
 exit /b 0

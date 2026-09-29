@@ -232,6 +232,7 @@ npm run start
 | מה רואים | המשמעות | הפתרון |
 |---|---|---|
 | `ERR_CONNECTION_REFUSED` **ולא הרצת כלום** | `localhost` מצביע למחשב שלך, ואין בו שרת | הרץ קליק כפול על `START-HERE-WINDOWS.cmd` — ואז הדפדפן ייפתח לבד |
+| `ERR_CONNECTION_REFUSED` **גם אחרי שהרצת** | החלון נסגר, או שהמחשב הופעל מחדש | מכאן והלאה זה לא יקרה: `npm run watchdog` מרים את האתר **ומחזיר אותו לבד** אם הוא נופל. לקום לבד עם המחשב: `npm run autostart` (פעם אחת) |
 | `ERR_CONNECTION_REFUSED` **והשרת רץ** | פורט אחר, פרוקסי/VPN, או אנטי-וירוס | `npm run doctor` → סעיף 6 יראה לך מה לבדוק (127.0.0.1 במקום localhost, חלון פרטי, כיבוי פרוקסי) |
 | `ERR_ADDRESS_INVALID` | גלשת ל-`0.0.0.0:3000` | גלוש ל-`http://localhost:3000` |
 | `'npm' is not recognized` | Node לא מותקן / חלון לא נפתח מחדש | התקן LTS מ-nodejs.org → חלון **חדש** של cmd |
