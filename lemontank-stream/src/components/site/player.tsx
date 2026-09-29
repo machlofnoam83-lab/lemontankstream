@@ -1,5 +1,7 @@
 "use client";
 
+import { Icon } from "@/components/ui/icons";
+
 import { CSRF_COOKIE } from "@/lib/cookies";
 
 /**
@@ -310,7 +312,7 @@ export function Player({
   if (locked) {
     return (
       <div className="player-wrap flex flex-col items-center justify-center gap-4 bg-gradient-to-br from-ink-900 via-ink-850 to-plus-600/20 p-6 text-center">
-        <div className="text-5xl" aria-hidden="true"></div>
+        <div className="text-brass-300" aria-hidden="true"><Icon name="crown" className="mx-auto size-12" /></div>
         <h2 className="text-xl font-black">התוכן הזה זמין למנויי פלוס</h2>
         <p className="max-w-md text-sm text-ink-300">{lockReason ?? "שדרגו לפלוס כדי לצפות בסרטים ובסדרות הפרימיום, באיכות 4K וללא פרסומות."}</p>
         <div className="flex flex-wrap justify-center gap-2">
@@ -333,7 +335,7 @@ export function Player({
   if (!sources.length) {
     return (
       <div className="player-wrap flex flex-col items-center justify-center gap-3 bg-ink-900 p-6 text-center">
-        <div className="text-4xl" aria-hidden="true"></div>
+        <div className="text-brass-300/80" aria-hidden="true"><Icon name="film" className="mx-auto size-10" /></div>
         <h2 className="text-lg font-bold">הווידאו עוד לא הועלה</h2>
         <p className="max-w-md text-sm text-ink-400">
           מנהל המערכת צריך להעלות את קובץ הווידאו (או להדביק קישור) בדף הניהול של הכותר. בינתיים אפשר להתעדכן — נוסיף התראה כשיהיה זמין.
@@ -447,7 +449,7 @@ export function Player({
 
       {error ? (
         <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-black/85 p-6 text-center">
-          <span className="text-3xl"></span>
+          <Icon name="film" className="size-8 text-brass-300" />
           <p className="max-w-md text-sm text-ink-200">{error}</p>
           <button onClick={() => { setError(null); videoRef.current?.load(); }} className="rounded-xl bg-lemon-400 px-4 py-2 text-sm font-bold text-ink-900">
             נסה שוב

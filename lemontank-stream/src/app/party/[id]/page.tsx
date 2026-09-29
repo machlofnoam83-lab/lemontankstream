@@ -1,3 +1,4 @@
+import { Icon } from "@/components/ui/icons";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
@@ -31,7 +32,7 @@ export default async function PartyPage({ params }: { params: Promise<{ id: stri
     return (
       <div className="mx-auto flex min-h-[70vh] max-w-xl flex-col justify-center px-4">
         <Card className="p-6 text-center">
-          <div className="text-5xl" aria-hidden="true"></div>
+          <div className="text-brass-300" aria-hidden="true"><Icon name="users" className="mx-auto size-12" /></div>
           <h1 className="mt-3 text-2xl font-black">{preview.host_name} מזמין אותך לצפייה משותפת</h1>
           <p className="mt-2 text-ink-300">
             יחד צופים ב<b> {preview.title_name}</b>

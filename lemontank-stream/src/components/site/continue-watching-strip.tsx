@@ -1,5 +1,7 @@
 "use client";
 
+import { Icon } from "@/components/ui/icons";
+
 import Link from "next/link";
 import type { TitleCard as TitleCardType } from "@/lib/catalog";
 import { formatPercent } from "@/lib/format";
@@ -26,7 +28,7 @@ export function ContinueWatchingStrip({ items }: { items: Item[] }) {
                   <div className="poster-fallback h-full w-full" style={{ ["--poster-color" as string]: item.color }} />
                 )}
                 <div className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 transition group-hover:opacity-100">
-                  <span className="rounded-full bg-lemon-400 p-3 text-ink-900"></span>
+                  <span className="rounded-full bg-brass-400 p-3 text-obsidian-950"><Icon name="play" className="size-4" strokeWidth={2} /></span>
                 </div>
                 {item.percent ? (
                   <div className="absolute inset-x-0 bottom-0 h-1.5 bg-white/25">

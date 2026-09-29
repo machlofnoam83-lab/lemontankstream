@@ -1,3 +1,4 @@
+import { Icon } from "@/components/ui/icons";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -71,7 +72,7 @@ export default async function LiveChannelPage({ params }: { params: Promise<{ id
             // eslint-disable-next-line @next/next/no-img-element
             <img src={channel.logo_url} alt="" className="h-14 w-14 rounded-2xl border border-white/10 object-contain p-1" />
           ) : (
-            <span className="flex h-14 w-14 items-center justify-center rounded-2xl bg-white/5 text-2xl" aria-hidden="true"></span>
+            <span className="flex size-14 items-center justify-center border border-brass-400/25 bg-brass-400/[0.06] text-brass-300 chamfer" aria-hidden="true"><Icon name="wifi" className="size-7" /></span>
           )}
           <div>
             <h1 className="text-2xl font-black">{channel.name_he}</h1>

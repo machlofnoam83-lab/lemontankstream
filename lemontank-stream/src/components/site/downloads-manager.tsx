@@ -1,5 +1,7 @@
 "use client";
 
+import { Icon } from "@/components/ui/icons";
+
 import { useEffect, useState } from "react";
 import { Button, Card, Spinner } from "@/components/ui/primitives";
 import { apiCall } from "@/lib/client/api";
@@ -153,7 +155,7 @@ export function DownloadsManager({ initial, planLabel }: { initial: DownloadRow[
                   // eslint-disable-next-line @next/next/no-img-element
                   <img src={row.poster_url} alt="" className="h-16 w-11 rounded-lg object-cover" />
                 ) : (
-                  <span className="flex h-16 w-11 items-center justify-center rounded-lg bg-white/10"></span>
+                  <span className="flex h-16 w-11 items-center justify-center border border-brass-400/20 bg-obsidian-800 text-brass-300/70"><Icon name="film" className="size-5" /></span>
                 )}
                 <div className="min-w-0 flex-1">
                   <div className="truncate font-bold">{row.title_name}</div>

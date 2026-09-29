@@ -1,5 +1,7 @@
 "use client";
 
+import { Icon } from "@/components/ui/icons";
+
 import { useMemo, useState } from "react";
 import Link from "next/link";
 import { formatDuration, formatDate } from "@/lib/format";
@@ -92,7 +94,7 @@ export function EpisodePicker({
                     // eslint-disable-next-line @next/next/no-img-element
                     <img src={ep.thumb_url} alt="" loading="lazy" className="h-full w-full object-cover" />
                   ) : (
-                    <span className="flex h-full w-full items-center justify-center text-2xl" aria-hidden="true"></span>
+                    <span className="flex h-full w-full items-center justify-center text-brass-300" aria-hidden="true"><Icon name="crown" className="size-5" /></span>
                   )}
                   <span className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 transition group-hover:opacity-100">
                     <span className="rounded-full bg-lemon-400 p-2 text-ink-900">{locked ? "" : ""}</span>

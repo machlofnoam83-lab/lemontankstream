@@ -1,5 +1,7 @@
 "use client";
 
+import { Icon } from "@/components/ui/icons";
+
 import { useState } from "react";
 import Link from "next/link";
 import { Button, Card, Field, Spinner, Switch } from "@/components/ui/primitives";
@@ -209,7 +211,7 @@ export function ListsManager({ initial }: { initial: UserListRow[] }) {
                         // eslint-disable-next-line @next/next/no-img-element
                         <img src={item.poster_url} alt="" className="h-14 w-10 rounded-lg object-cover" />
                       ) : (
-                        <span className="flex h-14 w-10 items-center justify-center rounded-lg bg-white/10"></span>
+                        <span className="flex h-14 w-10 items-center justify-center border border-brass-400/20 bg-obsidian-800 text-brass-300/70"><Icon name="film" className="size-4" /></span>
                       )}
                       <div className="min-w-0 flex-1">
                         <Link href={`/title/${item.slug}`} className="block truncate font-bold hover:text-lemon-300">

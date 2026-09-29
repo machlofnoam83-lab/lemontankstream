@@ -1,5 +1,7 @@
 "use client";
 
+import { Icon } from "@/components/ui/icons";
+
 import { useEffect, useState } from "react";
 import { Card, Spinner } from "@/components/ui/primitives";
 
@@ -78,7 +80,7 @@ export function AchievementsBoard({ initial }: { initial?: { earnedCount: number
     <div className="space-y-6">
       {newly.length > 0 && (
         <div className="card-surface flex items-center gap-3 rounded-2xl border-lemon-400/40 p-4">
-          <span className="text-2xl"></span>
+          <Icon name="seal" className="size-7 text-brass-300" />
           <div>
             <div className="font-black text-lemon-300">הרווחת {newly.length} תגים חדשים!</div>
             <div className="text-[0.85rem] text-ink-300">

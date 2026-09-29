@@ -1,3 +1,4 @@
+import { Icon } from "@/components/ui/icons";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Card, StatCard } from "@/components/ui/primitives";
@@ -55,9 +56,9 @@ export default async function AccountPage() {
       </header>
 
       <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
-        <StatCard label="כותרים שנצפו" value={stats.watched} icon={<span aria-hidden="true"></span>} />
-        <StatCard label="הושלמו" value={stats.completed} tone="success" icon={<span aria-hidden="true"></span>} />
-        <StatCard label="ברשימה שלי" value={stats.inList} icon={<span aria-hidden="true"></span>} />
+        <StatCard label="כותרים שנצפו" value={stats.watched} icon={<Icon name="film" className="size-4" />} />
+        <StatCard label="הושלמו" value={stats.completed} tone="success" icon={<Icon name="check" className="size-4" />} />
+        <StatCard label="ברשימה שלי" value={stats.inList} icon={<Icon name="tag" className="size-4" />} />
         <StatCard label="זמן צפייה" value={formatMinutes(stats.minutes)} icon={<span aria-hidden="true">⏱</span>} />
       </div>
 

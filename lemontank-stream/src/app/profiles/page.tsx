@@ -1,3 +1,4 @@
+import { Icon } from "@/components/ui/icons";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
@@ -36,7 +37,7 @@ export default async function ProfilesChooserPage() {
       <div className="mt-8 w-full max-w-3xl">
         {profiles.length === 0 ? (
           <Card className="p-6 text-center">
-            <div className="text-4xl"></div>
+            <Icon name="mask" className="mx-auto size-10 text-brass-300" />
             <h2 className="mt-2 text-xl font-bold">עוד אין פרופילים</h2>
             <p className="mt-1 text-ink-300">
               פרופיל מאפשר לכל אחד במשפחה לקבל היסטוריה, המלצות ושפה משלו — ופרופיל ילדים מוגבל לגילים מתאימים.

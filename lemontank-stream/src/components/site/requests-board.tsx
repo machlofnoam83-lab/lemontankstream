@@ -1,5 +1,7 @@
 "use client";
 
+import { Icon } from "@/components/ui/icons";
+
 import { useState } from "react";
 import Link from "next/link";
 import { Button, Card, Field, Spinner } from "@/components/ui/primitives";
@@ -89,7 +91,7 @@ export function RequestsBoard({ initial, loggedIn }: { initial: RequestRow[]; lo
               }`}
               aria-label={`חזק את הבקשה ${row.name}`}
             >
-              <span className="text-xl"></span>
+              <Icon name="users" className="size-5 text-brass-300" />
               <span className="text-[0.95rem] font-bold">{row.votes}</span>
             </button>
             <div className="min-w-0 flex-1">

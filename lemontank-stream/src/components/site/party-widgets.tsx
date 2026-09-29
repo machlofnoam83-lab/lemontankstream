@@ -1,5 +1,6 @@
 "use client";
 
+import { Icon } from "@/components/ui/icons";
 import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button, Spinner } from "@/components/ui/primitives";
@@ -94,9 +95,9 @@ export function StartPartyButton({
         type="button"
         onClick={start}
         disabled={state === "loading"}
-        className="inline-flex items-center gap-2 rounded-xl border border-plus-400/40 bg-plus-500/15 px-3.5 py-2 text-[0.95rem] font-bold text-plus-200 transition hover:bg-plus-500/25 disabled:opacity-60"
+        className="chamfer inline-flex items-center gap-2 border border-oxblood-500/45 bg-oxblood-500/15 px-3.5 py-2 text-[0.95rem] font-bold text-parchment-100 transition hover:bg-oxblood-500/25 disabled:opacity-60"
       >
-        {state === "loading" ? <Spinner /> : <span aria-hidden="true"></span>}
+        {state === "loading" ? <Spinner /> : <Icon name="users" className="size-4 text-brass-300" />}
         {label}
       </button>
       {state === "error" && <span className="mt-1 text-[0.8rem] text-ember-300">{error}</span>}

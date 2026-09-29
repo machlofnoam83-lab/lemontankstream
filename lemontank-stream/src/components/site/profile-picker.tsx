@@ -1,5 +1,7 @@
 "use client";
 
+import { Icon } from "@/components/ui/icons";
+
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button, Spinner } from "@/components/ui/primitives";
@@ -108,7 +110,7 @@ export function ProfilePicker({
             <span className="text-[0.95rem] font-bold">{profile.name}</span>
             <span className="flex items-center gap-1 text-[0.8rem] text-ink-400">
               {profile.is_kid ? " ילדים" : " רגיל"}
-              {profile.has_pin ? <span title="מוגן בקוד"></span> : null}
+              {profile.has_pin ? <span title="מוגן בקוד"><Icon name="lock" className="size-4 text-brass-300" /></span> : null}
               {isActive ? <span className="text-lemon-300">· פעיל</span> : null}
             </span>
           </button>
