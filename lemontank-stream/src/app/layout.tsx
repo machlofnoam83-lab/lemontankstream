@@ -48,7 +48,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       <body className="antialiased">
         <a
           href="#main"
-          className="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:right-2 focus:z-[100] focus:rounded-lg focus:bg-lemon-400 focus:px-4 focus:py-2 focus:text-black"
+          className="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:right-2 focus:z-[100] focus:chamfer-sm focus:bg-lemon-400 focus:px-4 focus:py-2 focus:text-black"
         >
           דלג לתוכן הראשי
         </a>

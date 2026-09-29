@@ -64,7 +64,7 @@ export function SubscriptionsTable({ items }: { items: AdminSubscription[] }) {
   return (
     <DataTable head={["#", "משתמש", "מסלול", "סטטוס", "התחלה", "סוף תקופה", "ניסיון", "ספק", "שולם", "פעולות"]}>
       {items.map((sub) => (
-        <tr key={sub.id} className="hover:bg-white/[0.03]">
+        <tr key={sub.id} className="hover:bg-parchment-100/[0.03]">
           <td className="px-3 py-2 font-mono text-[0.85rem] text-ink-500">{sub.id}</td>
           <td className="px-3 py-2">
             <span className="block text-xs font-medium">{sub.name}</span>

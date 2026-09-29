@@ -54,7 +54,7 @@ export function NewsletterBroadcast({ counts }: { counts: { confirmed: number; u
             value={subject}
             onChange={(event) => setSubject(event.target.value)}
             placeholder="לדוגמה: 12 כותרים חדשים עלו השבוע"
-            className="w-full rounded-xl border border-white/15 bg-black/40 px-3 py-2"
+            className="w-full chamfer border border-brass-400/20 bg-black/40 px-3 py-2"
           />
         </Field>
         <Field label="תוכן ההודעה" hint="יופיע בהתראה באתר ובמייל">
@@ -62,7 +62,7 @@ export function NewsletterBroadcast({ counts }: { counts: { confirmed: number; u
             value={body}
             onChange={(event) => setBody(event.target.value)}
             rows={5}
-            className="w-full rounded-xl border border-white/15 bg-black/40 px-3 py-2"
+            className="w-full chamfer border border-brass-400/20 bg-black/40 px-3 py-2"
           />
         </Field>
         <Field label="קישור (אופציונלי)">
@@ -71,7 +71,7 @@ export function NewsletterBroadcast({ counts }: { counts: { confirmed: number; u
             onChange={(event) => setLink(event.target.value)}
             placeholder="/title/new-release"
             dir="ltr"
-            className="w-full rounded-xl border border-white/15 bg-black/40 px-3 py-2"
+            className="w-full chamfer border border-brass-400/20 bg-black/40 px-3 py-2"
           />
         </Field>
       </div>
@@ -88,7 +88,7 @@ export function NewsletterBroadcast({ counts }: { counts: { confirmed: number; u
           שליחה לבדיקה
         </Button>
       ) : (
-        <div className="flex flex-wrap items-center gap-3 rounded-xl border border-brass-400/40 bg-brass-500/10 p-3">
+        <div className="flex flex-wrap items-center gap-3 chamfer border border-brass-400/40 bg-brass-500/10 p-3">
           <span className="text-[0.9rem] text-brass-200">
             לשלוח עכשיו? אי אפשר לבטל שליחה שכבר יצאה.
           </span>

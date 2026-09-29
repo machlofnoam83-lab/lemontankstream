@@ -115,7 +115,7 @@ export default async function TitlePage({ params }: { params: Promise<{ slug: st
   return (
     <div className="space-y-10">
       {/* ── גיבור הכותר ── */}
-      <div className="relative overflow-hidden rounded-[26px] border border-white/[0.07] shadow-[0_60px_120px_-60px_rgba(0,0,0,1)]">
+      <div className="relative overflow-hidden chamfer border border-brass-400/15 shadow-[0_60px_120px_-60px_rgba(0,0,0,1)]">
         <div className="absolute inset-0">
           {title.backdrop_url || title.poster_url ? (
             // eslint-disable-next-line @next/next/no-img-element
@@ -140,10 +140,10 @@ export default async function TitlePage({ params }: { params: Promise<{ slug: st
               <img
                 src={title.poster_url}
                 alt={`פוסטר ${title.name_he}`}
-                className="w-full rounded-2xl shadow-[0_30px_70px_-30px_rgba(0,0,0,1)] ring-1 ring-white/12 transition-transform duration-500 [transition-timing-function:var(--ease-cinema)] hover:-translate-y-1.5 hover:ring-lemon-400/40"
+                className="w-full chamfer shadow-[0_30px_70px_-30px_rgba(0,0,0,1)] ring-1 ring-brass-400/19 transition-transform duration-500 [transition-timing-function:var(--ease-cinema)] hover:-translate-y-1.5 hover:ring-lemon-400/40"
               />
             ) : (
-              <div className="poster-fallback aspect-2/3 w-full rounded-2xl text-lg ring-1 ring-white/12" style={{ ["--poster-color" as string]: title.color }}>
+              <div className="poster-fallback aspect-2/3 w-full chamfer text-lg ring-1 ring-brass-400/19" style={{ ["--poster-color" as string]: title.color }}>
                 {title.name_he}
               </div>
             )}
@@ -151,7 +151,7 @@ export default async function TitlePage({ params }: { params: Promise<{ slug: st
 
           <div className="min-w-0 space-y-4">
             <div className="flex flex-wrap items-center gap-2">
-              <span className="rounded-full bg-white/10 px-3 py-1 text-[0.85rem] font-bold">{title.kind === "movie" ? "סרט" : "סדרה"}</span>
+              <span className="rounded-full bg-parchment-100/[0.07] px-3 py-1 text-[0.85rem] font-bold">{title.kind === "movie" ? "סרט" : "סדרה"}</span>
               {title.plan_access === "plus" ? <span className="badge-plus"> פלוס בלבד</span> : <span className="badge-free">זמין בחינם</span>}
               {title.is_original ? <span className="rounded-full border border-lemon-400/40 px-3 py-1 text-[0.85rem] font-bold text-lemon-300">מקורי LemonTank</span> : null}
               {title.status !== "published" ? <span className="rounded-full bg-brass-500/20 px-3 py-1 text-[0.85rem] font-bold text-brass-300">טיוטה (לא מפורסם)</span> : null}
@@ -183,7 +183,7 @@ export default async function TitlePage({ params }: { params: Promise<{ slug: st
                 <>
                   <Link
                     href="/plans"
-                    className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-l from-plus-500 to-plus-600 px-6 py-3.5 text-sm font-black text-white shadow-[0_18px_44px_-16px_rgba(124,36,48,1)] transition hover:-translate-y-0.5 hover:brightness-110"
+                    className="inline-flex items-center gap-2 chamfer bg-gradient-to-l from-plus-500 to-plus-600 px-6 py-3.5 text-sm font-black text-parchment-100 shadow-[0_18px_44px_-16px_rgba(124,36,48,1)] transition hover:-translate-y-0.5 hover:brightness-110"
                   >
                      שדרג לפלוס כדי לצפות
                   </Link>
@@ -192,7 +192,7 @@ export default async function TitlePage({ params }: { params: Promise<{ slug: st
                       href={title.trailer_url}
                       target="_blank"
                       rel="noreferrer"
-                      className="rounded-xl border border-white/20 bg-white/10 px-5 py-3.5 text-sm font-bold backdrop-blur-md transition hover:bg-white/20"
+                      className="chamfer border border-brass-400/25 bg-parchment-100/[0.07] px-5 py-3.5 text-sm font-bold backdrop-blur-md transition hover:bg-parchment-100/[0.1]"
                     >
                        צפה בטריילר
                     </a>
@@ -202,7 +202,7 @@ export default async function TitlePage({ params }: { params: Promise<{ slug: st
                 <>
                   <Link
                     href={playHref}
-                    className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-b from-lemon-300 to-lemon-400 px-7 py-3.5 text-sm font-black text-ink-950 shadow-[0_18px_44px_-16px_rgba(201,154,74,0.95)] transition hover:-translate-y-0.5 hover:brightness-105"
+                    className="inline-flex items-center gap-2 chamfer bg-gradient-to-b from-lemon-300 to-lemon-400 px-7 py-3.5 text-sm font-black text-ink-950 shadow-[0_18px_44px_-16px_rgba(201,154,74,0.95)] transition hover:-translate-y-0.5 hover:brightness-105"
                   >
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" className="flip-rtl"><path d="M8 5v14l11-7z" /></svg>
                     {resumeTitlePercent > 0.02 ? `המשך לצפות (${Math.round(resumeTitlePercent * 100)}%)` : title.kind === "series" ? "צפה בפרק הראשון" : "צפה עכשיו"}
@@ -233,7 +233,7 @@ export default async function TitlePage({ params }: { params: Promise<{ slug: st
             )}
 
             {/* מטא-דאטה */}
-            <dl className="grid grid-cols-2 gap-x-6 gap-y-3 rounded-2xl border border-white/[0.07] bg-black/25 p-4 text-xs backdrop-blur-md md:grid-cols-3">
+            <dl className="grid grid-cols-2 gap-x-6 gap-y-3 chamfer border border-brass-400/15 bg-black/25 p-4 text-xs backdrop-blur-md md:grid-cols-3">
               {title.director ? (
                 <div>
                   <dt className="text-ink-400">בימוי</dt>
@@ -278,7 +278,7 @@ export default async function TitlePage({ params }: { params: Promise<{ slug: st
                   <Link
                     key={g.id}
                     href={`/genres/${g.slug}`}
-                    className="rounded-full border border-white/12 bg-white/[0.04] px-3.5 py-1.5 text-xs font-semibold text-ink-200 transition hover:border-lemon-400/50 hover:bg-lemon-400/10 hover:text-lemon-200"
+                    className="rounded-full border border-brass-400/19 bg-parchment-100/[0.04] px-3.5 py-1.5 text-xs font-semibold text-ink-200 transition hover:border-lemon-400/50 hover:bg-lemon-400/10 hover:text-lemon-200"
                   >
                     {g.icon} {g.name_he}
                   </Link>
@@ -306,14 +306,14 @@ export default async function TitlePage({ params }: { params: Promise<{ slug: st
 
       {/* ── תוכן משני ── */}
       {title.trivia ? (
-        <section className="card-surface rounded-2xl p-5">
+        <section className="card-surface chamfer p-5">
           <h2 className="mb-2 text-lg font-bold"> מאחורי הקלעים</h2>
           <p className="text-sm leading-relaxed text-ink-200">{title.trivia}</p>
         </section>
       ) : null}
 
       {title.content_warnings ? (
-        <section className="rounded-2xl border border-brass-500/25 bg-brass-500/5 p-4">
+        <section className="chamfer border border-brass-500/25 bg-brass-500/5 p-4">
           <h2 className="text-sm font-bold text-brass-300"> אזהרות תוכן</h2>
           <p className="mt-1 text-sm text-brass-200/80">{title.content_warnings}</p>
         </section>

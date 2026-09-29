@@ -82,7 +82,7 @@ export function SearchBox({ compact = false, autoFocus = false }: { compact?: bo
       </form>
 
       {open && items.length > 0 ? (
-        <div className="absolute top-full z-50 mt-2 w-full min-w-[20rem] overflow-hidden border border-brass-400/25 bg-obsidian-900/98 shadow-[0_30px_70px_-30px_rgba(0,0,0,1)] backdrop-blur-xl animate-ink-in chamfer">
+        <div className="absolute top-full z-50 mt-2 w-full min-w-[20rem] overflow-hidden border border-brass-400/25 bg-obsidian-900/98 shadow-[0_30px_70px_-30px_rgba(0,0,0,1)] backdrop-blur-md animate-ink-in chamfer">
           <ul className="max-h-[60vh] overflow-y-auto">
             {items.map((it) => (
               <li key={`${it.kind}-${it.id}`}>

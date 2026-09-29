@@ -71,8 +71,8 @@ export default async function AdminTitleEditPage({ params }: { params: Promise<{
           </div>
         </div>
         <div className="flex flex-wrap gap-2">
-          <Link href={`/title/${title.slug}`} className="rounded-xl border border-white/15 px-4 py-2 text-sm hover:bg-white/10">תצוגה באתר ←</Link>
-          <Link href={`/watch/${title.slug}`} className="rounded-xl border border-white/15 px-4 py-2 text-sm hover:bg-white/10">פתח בנגן</Link>
+          <Link href={`/title/${title.slug}`} className="chamfer border border-brass-400/20 px-4 py-2 text-sm hover:bg-parchment-100/[0.07]">תצוגה באתר ←</Link>
+          <Link href={`/watch/${title.slug}`} className="chamfer border border-brass-400/20 px-4 py-2 text-sm hover:bg-parchment-100/[0.07]">פתח בנגן</Link>
         </div>
       </header>
 
@@ -152,7 +152,7 @@ export default async function AdminTitleEditPage({ params }: { params: Promise<{
           {assets.length === 0 ? (
             <p className="mt-2 text-xs text-ink-400">עוד לא הועלו קבצים לכותר הזה.</p>
           ) : (
-            <ul className="mt-3 divide-y divide-white/5 text-xs">
+            <ul className="mt-3 divide-y divide-brass-400/12 text-xs">
               {assets.map((a) => (
                 <li key={a.id} className="flex items-center justify-between gap-2 py-2">
                   <span className="truncate">
@@ -172,7 +172,7 @@ export default async function AdminTitleEditPage({ params }: { params: Promise<{
               אין כתוביות לכותר. אפשר להעלות קובץ SRT/VTT דרך עורך הפרק (שדה המדיה) — המערכת ממירה SRT ל-VTT אוטומטית.
             </p>
           ) : (
-            <ul className="mt-3 divide-y divide-white/5 text-xs">
+            <ul className="mt-3 divide-y divide-brass-400/12 text-xs">
               {subtitles.map((s) => (
                 <li key={s.id} className="flex items-center justify-between py-2">
                   <span>{s.label} <span className="text-ink-500">({s.lang})</span></span>
@@ -192,7 +192,7 @@ export default async function AdminTitleEditPage({ params }: { params: Promise<{
             <li className="text-ink-400">אין רשומות עדיין.</li>
           ) : (
             audit.map((a, i) => (
-              <li key={i} className="flex items-center gap-2 border-b border-white/5 pb-2 last:border-0">
+              <li key={i} className="flex items-center gap-2 border-b border-brass-400/10 pb-2 last:border-0">
                 <Badge tone={a.severity === "critical" ? "danger" : a.severity === "warning" ? "warn" : "neutral"}>{a.action}</Badge>
                 <span className="text-ink-300">{a.actor_email ?? "מערכת"}</span>
                 <span className="ms-auto text-ink-500">{formatRelative(a.created_at)}</span>

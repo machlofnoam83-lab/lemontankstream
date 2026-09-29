@@ -35,27 +35,27 @@ export default async function AdminAuditPage({
 
       <Card className="p-4">
         <div className="flex flex-wrap gap-3 text-xs">
-          <span className="rounded-xl bg-white/[0.04] px-3 py-2">אירועי אבטחה ב-24ש׳: <b>{formatNumber(summary.byKind.reduce((s, k) => s + Number(k.c), 0))}</b></span>
-          <span className="rounded-xl bg-white/[0.04] px-3 py-2">התחברויות כושלות ב-24ש׳: <b className="text-brass-300">{formatNumber(summary.failedLogins)}</b></span>
-          <span className="rounded-xl bg-white/[0.04] px-3 py-2">סשנים פעילים: <b>{formatNumber(summary.activeSessions)}</b></span>
+          <span className="chamfer bg-parchment-100/[0.04] px-3 py-2">אירועי אבטחה ב-24ש׳: <b>{formatNumber(summary.byKind.reduce((s, k) => s + Number(k.c), 0))}</b></span>
+          <span className="chamfer bg-parchment-100/[0.04] px-3 py-2">התחברויות כושלות ב-24ש׳: <b className="text-brass-300">{formatNumber(summary.failedLogins)}</b></span>
+          <span className="chamfer bg-parchment-100/[0.04] px-3 py-2">סשנים פעילים: <b>{formatNumber(summary.activeSessions)}</b></span>
         </div>
       </Card>
 
-      <form className="flex flex-wrap items-center gap-2 rounded-2xl border border-white/10 bg-white/[0.03] p-3" action="/admin/audit">
-        <input name="action" defaultValue={action} placeholder="סינון לפי פעולה, לדוגמה: title. או user." aria-label="סינון פעולה" className="min-w-48 flex-1 rounded-xl border border-white/10 bg-ink-900/80 px-3 py-2 text-sm" />
-        <select name="severity" defaultValue={severity} aria-label="חומרה" className="rounded-xl border border-white/10 bg-ink-900/80 px-3 py-2 text-sm">
+      <form className="flex flex-wrap items-center gap-2 chamfer border border-brass-400/15 bg-parchment-100/[0.03] p-3" action="/admin/audit">
+        <input name="action" defaultValue={action} placeholder="סינון לפי פעולה, לדוגמה: title. או user." aria-label="סינון פעולה" className="min-w-48 flex-1 chamfer border border-brass-400/15 bg-ink-900/80 px-3 py-2 text-sm" />
+        <select name="severity" defaultValue={severity} aria-label="חומרה" className="chamfer border border-brass-400/15 bg-ink-900/80 px-3 py-2 text-sm">
           <option value="">כל החומרות</option>
           <option value="info">info</option>
           <option value="warning">warning</option>
           <option value="critical">critical</option>
         </select>
-        <button className="rounded-xl bg-lemon-400 px-4 py-2 text-sm font-bold text-ink-900">סנן</button>
-        {action || severity ? <Link href="/admin/audit" className="text-xs text-ink-300 hover:text-white">איפוס</Link> : null}
+        <button className="chamfer bg-lemon-400 px-4 py-2 text-sm font-bold text-ink-900">סנן</button>
+        {action || severity ? <Link href="/admin/audit" className="text-xs text-ink-300 hover:text-parchment-100">איפוס</Link> : null}
       </form>
 
       <DataTable head={["#", "פעולה", "מבצע", "ישות", "חומרה", "IP", "מתי"]}>
         {result.rows.map((row) => (
-          <tr key={row.id} className="hover:bg-white/[0.03]">
+          <tr key={row.id} className="hover:bg-parchment-100/[0.03]">
             <td className="px-3 py-2 text-[0.85rem] text-ink-500">{row.id}</td>
             <td className="px-3 py-2 font-mono text-[0.85rem]" dir="ltr">{row.action}</td>
             <td className="px-3 py-2 text-xs" dir="ltr">{row.actor_email ?? "מערכת"}</td>
@@ -76,7 +76,7 @@ export default async function AdminAuditPage({
               key={p}
               href={`/admin/audit?page=${p}${action ? `&action=${encodeURIComponent(action)}` : ""}${severity ? `&severity=${severity}` : ""}`}
               aria-current={p === page ? "page" : undefined}
-              className={`rounded-lg px-3 py-1.5 text-sm ${p === page ? "bg-lemon-400 font-bold text-ink-900" : "bg-white/5 hover:bg-white/10"}`}
+              className={`chamfer-sm px-3 py-1.5 text-sm ${p === page ? "bg-lemon-400 font-bold text-ink-900" : "bg-parchment-100/[0.04] hover:bg-parchment-100/[0.07]"}`}
             >
               {p}
             </Link>

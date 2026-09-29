@@ -44,7 +44,7 @@ export default async function ProfilesChooserPage() {
             </p>
             <Link
               href="/account/profiles"
-              className="mt-4 inline-block rounded-xl bg-lemon-400 px-5 py-2.5 font-bold text-ink-950"
+              className="mt-4 inline-block chamfer bg-lemon-400 px-5 py-2.5 font-bold text-ink-950"
             >
               יצירת הפרופיל הראשון
             </Link>
@@ -57,7 +57,7 @@ export default async function ProfilesChooserPage() {
       {profiles.length < maxProfilesFor(session.user.effective_plan) && (
         <Link
           href="/account/profiles"
-          className="mt-8 rounded-xl border border-white/15 bg-white/[0.05] px-4 py-2 text-[0.95rem] hover:bg-white/[0.1]"
+          className="mt-8 chamfer border border-brass-400/20 bg-parchment-100/[0.05] px-4 py-2 text-[0.95rem] hover:bg-parchment-100/[0.1]"
         >
            הוספת פרופיל ({profiles.length}/{maxProfilesFor(session.user.effective_plan)})
         </Link>

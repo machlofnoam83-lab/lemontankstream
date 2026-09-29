@@ -92,17 +92,17 @@ export function ProfilePicker({
             type="button"
             onClick={() => onPick(profile)}
             disabled={busy !== null}
-            className={`group flex flex-col items-center gap-2 rounded-2xl p-3 transition ${
-              isActive ? "bg-white/10 ring-2 ring-lemon-400" : "hover:bg-white/[0.07]"
+            className={`group flex flex-col items-center gap-2 chamfer p-3 transition ${
+              isActive ? "bg-parchment-100/[0.07] ring-2 ring-lemon-400" : "hover:bg-parchment-100/[0.07]"
             }`}
           >
             <span
-              className="flex h-16 w-16 items-center justify-center rounded-2xl text-2xl font-black text-ink-950 md:h-20 md:w-20 md:text-3xl"
+              className="flex h-16 w-16 items-center justify-center chamfer text-2xl font-black text-ink-950 md:h-20 md:w-20 md:text-3xl"
               style={{ background: profile.color || "#f7c22b" }}
             >
               {busy === profile.id ? <Spinner /> : profile.avatar_url ? (
                 // eslint-disable-next-line @next/next/no-img-element
-                <img src={profile.avatar_url} alt="" className="h-full w-full rounded-2xl object-cover" />
+                <img src={profile.avatar_url} alt="" className="h-full w-full chamfer object-cover" />
               ) : (
                 profile.name.charAt(0)
               )}
@@ -120,7 +120,7 @@ export function ProfilePicker({
       {pinFor && (
         <form
           onSubmit={submitPin}
-          className="w-full rounded-2xl border border-lemon-400/30 bg-ink-900/80 p-4 text-center"
+          className="w-full chamfer border border-lemon-400/30 bg-ink-900/80 p-4 text-center"
         >
           <div className="font-bold"> הקוד של {pinFor.name}</div>
           <p className="mt-1 text-[0.85rem] text-ink-400">הזן קוד בן 4 ספרות כדי לעבור</p>
@@ -130,7 +130,7 @@ export function ProfilePicker({
             inputMode="numeric"
             autoFocus
             dir="ltr"
-            className="mt-3 w-32 rounded-xl border border-white/20 bg-black/50 px-3 py-2 text-center font-mono text-2xl tracking-[0.4em]"
+            className="mt-3 w-32 chamfer border border-brass-400/25 bg-black/50 px-3 py-2 text-center font-mono text-2xl tracking-[0.4em]"
             aria-label="קוד פרופיל"
           />
           <div className="mt-3 flex items-center justify-center gap-2">

@@ -106,7 +106,7 @@ export function RedeemPanel({ initial, signedIn }: { initial: Redemption[]; sign
           </button>
 
           {showDetails ? (
-            <div className="space-y-3 rounded-xl border border-white/10 bg-white/[0.03] p-3">
+            <div className="space-y-3 chamfer border border-brass-400/15 bg-parchment-100/[0.03] p-3">
               <Field label="איך אפשר להשיג אותך" htmlFor="gift-contact" hint="דיסקורד, וואטסאפ או אימייל — כדי שנוכל לאשר מהר">
                 <Input
                   id="gift-contact"
@@ -135,7 +135,7 @@ export function RedeemPanel({ initial, signedIn }: { initial: Redemption[]; sign
           </Button>
         </form>
 
-        <div className="mt-5 space-y-2 border-t border-white/10 pt-4 text-[0.85rem] text-ink-400">
+        <div className="mt-5 space-y-2 border-t border-brass-400/15 pt-4 text-[0.85rem] text-ink-400">
           <p> אנחנו לא שומרים את הקוד בטקסט גלוי — נשמר Hash ועותק מוצפן בלבד.</p>
           <p>⏱ אחרי כמה ניסיונות כושלים החשבון נחסם זמנית ממימוש — הגנה מניחוש קודים.</p>
           <p> מימוש מוצלח מנפיק רשומת תשלום ומאריך את המנוי בלי לאבד את הימים שנשארו.</p>
@@ -147,7 +147,7 @@ export function RedeemPanel({ initial, signedIn }: { initial: Redemption[]; sign
         {rows.length === 0 ? (
           <p className="mt-3 text-sm text-ink-400">עוד לא מימשת כרטיס. אחרי המימוש תראה כאן את הסטטוס.</p>
         ) : (
-          <ul className="mt-3 divide-y divide-white/5 text-sm">
+          <ul className="mt-3 divide-y divide-brass-400/12 text-sm">
             {rows.map((row) => (
               <li key={row.id} className="flex flex-wrap items-center justify-between gap-2 py-2.5">
                 <span className="font-mono text-xs text-ink-400" dir="ltr">{row.code_prefix}…</span>

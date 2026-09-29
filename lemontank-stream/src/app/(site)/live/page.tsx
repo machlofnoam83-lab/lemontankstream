@@ -27,7 +27,7 @@ export default async function LivePage() {
           ערוצים בזמן אמת. ערוצי פרימיום (ספורט/סרטים ב-4K) זמינים למנויי פלוס.
         </p>
         {!isPlus ? (
-          <Link href="/plans" className="w-fit rounded-xl bg-gradient-to-l from-plus-500 to-plus-600 px-4 py-2 text-xs font-bold text-white">
+          <Link href="/plans" className="w-fit chamfer bg-gradient-to-l from-plus-500 to-plus-600 px-4 py-2 text-xs font-bold text-parchment-100">
              שדרג לפלוס לפתיחת כל הערוצים
           </Link>
         ) : null}
@@ -52,9 +52,9 @@ export default async function LivePage() {
                     <Link
                       key={c.id}
                       href={locked ? "/plans" : `/live/${c.id}`}
-                      className="card-surface group flex flex-col items-center gap-2 rounded-2xl p-4 transition hover:border-lemon-400/40"
+                      className="card-surface group flex flex-col items-center gap-2 chamfer p-4 transition hover:border-lemon-400/40"
                     >
-                      <span className="flex h-16 w-16 items-center justify-center overflow-hidden rounded-xl bg-ink-800 text-2xl">
+                      <span className="flex h-16 w-16 items-center justify-center overflow-hidden chamfer bg-ink-800 text-2xl">
                         {c.logo_url ? (
                           // eslint-disable-next-line @next/next/no-img-element
                           <img src={c.logo_url} alt="" className="h-full w-full object-contain" loading="lazy" />

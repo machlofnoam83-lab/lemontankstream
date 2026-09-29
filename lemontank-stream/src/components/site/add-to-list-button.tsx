@@ -49,8 +49,8 @@ export function AddToListButton({
       disabled={busy}
       aria-pressed={inList}
       title={inList ? "הסר מהרשימה שלי" : "הוסף לרשימה שלי"}
-      className={`inline-flex items-center gap-2 rounded-xl border transition ${
-        inList ? "border-lemon-400/60 bg-lemon-400/15 text-lemon-200" : "border-white/20 bg-white/10 text-white hover:bg-white/20"
+      className={`inline-flex items-center gap-2 chamfer border transition ${
+        inList ? "border-lemon-400/60 bg-lemon-400/15 text-lemon-200" : "border-brass-400/25 bg-parchment-100/[0.07] text-parchment-100 hover:bg-parchment-100/[0.1]"
       } ${compact ? "px-3 py-3 text-sm" : "px-4 py-2.5 text-sm font-semibold"} disabled:opacity-50`}
     >
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">

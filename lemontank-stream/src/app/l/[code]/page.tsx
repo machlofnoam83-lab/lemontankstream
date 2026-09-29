@@ -49,7 +49,7 @@ export default async function SharedListPage({ params }: { params: Promise<{ cod
       )}
 
       <div className="text-center">
-        <Link href="/" className="rounded-xl bg-lemon-400 px-5 py-2.5 font-bold text-ink-950">
+        <Link href="/" className="chamfer bg-lemon-400 px-5 py-2.5 font-bold text-ink-950">
           גם אני רוצה — לדף הבית
         </Link>
       </div>

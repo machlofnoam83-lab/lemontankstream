@@ -15,7 +15,7 @@ export default async function NotificationsPage() {
       <EmptyState
         title="צריך להתחבר"
         icon="key"
-        action={<Link href="/login?next=/notifications" className="rounded-xl bg-lemon-400 px-4 py-2 text-sm font-bold text-ink-900">התחברות</Link>}
+        action={<Link href="/login?next=/notifications" className="chamfer bg-lemon-400 px-4 py-2 text-sm font-bold text-ink-900">התחברות</Link>}
       />
     );
   }
@@ -31,7 +31,7 @@ export default async function NotificationsPage() {
         title="אין התראות חדשות"
         description="כשנוסיף תוכן חדש, פרק חדש לסדרה שאתה עוקב אחריה או שינוי במנוי — תקבל התראה כאן."
         icon="bell"
-        action={<Link href="/new" className="rounded-xl bg-lemon-400 px-4 py-2 text-sm font-bold text-ink-900">גלה מה חדש</Link>}
+        action={<Link href="/new" className="chamfer bg-lemon-400 px-4 py-2 text-sm font-bold text-ink-900">גלה מה חדש</Link>}
       />
     );
   }

@@ -100,7 +100,7 @@ export default async function AdminSecurityPage() {
         <h2 className="mb-3 text-sm font-bold">✅ מצב ההגנות במערכת</h2>
         <ul className="grid gap-2 md:grid-cols-2">
           {protections.map(([name, detail, ok]) => (
-            <li key={name} className="flex items-start gap-2 rounded-xl border border-white/8 bg-white/[0.02] p-2.5">
+            <li key={name} className="flex items-start gap-2 chamfer border border-brass-400/15 bg-parchment-100/[0.02] p-2.5">
               <span className={ok ? "text-verdigris-400" : "text-brass-300"} aria-hidden="true">{ok ? "✓" : "!"}</span>
               <span className="text-xs">
                 <b className="text-ink-100">{name}</b>
@@ -141,7 +141,7 @@ export default async function AdminSecurityPage() {
             ) : (
               <ul className="space-y-1.5 text-[0.85rem]">
                 {failedLogins.slice(0, 15).map((f, i) => (
-                  <li key={i} className="flex items-center justify-between gap-2 border-b border-white/5 pb-1.5">
+                  <li key={i} className="flex items-center justify-between gap-2 border-b border-brass-400/10 pb-1.5">
                     <span dir="ltr" className="truncate font-mono text-ink-300">{f.email_norm ?? "—"}</span>
                     <span className="shrink-0 text-ink-500">{f.reason ?? "—"}</span>
                     <span dir="ltr" className="shrink-0 font-mono text-ink-500">{f.ip ?? "—"}</span>
@@ -190,19 +190,19 @@ export default async function AdminSecurityPage() {
       <Card className="p-5">
         <h2 className="mb-2 text-sm font-bold">🧬 שלמות מסד הנתונים</h2>
         <ul className="grid gap-2 text-xs md:grid-cols-4">
-          <li className="rounded-xl bg-white/[0.03] p-3">
+          <li className="chamfer bg-parchment-100/[0.03] p-3">
             <span className="block text-ink-400">integrity_check</span>
             <b className={stats.integrity === "ok" ? "text-verdigris-400" : "text-ember-400"}>{stats.integrity}</b>
           </li>
-          <li className="rounded-xl bg-white/[0.03] p-3">
+          <li className="chamfer bg-parchment-100/[0.03] p-3">
             <span className="block text-ink-400">הפרות מפתח זר</span>
             <b className={stats.fkViolations === 0 ? "text-verdigris-400" : "text-ember-400"}>{stats.fkViolations}</b>
           </li>
-          <li className="rounded-xl bg-white/[0.03] p-3">
+          <li className="chamfer bg-parchment-100/[0.03] p-3">
             <span className="block text-ink-400">מצב יומן</span>
             <b>{stats.journalMode}</b>
           </li>
-          <li className="rounded-xl bg-white/[0.03] p-3">
+          <li className="chamfer bg-parchment-100/[0.03] p-3">
             <span className="block text-ink-400">אכיפת מפתחות זרים</span>
             <b className={stats.foreignKeys ? "text-verdigris-400" : "text-ember-400"}>{stats.foreignKeys ? "מופעל" : "כבוי"}</b>
           </li>

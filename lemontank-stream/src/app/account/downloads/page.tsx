@@ -23,7 +23,7 @@ export default async function DownloadsPage() {
       </header>
 
       {!isPlus && (
-        <div className="rounded-2xl border border-lemon-400/40 bg-lemon-400/10 p-4">
+        <div className="chamfer border border-lemon-400/40 bg-lemon-400/10 p-4">
           <div className="font-bold">הורדות הן תכונת פלוס</div>
           <p className="mt-1 text-[0.92rem] text-ink-200">
             מנוי פלוס פותח הורדות, 4K ומסכים במקביל. <Link href="/plans" className="font-bold text-lemon-300 underline">לשדרוג</Link>
@@ -32,15 +32,15 @@ export default async function DownloadsPage() {
       )}
 
       <div className="grid gap-3 sm:grid-cols-3">
-        <div className="rounded-2xl bg-white/[0.05] p-4 text-center">
+        <div className="chamfer bg-parchment-100/[0.05] p-4 text-center">
           <div className="text-2xl font-black">{stats.active}</div>
           <div className="text-[0.85rem] text-ink-400">הורדות פעילות</div>
         </div>
-        <div className="rounded-2xl bg-white/[0.05] p-4 text-center">
+        <div className="chamfer bg-parchment-100/[0.05] p-4 text-center">
           <div className="text-2xl font-black">{stats.total}</div>
           <div className="text-[0.85rem] text-ink-400">סה&quot;כ הורדות</div>
         </div>
-        <div className="rounded-2xl bg-white/[0.05] p-4 text-center">
+        <div className="chamfer bg-parchment-100/[0.05] p-4 text-center">
           <div className="text-2xl font-black">{stats.devices}</div>
           <div className="text-[0.85rem] text-ink-400">מכשירים רשומים</div>
         </div>

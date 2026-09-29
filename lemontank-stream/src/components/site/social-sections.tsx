@@ -93,7 +93,7 @@ export function CommentsSection({ titleId, episodeId, enabled = true }: { titleI
       ) : (
         <ul className="space-y-3">
           {items.map((c) => (
-            <li key={c.id} className="rounded-2xl border border-white/8 bg-white/[0.02] p-4">
+            <li key={c.id} className="chamfer border border-brass-400/15 bg-parchment-100/[0.02] p-4">
               <div className="flex items-center gap-2">
                 <span className="flex h-8 w-8 items-center justify-center rounded-full bg-lemon-400 font-bold text-ink-900">
                   {c.user_name.charAt(0)}
@@ -155,7 +155,7 @@ export function ReviewsSection({ titleId, canReview }: { titleId: number; canRev
       <h2 id="reviews-heading" className="text-lg font-extrabold"> ביקורות ({items.length})</h2>
 
       {canReview ? (
-        <div className="space-y-3 rounded-2xl border border-white/10 bg-white/[0.02] p-4">
+        <div className="space-y-3 chamfer border border-brass-400/15 bg-parchment-100/[0.02] p-4">
           <Textarea value={body} onChange={(e) => setBody(e.target.value)} placeholder="כתוב ביקורת מפורטת… מה אהבת ומה פחות?" maxLength={4000} />
           <div className="flex flex-wrap items-center gap-4">
             <div className="flex items-center gap-1" role="radiogroup" aria-label="דירוג">
@@ -186,7 +186,7 @@ export function ReviewsSection({ titleId, canReview }: { titleId: number; canRev
       ) : (
         <ul className="space-y-3">
           {items.map((r) => (
-            <li key={r.id} className="rounded-2xl border border-white/8 bg-white/[0.02] p-4">
+            <li key={r.id} className="chamfer border border-brass-400/15 bg-parchment-100/[0.02] p-4">
               <div className="flex items-center gap-2">
                 <span className="text-sm font-bold">{r.user_name}</span>
                 {r.user_plan === "plus" ? <span className="badge-plus">פלוס</span> : null}
@@ -195,7 +195,7 @@ export function ReviewsSection({ titleId, canReview }: { titleId: number; canRev
               </div>
               {r.headline ? <h3 className="mt-2 font-bold">{r.headline}</h3> : null}
               {r.has_spoilers && !revealed[r.id] ? (
-                <button onClick={() => setRevealed((prev) => ({ ...prev, [r.id]: true }))} className="mt-2 rounded-lg bg-ember-500/15 px-3 py-2 text-xs text-ember-300">
+                <button onClick={() => setRevealed((prev) => ({ ...prev, [r.id]: true }))} className="mt-2 chamfer-sm bg-ember-500/15 px-3 py-2 text-xs text-ember-300">
                    הביקורת מכילה ספוילרים — לחץ להצגה
                 </button>
               ) : (

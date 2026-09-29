@@ -79,7 +79,7 @@ export function AchievementsBoard({ initial }: { initial?: { earnedCount: number
   return (
     <div className="space-y-6">
       {newly.length > 0 && (
-        <div className="card-surface flex items-center gap-3 rounded-2xl border-lemon-400/40 p-4">
+        <div className="card-surface flex items-center gap-3 chamfer border-lemon-400/40 p-4">
           <Icon name="seal" className="size-7 text-brass-300" />
           <div>
             <div className="font-black text-lemon-300">הרווחת {newly.length} תגים חדשים!</div>
@@ -101,7 +101,7 @@ export function AchievementsBoard({ initial }: { initial?: { earnedCount: number
             {meta.earnedCount}
             <span className="text-lg text-ink-400"> / {meta.totalCount}</span>
           </div>
-          <div className="mt-2 h-2 overflow-hidden rounded-full bg-white/10">
+          <div className="mt-2 h-2 overflow-hidden rounded-full bg-parchment-100/[0.07]">
             <div className="h-full rounded-full bg-gradient-to-l from-lemon-300 to-lemon-500 transition-all" style={{ width: `${percent}%` }} />
           </div>
         </Card>
@@ -132,7 +132,7 @@ export function AchievementsBoard({ initial }: { initial?: { earnedCount: number
               <div className="text-[0.85rem] text-ink-400">+{nextBadge.points} נקודות</div>
             </div>
           </div>
-          <div className="mt-3 h-2.5 overflow-hidden rounded-full bg-white/10">
+          <div className="mt-3 h-2.5 overflow-hidden rounded-full bg-parchment-100/[0.07]">
             <div className="h-full rounded-full bg-gradient-to-l from-lemon-300 to-lemon-500" style={{ width: `${nextBadge.percent}%` }} />
           </div>
         </Card>
@@ -148,8 +148,8 @@ export function AchievementsBoard({ initial }: { initial?: { earnedCount: number
             key={key}
             type="button"
             onClick={() => setFilter(key)}
-            className={`rounded-xl px-3.5 py-2 text-[0.95rem] font-bold transition ${
-              filter === key ? "bg-lemon-400 text-ink-950" : "bg-white/[0.07] text-ink-200 hover:bg-white/[0.12]"
+            className={`chamfer px-3.5 py-2 text-[0.95rem] font-bold transition ${
+              filter === key ? "bg-lemon-400 text-ink-950" : "bg-parchment-100/[0.07] text-ink-200 hover:bg-parchment-100/[0.12]"
             }`}
           >
             {label}
@@ -163,11 +163,11 @@ export function AchievementsBoard({ initial }: { initial?: { earnedCount: number
           return (
             <div
               key={badge.code}
-              className={`card-surface rounded-2xl border p-4 transition ${badge.earned ? style.ring : "border-white/10 opacity-80"}`}
+              className={`card-surface chamfer border p-4 transition ${badge.earned ? style.ring : "border-brass-400/15 opacity-80"}`}
             >
               <div className="flex items-start justify-between gap-3">
                 <div className="flex items-center gap-3">
-                  <span className={`flex h-12 w-12 items-center justify-center rounded-xl text-2xl ${badge.earned ? "bg-white/10" : "bg-white/[0.04] grayscale"}`}>
+                  <span className={`flex h-12 w-12 items-center justify-center chamfer text-2xl ${badge.earned ? "bg-parchment-100/[0.07]" : "bg-parchment-100/[0.04] grayscale"}`}>
                     {badge.icon}
                   </span>
                   <div>
@@ -189,7 +189,7 @@ export function AchievementsBoard({ initial }: { initial?: { earnedCount: number
                       {badge.criterion.progress}/{badge.criterion.target}
                     </span>
                   </div>
-                  <div className="mt-1.5 h-2 overflow-hidden rounded-full bg-white/10">
+                  <div className="mt-1.5 h-2 overflow-hidden rounded-full bg-parchment-100/[0.07]">
                     <div className="h-full rounded-full bg-gradient-to-l from-lemon-300/80 to-lemon-500/80" style={{ width: `${badge.percent}%` }} />
                   </div>
                 </div>

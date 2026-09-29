@@ -198,8 +198,8 @@ export function EpisodeManager({
             <button
               key={s.id}
               onClick={() => setSeasonNumber(s.number)}
-              className={`whitespace-nowrap rounded-xl border px-3.5 py-2 text-sm ${
-                seasonNumber === s.number ? "border-lemon-400 bg-lemon-400/15 font-bold text-lemon-200" : "border-white/10 hover:bg-white/10"
+              className={`whitespace-nowrap chamfer border px-3.5 py-2 text-sm ${
+                seasonNumber === s.number ? "border-lemon-400 bg-lemon-400/15 font-bold text-lemon-200" : "border-brass-400/15 hover:bg-parchment-100/[0.07]"
               }`}
             >
               {s.name_he ?? `עונה ${s.number}`} <span className="text-[0.8rem] text-ink-400">({s.episodes_count})</span>
@@ -235,8 +235,8 @@ export function EpisodeManager({
           {filtered.map((ep) => {
             const access = ep.plan_access === "inherit" ? titlePlan : ep.plan_access;
             return (
-              <li key={ep.id} className="flex flex-wrap items-center gap-3 rounded-2xl border border-white/8 bg-white/[0.02] p-3">
-                <span className="h-16 w-28 shrink-0 overflow-hidden rounded-lg bg-ink-800">
+              <li key={ep.id} className="flex flex-wrap items-center gap-3 chamfer border border-brass-400/15 bg-parchment-100/[0.02] p-3">
+                <span className="h-16 w-28 shrink-0 overflow-hidden chamfer-sm bg-ink-800">
                   {ep.thumb_url ? (
                     // eslint-disable-next-line @next/next/no-img-element
                     <img src={ep.thumb_url} alt="" className="h-full w-full object-cover" />
@@ -320,11 +320,11 @@ export function EpisodeManager({
         </div>
 
         {/* ── מדיה לפרק ── */}
-        <div className="space-y-3 rounded-xl border border-white/10 bg-white/[0.02] p-3">
+        <div className="space-y-3 chamfer border border-brass-400/15 bg-parchment-100/[0.02] p-3">
           <h3 className="text-sm font-bold">🎥 וידאו הפרק</h3>
 
           <div className="flex flex-wrap items-center gap-2">
-            <label className="cursor-pointer rounded-lg bg-lemon-400 px-3 py-2 text-xs font-bold text-ink-900">
+            <label className="cursor-pointer chamfer-sm bg-lemon-400 px-3 py-2 text-xs font-bold text-ink-900">
               העלה קובץ וידאו
               <input
                 type="file"
@@ -346,7 +346,7 @@ export function EpisodeManager({
                 <span className="truncate">{uploadProgress.name}</span>
                 <span>{uploadProgress.percent}%</span>
               </div>
-              <div className="mt-1 h-1.5 w-full overflow-hidden rounded-full bg-white/10">
+              <div className="mt-1 h-1.5 w-full overflow-hidden rounded-full bg-parchment-100/[0.07]">
                 <div className="h-full bg-lemon-400 transition-all" style={{ width: `${uploadProgress.percent}%` }} />
               </div>
             </div>

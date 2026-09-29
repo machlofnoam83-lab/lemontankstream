@@ -84,10 +84,10 @@ export function RequestsBoard({ initial, loggedIn }: { initial: RequestRow[]; lo
             <button
               type="button"
               onClick={() => (loggedIn ? vote(row) : (window.location.href = "/login?next=/requests"))}
-              className={`flex w-16 shrink-0 flex-col items-center rounded-xl border px-2 py-2 transition ${
+              className={`flex w-16 shrink-0 flex-col items-center chamfer border px-2 py-2 transition ${
                 row.voted
                   ? "border-lemon-400 bg-lemon-400/20 text-lemon-200"
-                  : "border-white/15 bg-white/[0.05] text-ink-200 hover:bg-white/[0.1]"
+                  : "border-brass-400/20 bg-parchment-100/[0.05] text-ink-200 hover:bg-parchment-100/[0.1]"
               }`}
               aria-label={`חזק את הבקשה ${row.name}`}
             >
@@ -97,7 +97,7 @@ export function RequestsBoard({ initial, loggedIn }: { initial: RequestRow[]; lo
             <div className="min-w-0 flex-1">
               <div className="flex flex-wrap items-center gap-2">
                 <h3 className="text-lg font-bold">{row.name}</h3>
-                <span className="rounded-full bg-white/10 px-2 py-0.5 text-[0.78rem] text-ink-300">
+                <span className="rounded-full bg-parchment-100/[0.07] px-2 py-0.5 text-[0.78rem] text-ink-300">
                   {KIND_LABEL[row.kind] ?? row.kind}
                   {row.year ? ` · ${row.year}` : ""}
                 </span>
@@ -131,7 +131,7 @@ export function RequestsBoard({ initial, loggedIn }: { initial: RequestRow[]; lo
                 required
                 minLength={2}
                 placeholder="למשל: הכל בכל מקום בבת אחת"
-                className="w-full rounded-xl border border-white/15 bg-black/40 px-3 py-2"
+                className="w-full chamfer border border-brass-400/20 bg-black/40 px-3 py-2"
               />
             </Field>
             <div className="flex gap-2">
@@ -140,7 +140,7 @@ export function RequestsBoard({ initial, loggedIn }: { initial: RequestRow[]; lo
                 <select
                   value={kind}
                   onChange={(event) => setKind(event.target.value)}
-                  className="mt-1 w-full rounded-xl border border-white/15 bg-black/40 px-3 py-2 text-ink-100"
+                  className="mt-1 w-full chamfer border border-brass-400/20 bg-black/40 px-3 py-2 text-ink-100"
                 >
                   <option value="any">לא משנה</option>
                   <option value="movie">סרט</option>
@@ -154,7 +154,7 @@ export function RequestsBoard({ initial, loggedIn }: { initial: RequestRow[]; lo
                   onChange={(event) => setYear(event.target.value.replace(/\D/g, "").slice(0, 4))}
                   inputMode="numeric"
                   placeholder="2024"
-                  className="mt-1 w-full rounded-xl border border-white/15 bg-black/40 px-3 py-2"
+                  className="mt-1 w-full chamfer border border-brass-400/20 bg-black/40 px-3 py-2"
                 />
               </label>
             </div>
@@ -163,7 +163,7 @@ export function RequestsBoard({ initial, loggedIn }: { initial: RequestRow[]; lo
                 value={note}
                 onChange={(event) => setNote(event.target.value)}
                 placeholder="שמעתי שזה מטורף"
-                className="w-full rounded-xl border border-white/15 bg-black/40 px-3 py-2"
+                className="w-full chamfer border border-brass-400/20 bg-black/40 px-3 py-2"
               />
             </Field>
             <Button type="submit" disabled={busy || name.trim().length < 2} className="w-full">
@@ -173,12 +173,12 @@ export function RequestsBoard({ initial, loggedIn }: { initial: RequestRow[]; lo
             {flash && <p className="text-[0.88rem] text-verdigris-300">{flash}</p>}
           </form>
         ) : (
-          <Link href="/login?next=/requests" className="mt-3 block rounded-xl bg-lemon-400 px-4 py-2 text-center font-bold text-ink-950">
+          <Link href="/login?next=/requests" className="mt-3 block chamfer bg-lemon-400 px-4 py-2 text-center font-bold text-ink-950">
             התחברו כדי לבקש
           </Link>
         )}
 
-        <div className="mt-4 border-t border-white/10 pt-3 text-[0.82rem] text-ink-400">
+        <div className="mt-4 border-t border-brass-400/15 pt-3 text-[0.82rem] text-ink-400">
           <p className="font-bold text-ink-300">איך זה עובד?</p>
           <ol className="mt-1 list-decimal space-y-1 pr-4">
             <li>אתם מבקשים כותר.</li>

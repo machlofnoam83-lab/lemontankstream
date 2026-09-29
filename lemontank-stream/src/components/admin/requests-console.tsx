@@ -79,7 +79,7 @@ export function RequestsConsole({ initial, stats }: { initial: AdminRequestRow[]
             type="button"
             onClick={() => reload(value)}
             className={`rounded-full px-4 py-1.5 text-[0.9rem] ${
-              filter === value ? "bg-lemon-400 font-bold text-ink-950" : "bg-white/[0.07] hover:bg-white/[0.12]"
+              filter === value ? "bg-lemon-400 font-bold text-ink-950" : "bg-parchment-100/[0.07] hover:bg-parchment-100/[0.12]"
             }`}
           >
             {label}
@@ -87,18 +87,18 @@ export function RequestsConsole({ initial, stats }: { initial: AdminRequestRow[]
         ))}
       </div>
 
-      {message && <div className="rounded-xl border border-lemon-400/40 bg-lemon-400/10 p-3 text-[0.92rem]">{message}</div>}
+      {message && <div className="chamfer border border-lemon-400/40 bg-lemon-400/10 p-3 text-[0.92rem]">{message}</div>}
 
       {rows.length === 0 ? (
         <Card className="p-6 text-center text-ink-300">אין בקשות בסינון הזה.</Card>
       ) : (
         <ul className="space-y-3">
           {rows.map((row) => (
-            <li key={row.id} className="rounded-2xl bg-white/[0.05] p-4">
+            <li key={row.id} className="chamfer bg-parchment-100/[0.05] p-4">
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <div className="min-w-0">
                   <div className="flex flex-wrap items-center gap-2">
-                    <span className="rounded-lg bg-lemon-400/20 px-2 py-0.5 font-black text-lemon-200">{row.votes} קולות</span>
+                    <span className="chamfer-sm bg-lemon-400/20 px-2 py-0.5 font-black text-lemon-200">{row.votes} קולות</span>
                     <h3 className="text-lg font-bold">{row.name}</h3>
                     <span className="text-[0.82rem] text-ink-400">
                       {row.kind === "movie" ? "סרט" : row.kind === "series" ? "סדרה" : "לא משנה"}
@@ -112,16 +112,16 @@ export function RequestsConsole({ initial, stats }: { initial: AdminRequestRow[]
                 </div>
                 <div className="flex flex-wrap items-center gap-2">
                   {busy === row.id && <Spinner />}
-                  <button type="button" onClick={() => { setNoteFor(row.id); setNote(row.admin_note ?? ""); }} className="rounded-lg bg-white/[0.08] px-3 py-1.5 text-[0.85rem] hover:bg-white/[0.14]">
+                  <button type="button" onClick={() => { setNoteFor(row.id); setNote(row.admin_note ?? ""); }} className="chamfer-sm bg-parchment-100/[0.08] px-3 py-1.5 text-[0.85rem] hover:bg-parchment-100/[0.14]">
                     הערת אדמין
                   </button>
-                  <button type="button" onClick={() => update(row, "planned")} className="rounded-lg bg-brass-500/20 px-3 py-1.5 text-[0.85rem] text-brass-100 hover:bg-brass-500/30">
+                  <button type="button" onClick={() => update(row, "planned")} className="chamfer-sm bg-brass-500/20 px-3 py-1.5 text-[0.85rem] text-brass-100 hover:bg-brass-500/30">
                     בתכנון
                   </button>
-                  <button type="button" onClick={() => update(row, "added")} className="rounded-lg bg-verdigris-500/20 px-3 py-1.5 text-[0.85rem] text-verdigris-100 hover:bg-verdigris-500/30">
+                  <button type="button" onClick={() => update(row, "added")} className="chamfer-sm bg-verdigris-500/20 px-3 py-1.5 text-[0.85rem] text-verdigris-100 hover:bg-verdigris-500/30">
                     נוסף ✓
                   </button>
-                  <button type="button" onClick={() => update(row, "declined")} className="rounded-lg px-3 py-1.5 text-[0.85rem] text-ember-300 hover:bg-ember-500/10">
+                  <button type="button" onClick={() => update(row, "declined")} className="chamfer-sm px-3 py-1.5 text-[0.85rem] text-ember-300 hover:bg-ember-500/10">
                     דחה
                   </button>
                 </div>
@@ -132,9 +132,9 @@ export function RequestsConsole({ initial, stats }: { initial: AdminRequestRow[]
                     value={note}
                     onChange={(event) => setNote(event.target.value)}
                     placeholder="למה נדחה / מתי צפוי לעלות"
-                    className="flex-1 rounded-xl border border-white/15 bg-black/40 px-3 py-2"
+                    className="flex-1 chamfer border border-brass-400/20 bg-black/40 px-3 py-2"
                   />
-                  <button type="button" onClick={() => update(row, row.status === "open" ? "planned" : row.status)} className="rounded-xl bg-lemon-400 px-4 py-2 font-bold text-ink-950">
+                  <button type="button" onClick={() => update(row, row.status === "open" ? "planned" : row.status)} className="chamfer bg-lemon-400 px-4 py-2 font-bold text-ink-950">
                     שמור
                   </button>
                 </div>

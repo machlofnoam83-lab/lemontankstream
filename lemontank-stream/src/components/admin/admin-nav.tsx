@@ -66,7 +66,7 @@ export function AdminNav({ role }: { role: string }) {
   return (
     <>
       {/* מובייל: רצועת ניווט נגללת */}
-      <nav className="no-scrollbar -mx-4 flex gap-1.5 overflow-x-auto border-b border-white/[0.06] px-4 pb-2.5 lg:hidden" aria-label="ניווט פאנל ניהול (מובייל)">
+      <nav className="no-scrollbar -mx-4 flex gap-1.5 overflow-x-auto border-b border-brass-400/15 px-4 pb-2.5 lg:hidden" aria-label="ניווט פאנל ניהול (מובייל)">
         {ALL_ITEMS.map((item) => {
           const active = isActive(pathname, item.href);
           return (
@@ -77,7 +77,7 @@ export function AdminNav({ role }: { role: string }) {
               className={`flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full px-3.5 py-1.5 text-xs transition ${
                 active
                   ? "bg-lemon-400/15 font-bold text-lemon-200 ring-1 ring-lemon-400/35"
-                  : "text-ink-300 hover:bg-white/[0.06]"
+                  : "text-ink-300 hover:bg-parchment-100/[0.06]"
               }`}
             >
               <span aria-hidden="true">{item.icon}</span>
@@ -101,18 +101,18 @@ export function AdminNav({ role }: { role: string }) {
                       <Link
                         href={item.href}
                         aria-current={active ? "page" : undefined}
-                        className={`group relative flex items-center gap-2.5 rounded-xl px-3 py-2 text-sm transition-all duration-250 [transition-timing-function:var(--ease-cinema)] ${
+                        className={`group relative flex items-center gap-2.5 chamfer px-3 py-2 text-sm transition-all duration-250 [transition-timing-function:var(--ease-cinema)] ${
                           active
                             ? "bg-gradient-to-l from-lemon-400/[0.16] to-transparent font-bold text-lemon-200"
-                            : "text-ink-300 hover:bg-white/[0.05] hover:text-white"
+                            : "text-ink-300 hover:bg-parchment-100/[0.05] hover:text-parchment-100"
                         }`}
                       >
                         {active ? (
                           <span className="absolute inset-y-1.5 right-0 w-[3px] rounded-full bg-gradient-to-b from-lemon-300 to-lemon-500 shadow-[0_0_14px_1px_rgba(201,154,74,0.7)]" aria-hidden="true" />
                         ) : null}
                         <span
-                          className={`flex h-7 w-7 items-center justify-center rounded-lg text-[0.95rem] transition-colors ${
-                            active ? "bg-lemon-400/15" : "bg-white/[0.04] group-hover:bg-white/[0.08]"
+                          className={`flex h-7 w-7 items-center justify-center chamfer-sm text-[0.95rem] transition-colors ${
+                            active ? "bg-lemon-400/15" : "bg-parchment-100/[0.04] group-hover:bg-parchment-100/[0.08]"
                           }`}
                           aria-hidden="true"
                         >
@@ -127,7 +127,7 @@ export function AdminNav({ role }: { role: string }) {
             </div>
           ))}
 
-          <div className="card-surface rounded-2xl p-3.5 text-[0.85rem] leading-relaxed text-ink-400">
+          <div className="card-surface chamfer p-3.5 text-[0.85rem] leading-relaxed text-ink-400">
             <p className="font-bold text-ink-200">מחובר כ: {role}</p>
             <p className="mt-1">ההרשאות נאכפות בצד השרת בכל בקשה — לא בממשק.</p>
           </div>

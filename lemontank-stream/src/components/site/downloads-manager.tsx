@@ -118,7 +118,7 @@ export function DownloadsManager({ initial, planLabel }: { initial: DownloadRow[
         ) : (
           <ul className="grid gap-2 sm:grid-cols-2">
             {devices.map((device) => (
-              <li key={device.id} className="flex items-center justify-between gap-3 rounded-xl bg-white/[0.05] p-3">
+              <li key={device.id} className="flex items-center justify-between gap-3 chamfer bg-parchment-100/[0.05] p-3">
                 <div>
                   <div className="font-bold">
                     {device.label ?? "מכשיר"} {device.trusted ? <span className="text-verdigris-300">✓ מהימן</span> : null}
@@ -128,10 +128,10 @@ export function DownloadsManager({ initial, planLabel }: { initial: DownloadRow[
                   </div>
                 </div>
                 <div className="flex gap-2">
-                  <button type="button" onClick={() => toggleTrust(device)} className="rounded-lg bg-white/[0.08] px-3 py-1.5 text-[0.85rem] hover:bg-white/[0.14]">
+                  <button type="button" onClick={() => toggleTrust(device)} className="chamfer-sm bg-parchment-100/[0.08] px-3 py-1.5 text-[0.85rem] hover:bg-parchment-100/[0.14]">
                     {device.trusted ? "בטל אמון" : "סמן מהימן"}
                   </button>
-                  <button type="button" onClick={() => removeDevice(device)} className="rounded-lg px-3 py-1.5 text-[0.85rem] text-ember-300 hover:bg-ember-500/10">
+                  <button type="button" onClick={() => removeDevice(device)} className="chamfer-sm px-3 py-1.5 text-[0.85rem] text-ember-300 hover:bg-ember-500/10">
                     הסר
                   </button>
                 </div>
@@ -150,10 +150,10 @@ export function DownloadsManager({ initial, planLabel }: { initial: DownloadRow[
         ) : (
           <ul className="grid gap-2">
             {downloads.map((row) => (
-              <li key={row.id} className="flex items-center gap-3 rounded-xl bg-white/[0.05] p-3">
+              <li key={row.id} className="flex items-center gap-3 chamfer bg-parchment-100/[0.05] p-3">
                 {row.poster_url ? (
                   // eslint-disable-next-line @next/next/no-img-element
-                  <img src={row.poster_url} alt="" className="h-16 w-11 rounded-lg object-cover" />
+                  <img src={row.poster_url} alt="" className="h-16 w-11 chamfer-sm object-cover" />
                 ) : (
                   <span className="flex h-16 w-11 items-center justify-center border border-brass-400/20 bg-obsidian-800 text-brass-300/70"><Icon name="film" className="size-5" /></span>
                 )}
@@ -168,7 +168,7 @@ export function DownloadsManager({ initial, planLabel }: { initial: DownloadRow[
                     {row.expired ? "פג תוקף" : `בתוקף עד ${String(row.expires_at ?? "").slice(0, 16).replace("T", " ")}`}
                   </div>
                 </div>
-                <button type="button" onClick={() => remove(row)} disabled={busy} className="rounded-lg px-3 py-1.5 text-[0.85rem] text-ember-300 hover:bg-ember-500/10">
+                <button type="button" onClick={() => remove(row)} disabled={busy} className="chamfer-sm px-3 py-1.5 text-[0.85rem] text-ember-300 hover:bg-ember-500/10">
                   מחק
                 </button>
               </li>

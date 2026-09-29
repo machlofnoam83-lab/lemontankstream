@@ -177,7 +177,7 @@ export function SecurityPanels({
             <p className="font-bold">קודי גיבוי חד-פעמיים — שמור אותם במקום בטוח:</p>
             <div className="mt-2 grid grid-cols-2 gap-1 font-mono text-xs sm:grid-cols-4" dir="ltr">
               {backupCodes.map((c) => (
-                <span key={c} className="rounded bg-black/30 px-2 py-1">{c}</span>
+                <span key={c} className="chamfer-sm bg-black/30 px-2 py-1">{c}</span>
               ))}
             </div>
           </Alert>
@@ -202,11 +202,11 @@ export function SecurityPanels({
             <p className="text-xs text-ink-300">
               1. סרוק את הקוד באפליקציית Google Authenticator / Authy. 2. הזן את הקוד בן 6 הספרות לאימות.
             </p>
-            <div className="rounded-xl bg-white p-3">
+            <div className="chamfer bg-white p-3">
               {/* QR נוצר כקישור otpauth — אפשר גם להעתיק את המפתח */}
               <div className="break-all font-mono text-[0.85rem] text-black" dir="ltr">{setup.otpauth}</div>
             </div>
-            <div className="rounded-xl border border-white/10 bg-black/30 p-3">
+            <div className="chamfer border border-brass-400/15 bg-black/30 p-3">
               <span className="text-[0.8rem] text-ink-400">מפתח סודי (הקלד ידנית):</span>
               <div className="font-mono text-sm tracking-widest" dir="ltr">{setup.secret.match(/.{1,4}/g)?.join(" ")}</div>
             </div>
@@ -231,7 +231,7 @@ export function SecurityPanels({
             <Button size="sm" variant="ghost" onClick={revokeAll}>נתק את כל שאר המכשירים</Button>
           ) : null}
         </div>
-        <ul className="mt-3 divide-y divide-white/5">
+        <ul className="mt-3 divide-y divide-brass-400/12">
           {sessions.map((s) => (
             <li key={s.id} className="flex flex-wrap items-center justify-between gap-3 py-3 text-sm">
               <div className="min-w-0">

@@ -34,7 +34,7 @@ export default async function WrappedPage({ searchParams }: { searchParams: Prom
               key={option}
               href={`/wrapped?year=${option}`}
               className={`rounded-full px-4 py-1.5 text-[0.92rem] ${
-                option === year ? "bg-lemon-400 font-bold text-ink-950" : "bg-white/[0.07] hover:bg-white/[0.12]"
+                option === year ? "bg-lemon-400 font-bold text-ink-950" : "bg-parchment-100/[0.07] hover:bg-parchment-100/[0.12]"
               }`}
             >
               {option}
@@ -48,7 +48,7 @@ export default async function WrappedPage({ searchParams }: { searchParams: Prom
           <Icon name="sparkles" className="mx-auto size-10 text-brass-300" />
           <h2 className="mt-3 text-2xl font-black">עוד אין נתוני צפייה ל-{year}</h2>
           <p className="mt-2 text-ink-300">צפו במשהו, ותוך דקות תתחילו לראות כאן את הסיכום האישי שלכם.</p>
-          <Link href="/movies" className="mt-4 inline-block rounded-xl bg-lemon-400 px-5 py-2.5 font-bold text-ink-950">
+          <Link href="/movies" className="mt-4 inline-block chamfer bg-lemon-400 px-5 py-2.5 font-bold text-ink-950">
             לסרטים
           </Link>
         </Card>
@@ -113,7 +113,7 @@ export default async function WrappedPage({ searchParams }: { searchParams: Prom
               <h2 className="mb-3 text-2xl font-black">האנשים של השנה</h2>
               <div className="flex flex-wrap gap-2">
                 {wrap.topPeople.map((row) => (
-                  <span key={row.label} className="rounded-full bg-white/[0.07] px-4 py-2 text-[0.95rem]">
+                  <span key={row.label} className="rounded-full bg-parchment-100/[0.07] px-4 py-2 text-[0.95rem]">
                     {row.label} <span className="text-ink-400">· {row.value}</span>
                   </span>
                 ))}
@@ -137,10 +137,10 @@ export default async function WrappedPage({ searchParams }: { searchParams: Prom
           </div>
 
           <div className="flex flex-wrap justify-center gap-3">
-            <Link href="/account/achievements" className="rounded-xl bg-white/[0.07] px-5 py-2.5 font-bold hover:bg-white/[0.12]">
+            <Link href="/account/achievements" className="chamfer bg-parchment-100/[0.07] px-5 py-2.5 font-bold hover:bg-parchment-100/[0.12]">
               לתגים שלי
             </Link>
-            <Link href="/account/history" className="rounded-xl bg-white/[0.07] px-5 py-2.5 font-bold hover:bg-white/[0.12]">
+            <Link href="/account/history" className="chamfer bg-parchment-100/[0.07] px-5 py-2.5 font-bold hover:bg-parchment-100/[0.12]">
               היסטוריית צפייה
             </Link>
           </div>

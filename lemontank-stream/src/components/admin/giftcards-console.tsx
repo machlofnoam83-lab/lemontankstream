@@ -242,7 +242,7 @@ export function GiftCardsConsole({ initial, canManage }: { initial: GiftCardsDat
           </p>
           <div className="mt-3 space-y-1">
             {issuedCodes.map((value) => (
-              <div key={value} className="flex items-center justify-between gap-3 rounded-lg bg-black/40 px-3 py-2 font-mono text-sm" dir="ltr">
+              <div key={value} className="flex items-center justify-between gap-3 chamfer-sm bg-black/40 px-3 py-2 font-mono text-sm" dir="ltr">
                 <span>{value}</span>
                 <button type="button" onClick={() => void navigator.clipboard?.writeText(value)} className="text-xs text-lemon-300">
                   העתק
@@ -282,7 +282,7 @@ export function GiftCardsConsole({ initial, canManage }: { initial: GiftCardsDat
           type="button"
           disabled={busy || !canManage}
           onClick={() => void createCards()}
-          className="mt-3 rounded-xl bg-lemon-400 px-4 py-2 font-bold text-ink-950 disabled:opacity-50"
+          className="mt-3 chamfer bg-lemon-400 px-4 py-2 font-bold text-ink-950 disabled:opacity-50"
         >
           {busy ? <Spinner /> : "הנפק כרטיסים"}
         </button>
@@ -299,7 +299,7 @@ export function GiftCardsConsole({ initial, canManage }: { initial: GiftCardsDat
         ) : (
           <ul className="mt-3 space-y-3">
             {data.pending.map((request) => (
-              <li key={request.id} className="rounded-xl border border-white/10 bg-white/[0.03] p-3">
+              <li key={request.id} className="chamfer border border-brass-400/15 bg-parchment-100/[0.03] p-3">
                 <div className="flex flex-wrap items-center gap-2 text-sm">
                   <span className="font-bold">#{request.id}</span>
                   <span className="font-mono text-xs text-ink-400" dir="ltr">{request.code_prefix}…</span>
@@ -313,13 +313,13 @@ export function GiftCardsConsole({ initial, canManage }: { initial: GiftCardsDat
                     value={notes[request.id] ?? ""}
                     onChange={(event) => setNotes({ ...notes, [request.id]: event.target.value })}
                     placeholder="הערה ללקוח (אופציונלי)"
-                    className="min-w-[200px] flex-1 rounded-lg border border-white/15 bg-black/40 px-3 py-1.5 text-sm"
+                    className="min-w-[200px] flex-1 chamfer-sm border border-brass-400/20 bg-black/40 px-3 py-1.5 text-sm"
                   />
                   <button
                     type="button"
                     disabled={busy || !canManage}
                     onClick={() => void decide(request.id, "approve")}
-                    className="rounded-lg bg-verdigris-500/90 px-3 py-1.5 text-sm font-bold text-ink-950 disabled:opacity-50"
+                    className="chamfer-sm bg-verdigris-500/90 px-3 py-1.5 text-sm font-bold text-ink-950 disabled:opacity-50"
                   >
                     אשר והפעל מנוי
                   </button>
@@ -327,7 +327,7 @@ export function GiftCardsConsole({ initial, canManage }: { initial: GiftCardsDat
                     type="button"
                     disabled={busy || !canManage}
                     onClick={() => void decide(request.id, "reject")}
-                    className="rounded-lg bg-white/[0.08] px-3 py-1.5 text-sm disabled:opacity-50"
+                    className="chamfer-sm bg-parchment-100/[0.08] px-3 py-1.5 text-sm disabled:opacity-50"
                   >
                     דחה
                   </button>
@@ -353,10 +353,10 @@ export function GiftCardsConsole({ initial, canManage }: { initial: GiftCardsDat
           </Field>
         </div>
         <div className="mt-2 flex flex-wrap gap-2">
-          <button type="button" disabled={busy || !canManage} onClick={() => void saveAlerts()} className="rounded-xl bg-lemon-400 px-4 py-2 font-bold text-ink-950 disabled:opacity-50">
+          <button type="button" disabled={busy || !canManage} onClick={() => void saveAlerts()} className="chamfer bg-lemon-400 px-4 py-2 font-bold text-ink-950 disabled:opacity-50">
             שמור ערוצים
           </button>
-          <button type="button" disabled={busy || !canManage} onClick={() => void testAlert()} className="rounded-xl bg-white/[0.08] px-4 py-2">
+          <button type="button" disabled={busy || !canManage} onClick={() => void testAlert()} className="chamfer bg-parchment-100/[0.08] px-4 py-2">
             שלח התראת בדיקה
           </button>
           <Badge tone={alerts.ready ? "success" : "warn"}>{alerts.ready ? "התראות פעילות" : "אין יעד מוגדר"}</Badge>
@@ -393,7 +393,7 @@ export function GiftCardsConsole({ initial, canManage }: { initial: GiftCardsDat
             </thead>
             <tbody>
               {data.cards.map((card) => (
-                <tr key={card.id} className="border-t border-white/5">
+                <tr key={card.id} className="border-t border-brass-400/10">
                   <td className="p-2">{card.id}</td>
                   <td className="p-2 font-mono text-xs" dir="ltr">{card.code_prefix}</td>
                   <td className="p-2">{card.plan_code}</td>
@@ -425,7 +425,7 @@ export function GiftCardsConsole({ initial, canManage }: { initial: GiftCardsDat
 
       {stepUpFor ? (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4">
-          <form onSubmit={confirmStepUp} className="w-full max-w-sm rounded-2xl border border-white/12 bg-ink-900 p-5">
+          <form onSubmit={confirmStepUp} className="w-full max-w-sm chamfer border border-brass-400/19 bg-ink-900 p-5">
             <h3 className="text-lg font-black">אימות מחדש נדרש</h3>
             <p className="mt-1 text-[0.9rem] text-ink-300">פעולה בכסף — הזן סיסמה כדי לאשר.</p>
             <input
@@ -433,15 +433,15 @@ export function GiftCardsConsole({ initial, canManage }: { initial: GiftCardsDat
               value={password}
               onChange={(event) => setPassword(event.target.value)}
               autoFocus
-              className="mt-3 w-full rounded-xl border border-white/15 bg-black/40 px-3 py-2"
+              className="mt-3 w-full chamfer border border-brass-400/20 bg-black/40 px-3 py-2"
               placeholder="סיסמה"
             />
             {stepError && <p className="mt-2 text-[0.88rem] text-ember-300">{stepError}</p>}
             <div className="mt-4 flex gap-2">
-              <button type="submit" disabled={busy} className="flex-1 rounded-xl bg-lemon-400 py-2 font-bold text-ink-950 disabled:opacity-60">
+              <button type="submit" disabled={busy} className="flex-1 chamfer bg-lemon-400 py-2 font-bold text-ink-950 disabled:opacity-60">
                 {busy ? <Spinner /> : "אשר"}
               </button>
-              <button type="button" onClick={() => setStepUpFor(null)} className="rounded-xl bg-white/[0.07] px-4 py-2">
+              <button type="button" onClick={() => setStepUpFor(null)} className="chamfer bg-parchment-100/[0.07] px-4 py-2">
                 ביטול
               </button>
             </div>

@@ -70,8 +70,8 @@ export default async function AdminSubscriptionsPage({
         <StatCard label="מתוכן מע״מ" value={formatPrice(vat)} />
       </div>
 
-      <form className="flex flex-wrap items-center gap-2 rounded-2xl border border-white/10 bg-white/[0.03] p-3" action="/admin/subscriptions">
-        <select name="status" defaultValue={status} aria-label="סטטוס" className="rounded-xl border border-white/10 bg-ink-900/80 px-3 py-2 text-sm">
+      <form className="flex flex-wrap items-center gap-2 chamfer border border-brass-400/15 bg-parchment-100/[0.03] p-3" action="/admin/subscriptions">
+        <select name="status" defaultValue={status} aria-label="סטטוס" className="chamfer border border-brass-400/15 bg-ink-900/80 px-3 py-2 text-sm">
           <option value="">כל הסטטוסים</option>
           <option value="active">פעיל</option>
           <option value="trialing">בניסיון</option>
@@ -79,13 +79,13 @@ export default async function AdminSubscriptionsPage({
           <option value="canceled">בוטל</option>
           <option value="expired">הסתיים</option>
         </select>
-        <select name="plan" defaultValue={plan} aria-label="מסלול" className="rounded-xl border border-white/10 bg-ink-900/80 px-3 py-2 text-sm">
+        <select name="plan" defaultValue={plan} aria-label="מסלול" className="chamfer border border-brass-400/15 bg-ink-900/80 px-3 py-2 text-sm">
           <option value="">כל המסלולים</option>
           <option value="plus">פלוס</option>
           <option value="free">חינם</option>
         </select>
-        <button className="rounded-xl bg-lemon-400 px-4 py-2 text-sm font-bold text-ink-900">סנן</button>
-        {status || plan ? <Link href="/admin/subscriptions" className="text-xs text-ink-300 hover:text-white">איפוס</Link> : null}
+        <button className="chamfer bg-lemon-400 px-4 py-2 text-sm font-bold text-ink-900">סנן</button>
+        {status || plan ? <Link href="/admin/subscriptions" className="text-xs text-ink-300 hover:text-parchment-100">איפוס</Link> : null}
       </form>
 
       <SubscriptionsTable items={items} />
@@ -97,7 +97,7 @@ export default async function AdminSubscriptionsPage({
               key={p}
               href={`/admin/subscriptions?page=${p}${status ? `&status=${status}` : ""}${plan ? `&plan=${plan}` : ""}`}
               aria-current={p === page ? "page" : undefined}
-              className={`rounded-lg px-3 py-1.5 text-sm ${p === page ? "bg-lemon-400 font-bold text-ink-900" : "bg-white/5 hover:bg-white/10"}`}
+              className={`chamfer-sm px-3 py-1.5 text-sm ${p === page ? "bg-lemon-400 font-bold text-ink-900" : "bg-parchment-100/[0.04] hover:bg-parchment-100/[0.07]"}`}
             >
               {p}
             </Link>

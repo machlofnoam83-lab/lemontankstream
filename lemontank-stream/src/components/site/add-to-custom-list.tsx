@@ -68,8 +68,8 @@ export function AddToCustomList({ titleId, compact = false }: { titleId: number;
         onClick={() => setOpen((value) => !value)}
         className={
           compact
-            ? "rounded-lg bg-white/[0.07] px-3 py-1.5 text-[0.85rem] hover:bg-white/[0.14]"
-            : "rounded-xl border border-white/15 bg-white/5 px-4 py-2.5 text-sm hover:bg-white/15"
+            ? "chamfer-sm bg-parchment-100/[0.07] px-3 py-1.5 text-[0.85rem] hover:bg-parchment-100/[0.14]"
+            : "chamfer border border-brass-400/20 bg-parchment-100/[0.04] px-4 py-2.5 text-sm hover:bg-parchment-100/[0.12]"
         }
         aria-expanded={open}
       >
@@ -77,7 +77,7 @@ export function AddToCustomList({ titleId, compact = false }: { titleId: number;
       </button>
 
       {open && (
-        <div className="absolute z-30 mt-2 w-64 rounded-2xl border border-white/12 bg-ink-900/97 p-3 shadow-2xl backdrop-blur-xl">
+        <div className="absolute z-30 mt-2 w-64 chamfer border border-brass-400/19 bg-ink-900/97 p-3 shadow-[0_24px_60px_-32px_rgba(0,0,0,0.95)] backdrop-blur-md">
           <div className="text-[0.85rem] font-bold text-ink-200">הרשימות שלי</div>
           <ul className="mt-2 max-h-56 space-y-1 overflow-y-auto">
             {lists.length === 0 && <li className="text-[0.85rem] text-ink-400">אין רשימות עדיין — פתחו אחת למטה.</li>}
@@ -87,7 +87,7 @@ export function AddToCustomList({ titleId, compact = false }: { titleId: number;
                   type="button"
                   disabled={busy}
                   onClick={() => add(list.id, list.name)}
-                  className="w-full rounded-lg px-2 py-1.5 text-right text-[0.9rem] hover:bg-white/[0.08] disabled:opacity-60"
+                  className="w-full chamfer-sm px-2 py-1.5 text-right text-[0.9rem] hover:bg-parchment-100/[0.08] disabled:opacity-60"
                 >
                   {list.is_public ? " " : " "}
                   {list.name}
@@ -97,14 +97,14 @@ export function AddToCustomList({ titleId, compact = false }: { titleId: number;
             ))}
           </ul>
 
-          <form onSubmit={create} className="mt-2 flex gap-1.5 border-t border-white/10 pt-2">
+          <form onSubmit={create} className="mt-2 flex gap-1.5 border-t border-brass-400/15 pt-2">
             <input
               value={newName}
               onChange={(event) => setNewName(event.target.value)}
               placeholder="רשימה חדשה…"
-              className="min-w-0 flex-1 rounded-lg border border-white/15 bg-black/40 px-2 py-1.5 text-[0.85rem]"
+              className="min-w-0 flex-1 chamfer-sm border border-brass-400/20 bg-black/40 px-2 py-1.5 text-[0.85rem]"
             />
-            <button type="submit" disabled={busy || newName.trim().length < 2} className="rounded-lg bg-lemon-400 px-2.5 py-1.5 text-[0.85rem] font-bold text-ink-950 disabled:opacity-50">
+            <button type="submit" disabled={busy || newName.trim().length < 2} className="chamfer-sm bg-lemon-400 px-2.5 py-1.5 text-[0.85rem] font-bold text-ink-950 disabled:opacity-50">
               צור
             </button>
           </form>

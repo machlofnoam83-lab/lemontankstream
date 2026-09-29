@@ -91,28 +91,28 @@ export default async function AdminUsersPage({
         <StatCard label="מנהלים בלי 2FA" value={formatNumber(stats.no2faAdmins)} tone={stats.no2faAdmins ? "danger" : "success"} />
       </div>
 
-      <form className="flex flex-wrap items-center gap-2 rounded-2xl border border-white/10 bg-white/[0.03] p-3" action="/admin/users">
-        <input name="q" defaultValue={q} placeholder="חיפוש לפי שם או אימייל…" aria-label="חיפוש משתמש" className="min-w-44 flex-1 rounded-xl border border-white/10 bg-ink-900/80 px-3 py-2 text-sm" />
-        <select name="plan" defaultValue={plan} aria-label="מסלול" className="rounded-xl border border-white/10 bg-ink-900/80 px-3 py-2 text-sm">
+      <form className="flex flex-wrap items-center gap-2 chamfer border border-brass-400/15 bg-parchment-100/[0.03] p-3" action="/admin/users">
+        <input name="q" defaultValue={q} placeholder="חיפוש לפי שם או אימייל…" aria-label="חיפוש משתמש" className="min-w-44 flex-1 chamfer border border-brass-400/15 bg-ink-900/80 px-3 py-2 text-sm" />
+        <select name="plan" defaultValue={plan} aria-label="מסלול" className="chamfer border border-brass-400/15 bg-ink-900/80 px-3 py-2 text-sm">
           <option value="">כל המסלולים</option>
           <option value="free">חינם</option>
           <option value="plus">פלוס</option>
         </select>
-        <select name="role" defaultValue={role} aria-label="תפקיד" className="rounded-xl border border-white/10 bg-ink-900/80 px-3 py-2 text-sm">
+        <select name="role" defaultValue={role} aria-label="תפקיד" className="chamfer border border-brass-400/15 bg-ink-900/80 px-3 py-2 text-sm">
           <option value="">כל התפקידים</option>
           <option value="user">צופה</option>
           <option value="editor">עורך</option>
           <option value="admin">מנהל</option>
           <option value="owner">בעלים</option>
         </select>
-        <select name="status" defaultValue={status} aria-label="סטטוס" className="rounded-xl border border-white/10 bg-ink-900/80 px-3 py-2 text-sm">
+        <select name="status" defaultValue={status} aria-label="סטטוס" className="chamfer border border-brass-400/15 bg-ink-900/80 px-3 py-2 text-sm">
           <option value="">כל הסטטוסים</option>
           <option value="active">פעיל</option>
           <option value="suspended">מושהה</option>
           <option value="banned">חסום</option>
           <option value="pending">ממתין</option>
         </select>
-        <button className="rounded-xl bg-lemon-400 px-4 py-2 text-sm font-bold text-ink-900">סנן</button>
+        <button className="chamfer bg-lemon-400 px-4 py-2 text-sm font-bold text-ink-900">סנן</button>
       </form>
 
       {items.length === 0 ? (
@@ -121,7 +121,7 @@ export default async function AdminUsersPage({
         <>
           <DataTable head={["#", "שם", "אימייל", "תפקיד", "מנוי", "סטטוס", "2FA", "התחברות אחרונה", "סשנים", "נרשם", "פעולות"]}>
             {items.map((u) => (
-              <tr key={u.id} className="hover:bg-white/[0.03]">
+              <tr key={u.id} className="hover:bg-parchment-100/[0.03]">
                 <td className="px-3 py-2 text-xs text-ink-400">{u.id}</td>
                 <td className="px-3 py-2 font-medium">{u.name}</td>
                 <td className="px-3 py-2 text-xs" dir="ltr">{u.email}</td>
@@ -161,7 +161,7 @@ export default async function AdminUsersPage({
                   key={p}
                   href={`/admin/users?page=${p}${plan ? `&plan=${plan}` : ""}${role ? `&role=${role}` : ""}${status ? `&status=${status}` : ""}${q ? `&q=${encodeURIComponent(q)}` : ""}`}
                   aria-current={p === page ? "page" : undefined}
-                  className={`rounded-lg px-3 py-1.5 text-sm ${p === page ? "bg-lemon-400 font-bold text-ink-900" : "bg-white/5 hover:bg-white/10"}`}
+                  className={`chamfer-sm px-3 py-1.5 text-sm ${p === page ? "bg-lemon-400 font-bold text-ink-900" : "bg-parchment-100/[0.04] hover:bg-parchment-100/[0.07]"}`}
                 >
                   {p}
                 </Link>

@@ -77,7 +77,7 @@ export function PasswordMeter({
     <div className="mt-2 space-y-1">
       <div className="flex gap-1" aria-hidden="true">
         {Array.from({ length: 5 }, (_, i) => (
-          <span key={i} className={`h-1.5 flex-1 rounded-full ${i < steps ? color : "bg-white/10"}`} />
+          <span key={i} className={`h-1.5 flex-1 rounded-full ${i < steps ? color : "bg-parchment-100/[0.07]"}`} />
         ))}
       </div>
       <p className="text-[0.85rem] text-ink-400">

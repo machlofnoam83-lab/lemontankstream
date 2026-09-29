@@ -58,8 +58,8 @@ export default async function AdminDashboard() {
           <p className="mt-1 text-sm text-ink-400">תמונת מצב מלאה של הקטלוג, המשתמשים, ההכנסות והאבטחה.</p>
         </div>
         <div className="flex flex-wrap gap-2">
-          <Link href="/admin/titles/new" className="rounded-xl bg-lemon-400 px-4 py-2.5 text-sm font-bold text-ink-900">+ הוסף סרט/סדרה</Link>
-          <Link href="/admin/security" className="rounded-xl border border-white/15 px-4 py-2.5 text-sm">בקרת אבטחה</Link>
+          <Link href="/admin/titles/new" className="chamfer bg-lemon-400 px-4 py-2.5 text-sm font-bold text-ink-900">+ הוסף סרט/סדרה</Link>
+          <Link href="/admin/security" className="chamfer border border-brass-400/20 px-4 py-2.5 text-sm">בקרת אבטחה</Link>
         </div>
       </header>
 
@@ -72,7 +72,7 @@ export default async function AdminDashboard() {
                 אין עדיין כותרים בקטלוג. זה מצב ההתחלה הרצוי: בלי תוכן מובנה, רק מה שאתה מעלה.
               </p>
             </div>
-            <Link href="/admin/titles/new" className="rounded-xl bg-lemon-400 px-5 py-2.5 text-sm font-black text-ink-900">
+            <Link href="/admin/titles/new" className="chamfer bg-lemon-400 px-5 py-2.5 text-sm font-black text-ink-900">
               הוסף את הכותר הראשון
             </Link>
           </div>
@@ -84,7 +84,7 @@ export default async function AdminDashboard() {
               { n: 4, t: "פרסם", d: "שנה סטטוס מ“טיוטה” ל“מפורסם” — רק אז זה מופיע באתר.", href: "/admin/titles" },
             ].map((step) => (
               <li key={step.n}>
-                <Link href={step.href} className="flex h-full gap-3 rounded-2xl border border-white/10 bg-white/[0.03] p-3 transition hover:border-lemon-400/40">
+                <Link href={step.href} className="flex h-full gap-3 chamfer border border-brass-400/15 bg-parchment-100/[0.03] p-3 transition hover:border-lemon-400/40">
                   <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-lemon-400 text-xs font-black text-ink-900">{step.n}</span>
                   <span>
                     <b className="block text-sm text-ink-100">{step.t}</b>
@@ -154,19 +154,19 @@ export default async function AdminDashboard() {
             <Link href="/admin/security" className="text-xs text-lemon-300 hover:underline">פירוט ←</Link>
           </div>
           <dl className="mt-3 grid grid-cols-2 gap-3 text-xs">
-            <div className="rounded-xl bg-white/[0.03] p-3">
+            <div className="chamfer bg-parchment-100/[0.03] p-3">
               <dt className="text-ink-400">ניסיונות התחברות כושלים</dt>
               <dd className="mt-1 text-lg font-bold text-brass-300">{formatNumber(security.failedLogins)}</dd>
             </div>
-            <div className="rounded-xl bg-white/[0.03] p-3">
+            <div className="chamfer bg-parchment-100/[0.03] p-3">
               <dt className="text-ink-400">סשנים פעילים</dt>
               <dd className="mt-1 text-lg font-bold">{formatNumber(security.activeSessions)}</dd>
             </div>
-            <div className="rounded-xl bg-white/[0.03] p-3">
+            <div className="chamfer bg-parchment-100/[0.03] p-3">
               <dt className="text-ink-400">חריגות Rate Limit</dt>
               <dd className="mt-1 text-lg font-bold">{formatNumber(Number(get<{ c: number }>("SELECT COUNT(*) c FROM security_events WHERE kind LIKE 'rate_limit%' AND created_at > datetime('now','-1 day')")?.c ?? 0))}</dd>
             </div>
-            <div className="rounded-xl bg-white/[0.03] p-3">
+            <div className="chamfer bg-parchment-100/[0.03] p-3">
               <dt className="text-ink-400">חסימות תקיפה</dt>
               <dd className="mt-1 text-lg font-bold text-ember-300">{formatNumber(Number(get<{ c: number }>("SELECT COUNT(*) c FROM security_events WHERE kind LIKE 'attack_pattern%' AND created_at > datetime('now','-1 day')")?.c ?? 0))}</dd>
             </div>
@@ -188,7 +188,7 @@ export default async function AdminDashboard() {
           <h2 className="mb-3 text-sm font-bold">🔥 הכותרים הנצפים</h2>
           <DataTable head={["כותר", "סוג", "מסלול", "צפיות", ""]}>
             {topTitles.map((t) => (
-              <tr key={t.id} className="hover:bg-white/[0.03]">
+              <tr key={t.id} className="hover:bg-parchment-100/[0.03]">
                 <td className="px-3 py-2 font-medium">{t.name_he}</td>
                 <td className="px-3 py-2 text-xs text-ink-300">{t.kind === "movie" ? "סרט" : "סדרה"}</td>
                 <td className="px-3 py-2">{t.plan_access === "plus" ? <Badge tone="plus">פלוס</Badge> : <Badge tone="free">חינם</Badge>}</td>
@@ -209,7 +209,7 @@ export default async function AdminDashboard() {
           </div>
           <ul className="mt-3 space-y-2 text-xs">
             {recentAudit.map((a, i) => (
-              <li key={i} className="flex items-center gap-2 border-b border-white/5 pb-2 last:border-0">
+              <li key={i} className="flex items-center gap-2 border-b border-brass-400/10 pb-2 last:border-0">
                 <Badge tone={a.severity === "critical" ? "danger" : a.severity === "warning" ? "warn" : "neutral"}>{a.action}</Badge>
                 <span className="min-w-0 flex-1 truncate text-ink-300">{a.actor_email ?? "מערכת"} · {a.entity ?? ""}</span>
                 <span className="shrink-0 text-ink-500">{formatRelative(a.created_at)}</span>
@@ -222,12 +222,12 @@ export default async function AdminDashboard() {
       <Card className="p-5">
         <h2 className="text-sm font-bold">🔧 פעולות מהירות</h2>
         <div className="mt-3 flex flex-wrap gap-2 text-sm">
-          <Link href="/admin/titles/new" className="rounded-xl bg-lemon-400 px-4 py-2 font-bold text-ink-900">+ סרט חדש</Link>
-          <Link href="/admin/titles/new?kind=series" className="rounded-xl bg-white/10 px-4 py-2 hover:bg-white/15">+ סדרה חדשה</Link>
-          <Link href="/admin/collections" className="rounded-xl bg-white/10 px-4 py-2 hover:bg-white/15">ניהול שורות הבית</Link>
-          <Link href="/admin/users" className="rounded-xl bg-white/10 px-4 py-2 hover:bg-white/15">הוספת משתמש / שינוי מנוי</Link>
-          <Link href="/api/export?type=backup" className="rounded-xl bg-white/10 px-4 py-2 hover:bg-white/15">גיבוי מלא (JSON)</Link>
-          <Link href="/api/export?type=catalog&format=csv" className="rounded-xl bg-white/10 px-4 py-2 hover:bg-white/15">ייצוא קטלוג (CSV)</Link>
+          <Link href="/admin/titles/new" className="chamfer bg-lemon-400 px-4 py-2 font-bold text-ink-900">+ סרט חדש</Link>
+          <Link href="/admin/titles/new?kind=series" className="chamfer bg-parchment-100/[0.07] px-4 py-2 hover:bg-parchment-100/[0.12]">+ סדרה חדשה</Link>
+          <Link href="/admin/collections" className="chamfer bg-parchment-100/[0.07] px-4 py-2 hover:bg-parchment-100/[0.12]">ניהול שורות הבית</Link>
+          <Link href="/admin/users" className="chamfer bg-parchment-100/[0.07] px-4 py-2 hover:bg-parchment-100/[0.12]">הוספת משתמש / שינוי מנוי</Link>
+          <Link href="/api/export?type=backup" className="chamfer bg-parchment-100/[0.07] px-4 py-2 hover:bg-parchment-100/[0.12]">גיבוי מלא (JSON)</Link>
+          <Link href="/api/export?type=catalog&format=csv" className="chamfer bg-parchment-100/[0.07] px-4 py-2 hover:bg-parchment-100/[0.12]">ייצוא קטלוג (CSV)</Link>
         </div>
       </Card>
     </div>

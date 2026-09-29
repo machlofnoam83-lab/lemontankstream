@@ -74,34 +74,34 @@ export default async function AdminTitlesPage({
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
-          <Link href="/admin/titles/new" className="rounded-xl bg-lemon-400 px-4 py-2.5 text-sm font-bold text-ink-900">+ סרט חדש</Link>
-          <Link href="/admin/titles/new?kind=series" className="rounded-xl bg-white/10 px-4 py-2.5 text-sm hover:bg-white/15">+ סדרה חדשה</Link>
+          <Link href="/admin/titles/new" className="chamfer bg-lemon-400 px-4 py-2.5 text-sm font-bold text-ink-900">+ סרט חדש</Link>
+          <Link href="/admin/titles/new?kind=series" className="chamfer bg-parchment-100/[0.07] px-4 py-2.5 text-sm hover:bg-parchment-100/[0.12]">+ סדרה חדשה</Link>
         </div>
       </header>
 
       {/* סינון */}
-      <form className="flex flex-wrap items-center gap-2 rounded-2xl border border-white/10 bg-white/[0.03] p-3" action="/admin/titles">
-        <input name="q" defaultValue={q} placeholder="חיפוש לפי שם…" aria-label="חיפוש כותר" className="min-w-40 flex-1 rounded-xl border border-white/10 bg-ink-900/80 px-3 py-2 text-sm" />
-        <select name="kind" defaultValue={kind} aria-label="סוג" className="rounded-xl border border-white/10 bg-ink-900/80 px-3 py-2 text-sm">
+      <form className="flex flex-wrap items-center gap-2 chamfer border border-brass-400/15 bg-parchment-100/[0.03] p-3" action="/admin/titles">
+        <input name="q" defaultValue={q} placeholder="חיפוש לפי שם…" aria-label="חיפוש כותר" className="min-w-40 flex-1 chamfer border border-brass-400/15 bg-ink-900/80 px-3 py-2 text-sm" />
+        <select name="kind" defaultValue={kind} aria-label="סוג" className="chamfer border border-brass-400/15 bg-ink-900/80 px-3 py-2 text-sm">
           <option value="">הכל</option>
           <option value="movie">סרטים</option>
           <option value="series">סדרות</option>
         </select>
-        <select name="plan" defaultValue={plan} aria-label="מסלול" className="rounded-xl border border-white/10 bg-ink-900/80 px-3 py-2 text-sm">
+        <select name="plan" defaultValue={plan} aria-label="מסלול" className="chamfer border border-brass-400/15 bg-ink-900/80 px-3 py-2 text-sm">
           <option value="">חינם + פלוס</option>
           <option value="free">חינם</option>
           <option value="plus">פלוס</option>
         </select>
-        <select name="status" defaultValue={status} aria-label="סטטוס" className="rounded-xl border border-white/10 bg-ink-900/80 px-3 py-2 text-sm">
+        <select name="status" defaultValue={status} aria-label="סטטוס" className="chamfer border border-brass-400/15 bg-ink-900/80 px-3 py-2 text-sm">
           <option value="">כל הסטטוסים</option>
           <option value="published">מפורסם</option>
           <option value="draft">טיוטה</option>
           <option value="scheduled">מתוזמן</option>
           <option value="archived">ארכיון</option>
         </select>
-        <button className="rounded-xl bg-lemon-400 px-4 py-2 text-sm font-bold text-ink-900">סנן</button>
+        <button className="chamfer bg-lemon-400 px-4 py-2 text-sm font-bold text-ink-900">סנן</button>
         {q || kind || plan || status ? (
-          <Link href="/admin/titles" className="rounded-xl px-3 py-2 text-xs text-ink-300 hover:text-white">איפוס</Link>
+          <Link href="/admin/titles" className="chamfer px-3 py-2 text-xs text-ink-300 hover:text-parchment-100">איפוס</Link>
         ) : null}
       </form>
 
@@ -110,19 +110,19 @@ export default async function AdminTitlesPage({
           title="לא נמצאו כותרים"
           description="אפשר ליצור סרט או סדרה חדשים — ומשם להעלות פוסטר, פרקים ווידאו."
           icon="film"
-          action={<Link href="/admin/titles/new" className="rounded-xl bg-lemon-400 px-4 py-2 text-sm font-bold text-ink-900">צור כותר ראשון</Link>}
+          action={<Link href="/admin/titles/new" className="chamfer bg-lemon-400 px-4 py-2 text-sm font-bold text-ink-900">צור כותר ראשון</Link>}
         />
       ) : (
         <>
           <TitlesBulkActions>
             <DataTable head={["", "פוסטר", "שם", "סוג", "שנה", "מסלול", "סטטוס", "פרקים", "צפיות", "עודכן", "פעולות"]}>
               {items.map((t) => (
-                <tr key={t.id} className="hover:bg-white/[0.03]">
+                <tr key={t.id} className="hover:bg-parchment-100/[0.03]">
                   <td className="px-3 py-2">
                     <input type="checkbox" name="titleId" value={t.id} className="accent-lemon-400" aria-label={`בחר ${t.name_he}`} />
                   </td>
                   <td className="px-3 py-2">
-                    <span className="block h-14 w-10 overflow-hidden rounded bg-ink-800">
+                    <span className="block h-14 w-10 overflow-hidden chamfer-sm bg-ink-800">
                       {t.poster_url ? (
                         // eslint-disable-next-line @next/next/no-img-element
                         <img src={t.poster_url} alt="" className="h-full w-full object-cover" loading="lazy" />
@@ -166,7 +166,7 @@ export default async function AdminTitlesPage({
                     <Link
                       href={`/admin/titles?page=${p}${kind ? `&kind=${kind}` : ""}${plan ? `&plan=${plan}` : ""}${status ? `&status=${status}` : ""}${q ? `&q=${encodeURIComponent(q)}` : ""}`}
                       aria-current={p === page ? "page" : undefined}
-                      className={`rounded-lg px-3 py-1.5 text-sm ${p === page ? "bg-lemon-400 font-bold text-ink-900" : "bg-white/5 hover:bg-white/10"}`}
+                      className={`chamfer-sm px-3 py-1.5 text-sm ${p === page ? "bg-lemon-400 font-bold text-ink-900" : "bg-parchment-100/[0.04] hover:bg-parchment-100/[0.07]"}`}
                     >
                       {p}
                     </Link>

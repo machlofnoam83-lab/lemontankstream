@@ -52,12 +52,12 @@ export default async function DeveloperPage() {
       <Card className="p-4">
         <h2 className="text-xl font-bold">איך משתמשים</h2>
         <p className="mt-1 text-[0.95rem] text-ink-300">
-          כל בקשה נושאת כותרת <code className="rounded bg-black/40 px-1.5 py-0.5 font-mono" dir="ltr">Authorization: Bearer &lt;המפתח&gt;</code>.
+          כל בקשה נושאת כותרת <code className="chamfer-sm bg-black/40 px-1.5 py-0.5 font-mono" dir="ltr">Authorization: Bearer &lt;המפתח&gt;</code>.
           המפתח עובד מהשרת שלך בלבד — <b>אסור</b> לשים אותו בקוד דפדפן, אחרת כל מי שיפתח את הכלי יראה אותו.
         </p>
         <div className="mt-4 grid gap-3 md:grid-cols-2">
           {EXAMPLES.map((example) => (
-            <div key={example.title} className="rounded-xl bg-black/40 p-3">
+            <div key={example.title} className="chamfer bg-black/40 p-3">
               <div className="font-bold">{example.title}</div>
               <div className="text-[0.85rem] text-ink-400">{example.desc}</div>
               <pre className="mt-2 overflow-x-auto whitespace-pre-wrap break-all font-mono text-[0.8rem] text-lemon-200" dir="ltr">

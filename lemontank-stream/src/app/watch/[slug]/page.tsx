@@ -101,7 +101,7 @@ export default async function WatchPage({
             label="ארח צפייה משותפת"
           />
           {playback.episode ? (
-            <span className="rounded-full bg-white/10 px-2.5 py-1">
+            <span className="rounded-full bg-parchment-100/[0.07] px-2.5 py-1">
               עונה {playback.episode.season_number} · פרק {playback.episode.number}
             </span>
           ) : null}
@@ -125,7 +125,7 @@ export default async function WatchPage({
               allowed={user.effective_plan === "plus"}
             />
           ) : null}
-          <Link href={`/title/${playback.title.slug}`} className="rounded-xl border border-white/15 bg-white/5 px-4 py-2.5 text-sm hover:bg-white/15">
+          <Link href={`/title/${playback.title.slug}`} className="chamfer border border-brass-400/20 bg-parchment-100/[0.04] px-4 py-2.5 text-sm hover:bg-parchment-100/[0.12]">
             כל הפרקים והפרטים
           </Link>
           {episodesWatched > 0 ? (

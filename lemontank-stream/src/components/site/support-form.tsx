@@ -36,7 +36,7 @@ export function SupportForm() {
   }
 
   return (
-    <form onSubmit={submit} className="card-surface space-y-4 rounded-2xl p-5">
+    <form onSubmit={submit} className="card-surface space-y-4 chamfer p-5">
       {error ? <Alert tone="danger">{error}</Alert> : null}
 
       <Field label="נושא" required htmlFor="subject">

@@ -73,10 +73,10 @@ export default async function PartyPage({ params }: { params: Promise<{ id: stri
           </p>
         </div>
         <div className="flex items-center gap-2 text-[0.9rem]">
-          <span className="rounded-xl bg-white/[0.07] px-3 py-2">
+          <span className="chamfer bg-parchment-100/[0.07] px-3 py-2">
             קוד הצטרפות: <b className="font-mono text-lemon-300" dir="ltr">{party.id}</b>
           </span>
-          <Link href={`/title/${party.title_slug}`} className="rounded-xl bg-white/[0.07] px-3 py-2 hover:bg-white/[0.12]">
+          <Link href={`/title/${party.title_slug}`} className="chamfer bg-parchment-100/[0.07] px-3 py-2 hover:bg-parchment-100/[0.12]">
             פרטי הכותר
           </Link>
         </div>
@@ -110,11 +110,11 @@ export default async function PartyPage({ params }: { params: Promise<{ id: stri
           {party.members.map((member) => (
             <li
               key={member.user_id}
-              className={`flex items-center gap-2 rounded-xl px-3 py-2 text-[0.9rem] ${
-                member.user_id === party.host_id ? "bg-lemon-400/15 text-lemon-200" : "bg-white/[0.07]"
+              className={`flex items-center gap-2 chamfer px-3 py-2 text-[0.9rem] ${
+                member.user_id === party.host_id ? "bg-lemon-400/15 text-lemon-200" : "bg-parchment-100/[0.07]"
               }`}
             >
-              <span className="flex h-6 w-6 items-center justify-center rounded-full bg-white/10 text-[0.75rem] font-black">
+              <span className="flex h-6 w-6 items-center justify-center rounded-full bg-parchment-100/[0.07] text-[0.75rem] font-black">
                 {member.name.charAt(0)}
               </span>
               {member.name}

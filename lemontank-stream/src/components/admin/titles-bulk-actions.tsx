@@ -47,7 +47,7 @@ export function TitlesBulkActions({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="space-y-3">
-      <div className="flex flex-wrap items-center gap-2 rounded-2xl border border-white/10 bg-white/[0.03] p-3">
+      <div className="flex flex-wrap items-center gap-2 chamfer border border-brass-400/15 bg-parchment-100/[0.03] p-3">
         <span className="text-xs text-ink-300">פעולה על הנבחרים:</span>
         <Select value={action} onChange={(e) => setAction(e.target.value)} className="w-auto" aria-label="בחר פעולה">
           <option value="plan:plus">העבר למסלול פלוס ⭐</option>

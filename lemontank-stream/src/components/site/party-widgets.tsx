@@ -121,7 +121,7 @@ export function CopyPartyLink({ partyId }: { partyId: string }) {
   }, [link]);
 
   return (
-    <button type="button" onClick={copy} className="rounded-xl bg-white/[0.07] px-3 py-2 text-[0.9rem] hover:bg-white/[0.12]">
+    <button type="button" onClick={copy} className="chamfer bg-parchment-100/[0.07] px-3 py-2 text-[0.9rem] hover:bg-parchment-100/[0.12]">
       {copied ? "✓ הקישור הועתק" : "העתק קישור הזמנה"}
     </button>
   );
@@ -142,7 +142,7 @@ export function SharePartyButton({ partyId, titleName }: { partyId: string; titl
     await navigator.clipboard.writeText(url).catch(() => undefined);
   };
   return (
-    <button type="button" onClick={share} className="rounded-xl bg-white/[0.07] px-3 py-2 text-[0.9rem] hover:bg-white/[0.12]">
+    <button type="button" onClick={share} className="chamfer bg-parchment-100/[0.07] px-3 py-2 text-[0.9rem] hover:bg-parchment-100/[0.12]">
       שיתוף
     </button>
   );
@@ -192,7 +192,7 @@ export function MyParties({ initial }: { initial?: { id: string; title_name: str
   return (
     <ul className="space-y-2">
       {parties.map((party) => (
-        <li key={party.id} className="flex flex-wrap items-center justify-between gap-3 rounded-xl bg-white/[0.05] p-3">
+        <li key={party.id} className="flex flex-wrap items-center justify-between gap-3 chamfer bg-parchment-100/[0.05] p-3">
           <div>
             <div className="font-bold">
               {party.title_name} {party.is_host ? <span className="text-[0.8rem] text-lemon-300">(מארח)</span> : null}
@@ -202,7 +202,7 @@ export function MyParties({ initial }: { initial?: { id: string; title_name: str
             </div>
           </div>
           <div className="flex gap-2">
-            <a href={`/party/${party.id}`} className="rounded-xl bg-lemon-400 px-3.5 py-2 text-[0.9rem] font-bold text-ink-950">
+            <a href={`/party/${party.id}`} className="chamfer bg-lemon-400 px-3.5 py-2 text-[0.9rem] font-bold text-ink-950">
               כניסה
             </a>
             <CopyPartyLink partyId={party.id} />
@@ -255,7 +255,7 @@ export function JoinByCode() {
         placeholder="קוד חדר"
         maxLength={8}
         dir="ltr"
-        className="w-40 rounded-xl border border-white/15 bg-black/40 px-3 py-2 font-mono tracking-widest"
+        className="w-40 chamfer border border-brass-400/20 bg-black/40 px-3 py-2 font-mono tracking-widest"
       />
       <Button type="submit" disabled={joining}>
         {joining ? "מצטרף…" : "הצטרף לחדר"}

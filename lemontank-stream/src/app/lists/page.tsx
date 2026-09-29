@@ -48,8 +48,8 @@ export default async function ListsPage() {
           (למשל: &quot;דקה 40 — הסצנה שצריך לראות&quot;). יש לך {totalItems} כותרים באוספים.
         </p>
         <div className="mt-3 flex flex-wrap gap-2">
-          <Link href="/movies" className="rounded-xl bg-lemon-400 px-4 py-2 font-bold text-ink-950">לסרטים</Link>
-          <Link href="/series" className="rounded-xl bg-white/[0.07] px-4 py-2 font-bold hover:bg-white/[0.12]">לסדרות</Link>
+          <Link href="/movies" className="chamfer bg-lemon-400 px-4 py-2 font-bold text-ink-950">לסרטים</Link>
+          <Link href="/series" className="chamfer bg-parchment-100/[0.07] px-4 py-2 font-bold hover:bg-parchment-100/[0.12]">לסדרות</Link>
         </div>
       </Card>
     </div>

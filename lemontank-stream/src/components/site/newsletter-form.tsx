@@ -47,7 +47,7 @@ export function NewsletterSignup({ compact = false }: { compact?: boolean }) {
         value={email}
         onChange={(event) => setEmail(event.target.value)}
         placeholder="האימייל שלך"
-        className="min-w-[200px] flex-1 rounded-xl border border-white/15 bg-black/40 px-3 py-2"
+        className="min-w-[200px] flex-1 chamfer border border-brass-400/20 bg-black/40 px-3 py-2"
         aria-label="כתובת אימייל לעדכונים"
       />
       <Button type="submit" disabled={state === "loading"}>
@@ -114,7 +114,7 @@ export function NewsletterPreferences({
     <Card className="space-y-4 p-4">
       <h2 className="text-xl font-bold">ההעדפות שלי</h2>
 
-      <div className="border-b border-white/10 pb-2">
+      <div className="border-b border-brass-400/15 pb-2">
         <Switch
           checked={optIn}
           onChange={setOptIn}

@@ -129,13 +129,13 @@ export function PlansEditor({ plans }: { plans: AdminPlan[] }) {
                     })()}
                     onChange={(e) => set(plan.code, "features_json", JSON.stringify(e.target.value.split("\n").map((s) => s.trim()).filter(Boolean)))}
                     rows={5}
-                    className="w-full rounded-xl border border-white/10 bg-ink-900/80 px-3 py-2 text-sm"
+                    className="w-full chamfer border border-brass-400/15 bg-ink-900/80 px-3 py-2 text-sm"
                   />
                 </Field>
               </div>
               <Field label="צבע תג" htmlFor={`c-${plan.code}`}>
                 <div className="flex items-center gap-2">
-                  <input id={`c-${plan.code}`} type="color" value={draft.badge_color} onChange={(e) => set(plan.code, "badge_color", e.target.value)} className="h-9 w-14 cursor-pointer rounded-lg border border-white/10 bg-transparent" />
+                  <input id={`c-${plan.code}`} type="color" value={draft.badge_color} onChange={(e) => set(plan.code, "badge_color", e.target.value)} className="h-9 w-14 cursor-pointer chamfer-sm border border-brass-400/15 bg-transparent" />
                   <Input value={draft.badge_color} onChange={(e) => set(plan.code, "badge_color", e.target.value)} dir="ltr" />
                 </div>
               </Field>

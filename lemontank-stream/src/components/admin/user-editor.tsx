@@ -87,7 +87,7 @@ export function UserEditorButton({ user, actorRole }: { user: AdminUser; actorRo
           </>
         }
       >
-        {error ? <p className="rounded-xl border border-ember-500/30 bg-ember-500/10 px-3 py-2 text-sm text-ember-200">{error}</p> : null}
+        {error ? <p className="chamfer border border-ember-500/30 bg-ember-500/10 px-3 py-2 text-sm text-ember-200">{error}</p> : null}
 
         <div className="grid gap-3 md:grid-cols-2">
           <Field label="שם" htmlFor="u-name">
@@ -134,7 +134,7 @@ export function UserEditorButton({ user, actorRole }: { user: AdminUser; actorRo
           <Textarea id="u-notes" value={notes} onChange={(e) => setNotes(e.target.value)} maxLength={2000} />
         </Field>
 
-        <div className="rounded-xl border border-white/10 bg-white/[0.02] p-3 text-xs text-ink-400">
+        <div className="chamfer border border-brass-400/15 bg-parchment-100/[0.02] p-3 text-xs text-ink-400">
           <p>סשנים פעילים: <b className="text-ink-200">{user.active_sessions ?? 0}</b> · תוכן שנצפה: {user.watched_items ?? 0} · 2FA: {user.twofa_enabled ? "מופעל" : "כבוי"}</p>
           <Button size="sm" variant="subtle" className="mt-2" onClick={revokeSessions} loading={busy}>נתק את כל המכשירים</Button>
         </div>

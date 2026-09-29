@@ -39,7 +39,7 @@ export default async function PrivacyPage() {
             ["רשומות סשן", summary.sessions],
             ["אירועי אנליטיקה", summary.analytics],
           ].map(([label, value]) => (
-            <div key={String(label)} className="rounded-xl border border-white/8 bg-white/[0.02] p-3">
+            <div key={String(label)} className="chamfer border border-brass-400/15 bg-parchment-100/[0.02] p-3">
               <dt className="text-ink-400">{label}</dt>
               <dd className="mt-1 text-lg font-bold">{value}</dd>
             </div>

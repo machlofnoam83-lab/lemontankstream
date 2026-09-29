@@ -36,7 +36,7 @@ const BREACH_LABEL: Record<"off" | "warn" | "enforce", string> = {
 const SEVERITY_STYLE: Record<string, string> = {
   critical: "border-ember-500/40 bg-ember-500/10 text-ember-200",
   warning: "border-brass-500/40 bg-brass-500/10 text-brass-200",
-  info: "border-white/12 bg-white/[0.05] text-ink-200",
+  info: "border-brass-400/19 bg-parchment-100/[0.05] text-ink-200",
 };
 
 /**
@@ -183,7 +183,7 @@ export function FortressDashboard({ initial, canManage }: { initial: FortressDat
       <Card className="p-4">
         <div className="flex flex-wrap items-center justify-between gap-2">
           <h2 className="text-lg font-bold">🚨 חריגות שזוהו</h2>
-          <button type="button" onClick={() => void refresh()} className="rounded-lg bg-white/[0.07] px-3 py-1.5 text-[0.85rem] hover:bg-white/[0.12]">
+          <button type="button" onClick={() => void refresh()} className="chamfer-sm bg-parchment-100/[0.07] px-3 py-1.5 text-[0.85rem] hover:bg-parchment-100/[0.12]">
             רענון
           </button>
         </div>
@@ -192,7 +192,7 @@ export function FortressDashboard({ initial, canManage }: { initial: FortressDat
         ) : (
           <ul className="mt-3 space-y-2">
             {report.anomalies.map((anomaly) => (
-              <li key={anomaly.kind} className={`rounded-xl border p-3 ${SEVERITY_STYLE[anomaly.severity] ?? SEVERITY_STYLE.info}`}>
+              <li key={anomaly.kind} className={`chamfer border p-3 ${SEVERITY_STYLE[anomaly.severity] ?? SEVERITY_STYLE.info}`}>
                 <div className="font-bold">{anomaly.title}</div>
                 <div className="text-[0.9rem]">{anomaly.detail}</div>
               </li>
@@ -206,7 +206,7 @@ export function FortressDashboard({ initial, canManage }: { initial: FortressDat
         <p className="mt-1 text-[0.9rem] text-ink-300">
           כל רשומה נושאת את ה-Hash של קודמתה. אם מישהו מוחק או משנה רשומה בדיעבד — השרשרת נשברת וזה מתגלה כאן.
         </p>
-        <div className="mt-3 rounded-xl bg-black/40 p-3 font-mono text-[0.8rem] text-ink-300">
+        <div className="mt-3 chamfer bg-black/40 p-3 font-mono text-[0.8rem] text-ink-300">
           <div>ראש השרשרת: #{auditChain.head.seq ?? "—"}</div>
           <div className="truncate">חתימה: {auditChain.head.entryHash ?? "—"}</div>
         </div>
@@ -233,14 +233,14 @@ export function FortressDashboard({ initial, canManage }: { initial: FortressDat
           rows={4}
           dir="ltr"
           placeholder={"203.0.113.7\n10.0.0.0/8"}
-          className="mt-3 w-full rounded-xl border border-white/15 bg-black/40 p-3 font-mono text-[0.85rem]"
+          className="mt-3 w-full chamfer border border-brass-400/20 bg-black/40 p-3 font-mono text-[0.85rem]"
         />
         <div className="mt-2 flex flex-wrap items-center gap-3">
           <button
             type="button"
             disabled={!canManage || busy}
             onClick={() => void runCritical(saveAllowlist)}
-            className="rounded-xl bg-lemon-400 px-4 py-2 font-bold text-ink-950 disabled:opacity-50"
+            className="chamfer bg-lemon-400 px-4 py-2 font-bold text-ink-950 disabled:opacity-50"
           >
             {busy ? <Spinner /> : "שמור רשימת היתר"}
           </button>
@@ -265,8 +265,8 @@ export function FortressDashboard({ initial, canManage }: { initial: FortressDat
               type="button"
               disabled={!canManage || busy}
               onClick={() => void runCritical(() => savePolicy({ breachMode: mode }))}
-              className={`rounded-xl px-3 py-2 text-[0.88rem] font-bold disabled:opacity-50 ${
-                breachMode === mode ? "bg-lemon-400 text-ink-950" : "bg-white/[0.07] text-ink-200"
+              className={`chamfer px-3 py-2 text-[0.88rem] font-bold disabled:opacity-50 ${
+                breachMode === mode ? "bg-lemon-400 text-ink-950" : "bg-parchment-100/[0.07] text-ink-200"
               }`}
             >
               {BREACH_LABEL[mode]}
@@ -279,7 +279,7 @@ export function FortressDashboard({ initial, canManage }: { initial: FortressDat
             ? ` · נבדק לאחרונה ${new Date(data.passwordPolicy.breachCache.lastCheckedAt).toLocaleString("he-IL")}`
             : ""}
         </div>
-        <div className="mt-4 border-t border-white/10 pt-3">
+        <div className="mt-4 border-t border-brass-400/15 pt-3">
           <div className="text-[0.9rem] text-ink-300">חובת אימות דו-שלבי על כל חשבונות הצוות</div>
           <div className="mt-2 flex gap-2">
             {(["on", "off"] as const).map((value) => (
@@ -288,8 +288,8 @@ export function FortressDashboard({ initial, canManage }: { initial: FortressDat
                 type="button"
                 disabled={!canManage || busy}
                 onClick={() => void runCritical(() => savePolicy({ requireStaff2fa: value }))}
-                className={`rounded-xl px-3 py-2 text-[0.88rem] font-bold disabled:opacity-50 ${
-                  staff2fa === value ? "bg-lemon-400 text-ink-950" : "bg-white/[0.07] text-ink-200"
+                className={`chamfer px-3 py-2 text-[0.88rem] font-bold disabled:opacity-50 ${
+                  staff2fa === value ? "bg-lemon-400 text-ink-950" : "bg-parchment-100/[0.07] text-ink-200"
                 }`}
               >
                 {value === "on" ? "חובה" : "רשות"}
@@ -309,7 +309,7 @@ export function FortressDashboard({ initial, canManage }: { initial: FortressDat
         </p>
         <div className="mt-3 flex flex-wrap gap-2">
           {data.criticalActions.map((action) => (
-            <code key={action} className="rounded-lg bg-white/[0.07] px-2 py-1 text-[0.8rem]">
+            <code key={action} className="chamfer-sm bg-parchment-100/[0.07] px-2 py-1 text-[0.8rem]">
               {action}
             </code>
           ))}
@@ -318,7 +318,7 @@ export function FortressDashboard({ initial, canManage }: { initial: FortressDat
 
       {stepUpFor && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4">
-          <form onSubmit={confirmStepUp} className="w-full max-w-sm rounded-2xl border border-white/12 bg-ink-900 p-5">
+          <form onSubmit={confirmStepUp} className="w-full max-w-sm chamfer border border-brass-400/19 bg-ink-900 p-5">
             <h3 className="text-lg font-black">אימות מחדש נדרש</h3>
             <p className="mt-1 text-[0.9rem] text-ink-300">פעולה רגישה — הזן את הסיסמה שלך כדי לאשר.</p>
             <input
@@ -326,15 +326,15 @@ export function FortressDashboard({ initial, canManage }: { initial: FortressDat
               value={password}
               onChange={(event) => setPassword(event.target.value)}
               autoFocus
-              className="mt-3 w-full rounded-xl border border-white/15 bg-black/40 px-3 py-2"
+              className="mt-3 w-full chamfer border border-brass-400/20 bg-black/40 px-3 py-2"
               placeholder="סיסמה"
             />
             {stepError && <p className="mt-2 text-[0.88rem] text-ember-300">{stepError}</p>}
             <div className="mt-4 flex gap-2">
-              <button type="submit" disabled={busy} className="flex-1 rounded-xl bg-lemon-400 py-2 font-bold text-ink-950 disabled:opacity-60">
+              <button type="submit" disabled={busy} className="flex-1 chamfer bg-lemon-400 py-2 font-bold text-ink-950 disabled:opacity-60">
                 {busy ? <Spinner /> : "אשר"}
               </button>
-              <button type="button" onClick={() => { setStepUpFor(null); setPassword(""); }} className="rounded-xl bg-white/[0.07] px-4 py-2">
+              <button type="button" onClick={() => { setStepUpFor(null); setPassword(""); }} className="chamfer bg-parchment-100/[0.07] px-4 py-2">
                 ביטול
               </button>
             </div>

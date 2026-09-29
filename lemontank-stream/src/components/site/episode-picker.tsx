@@ -46,7 +46,7 @@ export function EpisodePicker({
 
   if (!seasons.length) {
     return (
-      <div className="rounded-2xl border border-dashed border-white/10 p-6 text-center text-sm text-ink-400">
+      <div className="chamfer border border-dashed border-brass-400/15 p-6 text-center text-sm text-ink-400">
         עוד לא נוספו פרקים לסדרה הזו — האדמין יכול להוסיף בפאנל הניהול.
       </div>
     );
@@ -61,10 +61,10 @@ export function EpisodePicker({
               key={s.id}
               onClick={() => setSeasonNumber(s.number)}
               aria-pressed={seasonNumber === s.number}
-              className={`whitespace-nowrap rounded-xl border px-4 py-2 text-sm transition ${
+              className={`whitespace-nowrap chamfer border px-4 py-2 text-sm transition ${
                 seasonNumber === s.number
                   ? "border-lemon-400 bg-lemon-400/15 font-bold text-lemon-200"
-                  : "border-white/10 bg-white/5 text-ink-200 hover:bg-white/10"
+                  : "border-brass-400/15 bg-parchment-100/[0.04] text-ink-200 hover:bg-parchment-100/[0.07]"
               }`}
             >
               {s.name_he ?? `עונה ${s.number}`}
@@ -72,7 +72,7 @@ export function EpisodePicker({
             </button>
           ))}
         </div>
-        <button onClick={() => setReversed((r) => !r)} className="rounded-lg border border-white/10 px-3 py-1.5 text-xs text-ink-300 hover:bg-white/10">
+        <button onClick={() => setReversed((r) => !r)} className="chamfer-sm border border-brass-400/15 px-3 py-1.5 text-xs text-ink-300 hover:bg-parchment-100/[0.07]">
           {reversed ? "סדר עולה ↑" : "סדר יורד ↓"}
         </button>
       </div>
@@ -86,10 +86,10 @@ export function EpisodePicker({
             <li key={ep.id}>
               <Link
                 href={locked ? "/plans" : `/watch/${slug}?ep=${ep.id}`}
-                className="group flex items-center gap-4 rounded-2xl border border-white/8 bg-white/[0.02] p-3 transition hover:border-lemon-400/30 hover:bg-white/[0.06]"
+                className="group flex items-center gap-4 chamfer border border-brass-400/15 bg-parchment-100/[0.02] p-3 transition hover:border-lemon-400/30 hover:bg-parchment-100/[0.06]"
                 aria-label={`${ep.name_he}${locked ? " — דורש מנוי פלוס" : ""}`}
               >
-                <span className="relative h-20 w-32 shrink-0 overflow-hidden rounded-xl bg-ink-800">
+                <span className="relative h-20 w-32 shrink-0 overflow-hidden chamfer bg-ink-800">
                   {ep.thumb_url ? (
                     // eslint-disable-next-line @next/next/no-img-element
                     <img src={ep.thumb_url} alt="" loading="lazy" className="h-full w-full object-cover" />
@@ -100,7 +100,7 @@ export function EpisodePicker({
                     <span className="rounded-full bg-lemon-400 p-2 text-ink-900">{locked ? "" : ""}</span>
                   </span>
                   {percent > 0 ? (
-                    <span className="absolute inset-x-0 bottom-0 h-1 bg-white/25">
+                    <span className="absolute inset-x-0 bottom-0 h-1 bg-parchment-100/[0.20]">
                       <span className="block h-full bg-lemon-400" style={{ width: `${Math.min(100, percent * 100)}%` }} />
                     </span>
                   ) : null}
@@ -109,8 +109,8 @@ export function EpisodePicker({
                 <span className="min-w-0 flex-1">
                   <span className="flex items-center gap-2">
                     <span className="text-xs text-ink-400">פרק {ep.number}</span>
-                    {ep.is_premiere ? <span className="rounded bg-lemon-400/20 px-1.5 text-[0.8rem] text-lemon-300">בכורה</span> : null}
-                    {ep.is_finale ? <span className="rounded bg-ember-500/20 px-1.5 text-[0.8rem] text-ember-300">סיום עונה</span> : null}
+                    {ep.is_premiere ? <span className="chamfer-sm bg-lemon-400/20 px-1.5 text-[0.8rem] text-lemon-300">בכורה</span> : null}
+                    {ep.is_finale ? <span className="chamfer-sm bg-ember-500/20 px-1.5 text-[0.8rem] text-ember-300">סיום עונה</span> : null}
                     {ep.effective_access === "plus" ? <span className="badge-plus">פלוס</span> : <span className="badge-free">חינם</span>}
                   </span>
                   <span className="mt-1 block truncate font-bold">{ep.name_he}</span>
@@ -123,9 +123,9 @@ export function EpisodePicker({
                 </span>
 
                 {locked ? (
-                  <span className="shrink-0 rounded-xl bg-plus-500/20 px-3 py-2 text-xs font-bold text-plus-400">שדרג </span>
+                  <span className="shrink-0 chamfer bg-plus-500/20 px-3 py-2 text-xs font-bold text-plus-400">שדרג </span>
                 ) : (
-                  <span className="shrink-0 rounded-xl bg-white/10 px-3 py-2 text-xs font-bold text-white group-hover:bg-lemon-400 group-hover:text-ink-900">
+                  <span className="shrink-0 chamfer bg-parchment-100/[0.07] px-3 py-2 text-xs font-bold text-parchment-100 group-hover:bg-lemon-400 group-hover:text-ink-900">
                     צפה 
                   </span>
                 )}

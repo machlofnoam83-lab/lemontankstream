@@ -92,7 +92,7 @@ export function UserMenu({ user, notifications = 0 }: { user: SessionUser; notif
           <div className="fixed inset-0 z-40" onClick={() => setOpen(false)} aria-hidden="true" />
           <div
             role="menu"
-            className="absolute left-0 z-50 mt-2 w-64 origin-top border border-brass-400/25 bg-obsidian-900/97 py-1 shadow-[0_30px_70px_-30px_rgba(0,0,0,1)] backdrop-blur-xl animate-ink-in chamfer"
+            className="absolute left-0 z-50 mt-2 w-64 origin-top border border-brass-400/25 bg-obsidian-900/97 py-1 shadow-[0_30px_70px_-30px_rgba(0,0,0,1)] backdrop-blur-md animate-ink-in chamfer"
           >
             <div className="px-4 py-3">
               <div className="truncate font-display text-[1.02rem] font-bold text-parchment-100">{user.name}</div>

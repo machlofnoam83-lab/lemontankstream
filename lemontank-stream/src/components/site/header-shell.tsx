@@ -56,7 +56,7 @@ export function HeaderShell({
     <header
       className={`sticky top-0 z-40 transition-all duration-700 [transition-timing-function:var(--ease-ink)] ${
         scrolled
-          ? "bg-obsidian-950/92 shadow-[0_18px_50px_-30px_rgba(0,0,0,1)] backdrop-blur-xl"
+          ? "bg-obsidian-950/92 shadow-[0_18px_50px_-30px_rgba(0,0,0,1)] backdrop-blur-md"
           : "bg-gradient-to-b from-obsidian-950/95 via-obsidian-950/55 to-transparent"
       }`}
     >

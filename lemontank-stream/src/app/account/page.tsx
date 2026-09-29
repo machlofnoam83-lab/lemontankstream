@@ -84,12 +84,12 @@ export default async function AccountPage() {
                 </span>
               ))}
             </div>
-            <Link href="/account/achievements" className="rounded-xl bg-lemon-400 px-4 py-2 font-bold text-ink-950">
+            <Link href="/account/achievements" className="chamfer bg-lemon-400 px-4 py-2 font-bold text-ink-950">
               לכל ההישגים
             </Link>
           </div>
         </div>
-        <div className="mt-3 h-2 overflow-hidden rounded-full bg-white/10">
+        <div className="mt-3 h-2 overflow-hidden rounded-full bg-parchment-100/[0.07]">
           <div
             className="h-full rounded-full bg-gradient-to-l from-lemon-300 to-lemon-500"
             style={{ width: `${badges.length ? Math.round((earnedBadges.length / badges.length) * 100) : 0}%` }}
@@ -106,7 +106,7 @@ export default async function AccountPage() {
                 הפעלת 2FA מוסיפה שכבת הגנה קריטית — גם אם הסיסמה תיחשף, אף אחד לא יוכל להתחבר.
               </p>
             </div>
-            <Link href="/account/security" className="rounded-xl bg-brass-400 px-4 py-2 text-xs font-bold text-black">
+            <Link href="/account/security" className="chamfer bg-brass-400 px-4 py-2 text-xs font-bold text-black">
               הפעל 2FA עכשיו
             </Link>
           </div>
@@ -124,7 +124,7 @@ export default async function AccountPage() {
           {recent.length === 0 ? (
             <p className="text-xs text-ink-400">עוד לא צפית בכלום. אפשר להתחיל מהקטלוג.</p>
           ) : (
-            <ul className="divide-y divide-white/5 text-sm">
+            <ul className="divide-y divide-brass-400/12 text-sm">
               {recent.map((r, i) => (
                 <li key={i} className="flex items-center justify-between gap-3 py-2">
                   <Link href={`/title/${r.slug}`} className="min-w-0 flex-1 truncate hover:text-lemon-300">
@@ -146,7 +146,7 @@ export default async function AccountPage() {
           ) : (
             <ul className="space-y-2 text-sm">
               {notifications.map((n, i) => (
-                <li key={i} className="rounded-xl bg-white/[0.02] p-3">
+                <li key={i} className="chamfer bg-parchment-100/[0.02] p-3">
                   <div className="font-medium">{n.title}</div>
                   {n.body ? <div className="mt-0.5 text-xs text-ink-400">{n.body}</div> : null}
                   <div className="mt-1 text-[0.8rem] text-ink-500">{formatRelative(n.created_at)}</div>

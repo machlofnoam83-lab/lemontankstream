@@ -94,7 +94,7 @@ export default async function AdminHealthPage() {
           <h2 className="mb-3 text-sm font-bold">✅ בדיקות תצורה</h2>
           <ul className="space-y-2">
             {checks.map((check) => (
-              <li key={check.label} className="flex items-start justify-between gap-3 rounded-xl border border-white/8 bg-white/[0.02] p-2.5">
+              <li key={check.label} className="flex items-start justify-between gap-3 chamfer border border-brass-400/15 bg-parchment-100/[0.02] p-2.5">
                 <div>
                   <p className="text-xs font-medium">{check.label}</p>
                   <p className="mt-0.5 text-[0.85rem] text-ink-400" dir="auto">{check.detail}</p>

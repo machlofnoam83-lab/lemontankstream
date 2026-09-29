@@ -87,7 +87,7 @@ export function DeveloperKeys({ initial }: { initial: KeyRow[] }) {
             זו הפעם היחידה שבה המפתח מוצג. בשרת נשמר רק ה-Hash שלו — אם תאבד אותו, צריך ליצור חדש.
           </p>
           <div className="mt-3 flex flex-wrap items-center gap-2">
-            <code className="flex-1 break-all rounded-xl bg-black/50 p-3 font-mono text-[0.9rem] text-lemon-200" dir="ltr">
+            <code className="flex-1 break-all chamfer bg-black/50 p-3 font-mono text-[0.9rem] text-lemon-200" dir="ltr">
               {freshKey}
             </code>
             <Button onClick={copy}>{copied ? "✓ הועתק" : "העתק"}</Button>
@@ -108,7 +108,7 @@ export function DeveloperKeys({ initial }: { initial: KeyRow[] }) {
               required
               minLength={2}
               placeholder="לדוגמה: אתר שלי"
-              className="w-full rounded-xl border border-white/15 bg-black/40 px-3 py-2"
+              className="w-full chamfer border border-brass-400/20 bg-black/40 px-3 py-2"
             />
           </Field>
           <Field label="הרשאה">
@@ -125,7 +125,7 @@ export function DeveloperKeys({ initial }: { initial: KeyRow[] }) {
               max={6000}
               value={rateLimit}
               onChange={(event) => setRateLimit(event.target.value)}
-              className="w-full rounded-xl border border-white/15 bg-black/40 px-3 py-2"
+              className="w-full chamfer border border-brass-400/20 bg-black/40 px-3 py-2"
             />
           </Field>
           <Button type="submit" disabled={busy}>

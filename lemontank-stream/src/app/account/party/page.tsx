@@ -60,7 +60,7 @@ export default async function PartyHubPage() {
           <li>3. שולחים לחברים את הקישור או הקוד שקיבלתם.</li>
           <li>4. לוחצים Play — ומכאן כולם מסונכרנים איתך.</li>
         </ol>
-        <Link href="/movies" className="mt-3 inline-block rounded-xl bg-lemon-400 px-4 py-2 font-bold text-ink-950">
+        <Link href="/movies" className="mt-3 inline-block chamfer bg-lemon-400 px-4 py-2 font-bold text-ink-950">
           בחר משהו לצפות בו
         </Link>
       </Card>

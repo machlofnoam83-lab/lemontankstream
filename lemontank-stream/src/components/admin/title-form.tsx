@@ -220,12 +220,12 @@ export function TitleForm({ initial, genres, isNew = false }: { initial?: Partia
           כאן קובעים מי יכול לצפות בכותר. האכיפה מתבצעת בשרת — משתמש במסלול חינם לא יקבל קישור וידאו לתוכן פלוס.
         </p>
         <div className="mt-4 grid gap-3 md:grid-cols-3">
-          <label className={`cursor-pointer rounded-xl border p-3 ${values.plan_access === "free" ? "border-verdigris-500/50 bg-verdigris-500/10" : "border-white/10"}`}>
+          <label className={`cursor-pointer chamfer border p-3 ${values.plan_access === "free" ? "border-verdigris-500/50 bg-verdigris-500/10" : "border-brass-400/15"}`}>
             <input type="radio" name="plan_access" className="sr-only" checked={values.plan_access === "free"} onChange={() => set("plan_access", "free")} />
             <div className="font-bold text-verdigris-400">🆓 חינם לכולם</div>
             <p className="mt-1 text-[0.85rem] text-ink-400">גם משתמשים ללא מנוי (עם פרסומות).</p>
           </label>
-          <label className={`cursor-pointer rounded-xl border p-3 ${values.plan_access === "plus" ? "border-plus-500/50 bg-plus-500/10" : "border-white/10"}`}>
+          <label className={`cursor-pointer chamfer border p-3 ${values.plan_access === "plus" ? "border-plus-500/50 bg-plus-500/10" : "border-brass-400/15"}`}>
             <input type="radio" name="plan_access" className="sr-only" checked={values.plan_access === "plus"} onChange={() => set("plan_access", "plus")} />
             <div className="font-bold text-plus-400">⭐ פלוס בלבד</div>
             <p className="mt-1 text-[0.85rem] text-ink-400">רק מנויי פלוס. משתמש חינם יראה מסך שדרוג.</p>
@@ -295,7 +295,7 @@ export function TitleForm({ initial, genres, isNew = false }: { initial?: Partia
                 type="button"
                 onClick={() => set("genres", active ? values.genres.filter((id) => id !== g.id) : [...values.genres, g.id])}
                 aria-pressed={active}
-                className={`rounded-full border px-3 py-1.5 text-xs transition ${active ? "border-lemon-400 bg-lemon-400/20 text-lemon-200" : "border-white/15 text-ink-300 hover:bg-white/10"}`}
+                className={`rounded-full border px-3 py-1.5 text-xs transition ${active ? "border-lemon-400 bg-lemon-400/20 text-lemon-200" : "border-brass-400/20 text-ink-300 hover:bg-parchment-100/[0.07]"}`}
               >
                 {g.icon} {g.name_he}
               </button>

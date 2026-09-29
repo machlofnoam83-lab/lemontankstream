@@ -209,9 +209,9 @@ export default async function PlansPage() {
 
       {/* חיובים אחרונים */}
       {payments.length ? (
-        <section className="card-surface rounded-2xl p-5">
+        <section className="card-surface chamfer p-5">
           <h2 className="mb-3 text-lg font-bold">היסטוריית חיובים</h2>
-          <ul className="divide-y divide-white/5 text-sm">
+          <ul className="divide-y divide-brass-400/12 text-sm">
             {payments.map((p) => (
               <li key={p.id} className="flex items-center justify-between py-2.5">
                 <span className="text-parchment-300/75">{new Date(p.created_at).toLocaleDateString("he-IL")}</span>
@@ -227,7 +227,7 @@ export default async function PlansPage() {
         </section>
       ) : null}
 
-      <section className="card-surface rounded-2xl p-5">
+      <section className="card-surface chamfer p-5">
         <h2 className="mb-2 text-lg font-bold">שאלות נפוצות</h2>
         <dl className="space-y-3 text-sm">
           {[

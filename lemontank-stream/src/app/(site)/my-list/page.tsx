@@ -18,7 +18,7 @@ export default async function MyListPage() {
         title="צריך להתחבר"
         description="הרשימה האישית נשמרת בחשבון שלך וזמינה בכל מכשיר."
         icon="key"
-        action={<Link href="/login?next=/my-list" className="rounded-xl bg-lemon-400 px-4 py-2 text-sm font-bold text-ink-900">התחברות</Link>}
+        action={<Link href="/login?next=/my-list" className="chamfer bg-lemon-400 px-4 py-2 text-sm font-bold text-ink-900">התחברות</Link>}
       />
     );
   }
@@ -57,7 +57,7 @@ export default async function MyListPage() {
             title="הרשימה ריקה"
             description="לחץ על 'הוסף לרשימה' בכל סרט או סדרה כדי לשמור אותם כאן."
             icon="tag"
-            action={<Link href="/movies" className="rounded-xl bg-lemon-400 px-4 py-2 text-sm font-bold text-ink-900">גלה סרטים</Link>}
+            action={<Link href="/movies" className="chamfer bg-lemon-400 px-4 py-2 text-sm font-bold text-ink-900">גלה סרטים</Link>}
           />
         ) : (
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">

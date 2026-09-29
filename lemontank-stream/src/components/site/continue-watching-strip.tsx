@@ -19,7 +19,7 @@ export function ContinueWatchingStrip({ items }: { items: Item[] }) {
         {items.map((item) => {
           const href = item.episode_id ? `/watch/${item.slug}?ep=${item.episode_id}` : `/watch/${item.slug}`;
           return (
-            <Link key={`${item.id}-${item.episode_id ?? 0}`} href={href} className="row-scroll-item group w-64 shrink-0 overflow-hidden rounded-xl ring-1 ring-white/5 transition hover:ring-lemon-400/50">
+            <Link key={`${item.id}-${item.episode_id ?? 0}`} href={href} className="row-scroll-item group w-64 shrink-0 overflow-hidden chamfer ring-1 ring-brass-400/12 transition hover:ring-lemon-400/50">
               <div className="relative h-36 w-full bg-ink-800">
                 {item.backdrop_url || item.poster_url ? (
                   // eslint-disable-next-line @next/next/no-img-element
@@ -31,7 +31,7 @@ export function ContinueWatchingStrip({ items }: { items: Item[] }) {
                   <span className="rounded-full bg-brass-400 p-3 text-obsidian-950"><Icon name="play" className="size-4" strokeWidth={2} /></span>
                 </div>
                 {item.percent ? (
-                  <div className="absolute inset-x-0 bottom-0 h-1.5 bg-white/25">
+                  <div className="absolute inset-x-0 bottom-0 h-1.5 bg-parchment-100/[0.20]">
                     <div className="h-full bg-lemon-400" style={{ width: `${Math.min(100, item.percent * 100)}%` }} />
                   </div>
                 ) : null}

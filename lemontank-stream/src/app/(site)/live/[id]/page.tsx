@@ -61,7 +61,7 @@ export default async function LiveChannelPage({ params }: { params: Promise<{ id
   return (
     <div className="mx-auto max-w-5xl space-y-6 px-4 py-8">
       <nav className="text-xs text-ink-400">
-        <Link href="/live" className="hover:text-white"> שידור חי</Link>
+        <Link href="/live" className="hover:text-parchment-100"> שידור חי</Link>
         <span className="mx-2">/</span>
         <span className="text-ink-200">{channel.name_he}</span>
       </nav>
@@ -70,7 +70,7 @@ export default async function LiveChannelPage({ params }: { params: Promise<{ id
         <div className="flex items-center gap-3">
           {channel.logo_url ? (
             // eslint-disable-next-line @next/next/no-img-element
-            <img src={channel.logo_url} alt="" className="h-14 w-14 rounded-2xl border border-white/10 object-contain p-1" />
+            <img src={channel.logo_url} alt="" className="h-14 w-14 chamfer border border-brass-400/15 object-contain p-1" />
           ) : (
             <span className="flex size-14 items-center justify-center border border-brass-400/25 bg-brass-400/[0.06] text-brass-300 chamfer" aria-hidden="true"><Icon name="wifi" className="size-7" /></span>
           )}
@@ -86,14 +86,14 @@ export default async function LiveChannelPage({ params }: { params: Promise<{ id
             </p>
           </div>
         </div>
-        {user ? <Link href="/account/billing" className="text-xs text-ink-300 hover:text-white">ניהול המנוי שלי</Link> : null}
+        {user ? <Link href="/account/billing" className="text-xs text-ink-300 hover:text-parchment-100">ניהול המנוי שלי</Link> : null}
       </header>
 
       {locked ? (
         <Card className="p-8 text-center">
           <p className="text-lg font-bold">הערוץ הזה זמין למנויי פלוס </p>
           <p className="mt-2 text-sm text-ink-400">שדר חי, ללא פרסומות, בכל המכשירים.</p>
-          <Link href="/plans" className="mt-4 inline-block rounded-xl bg-lemon-400 px-6 py-3 font-bold text-ink-900">
+          <Link href="/plans" className="mt-4 inline-block chamfer bg-lemon-400 px-6 py-3 font-bold text-ink-900">
             שדרג לפלוס
           </Link>
           <p className="mt-3 text-[0.85rem] text-ink-500">
@@ -116,7 +116,7 @@ export default async function LiveChannelPage({ params }: { params: Promise<{ id
               הדפדפן שלך לא תומך בנגן וידאו.
             </video>
           </div>
-          <div className="flex flex-wrap items-center justify-between gap-2 border-t border-white/10 px-4 py-3 text-[0.85rem] text-ink-400">
+          <div className="flex flex-wrap items-center justify-between gap-2 border-t border-brass-400/15 px-4 py-3 text-[0.85rem] text-ink-400">
             <span>מקור השידור: <span dir="ltr" className="font-mono">{safeHost(channel.stream_url)}</span></span>
             <span>אם השידור לא מתחיל — ייתכן שהמקור דורש נגן HLS או שהערוץ מוגבל גאוגרפית.</span>
           </div>
@@ -128,7 +128,7 @@ export default async function LiveChannelPage({ params }: { params: Promise<{ id
       {epg.length ? (
         <Card className="p-5">
           <h2 className="text-sm font-bold"> לוח שידורים</h2>
-          <ul className="mt-3 divide-y divide-white/5 text-xs">
+          <ul className="mt-3 divide-y divide-brass-400/12 text-xs">
             {epg.slice(0, 20).map((entry, i) => (
               <li key={`${entry.time ?? i}-${entry.title ?? ""}`} className="flex items-center justify-between gap-3 py-2">
                 <span dir="ltr" className="font-mono text-[0.85rem] text-ink-300">{entry.time ?? ""}{entry.until ? `–${entry.until}` : ""}</span>

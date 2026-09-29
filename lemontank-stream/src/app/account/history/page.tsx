@@ -32,7 +32,7 @@ export default async function HistoryPage() {
         title="היסטוריית הצפייה ריקה"
         description="ברגע שתתחיל לצפות — כל ההתקדמות תישמר כאן ותוכל להמשיך מכל מכשיר."
         icon="clock"
-        action={<Link href="/" className="rounded-xl bg-lemon-400 px-4 py-2 text-sm font-bold text-ink-900">לדף הבית</Link>}
+        action={<Link href="/" className="chamfer bg-lemon-400 px-4 py-2 text-sm font-bold text-ink-900">לדף הבית</Link>}
       />
     );
   }
@@ -44,7 +44,7 @@ export default async function HistoryPage() {
           <h1 className="text-2xl font-black md:text-3xl"> היסטוריית צפייה</h1>
           <p className="mt-1 text-sm text-ink-400">{items.length} כותרים שנצפו לאחרונה</p>
         </div>
-        <Link href="/account/privacy" className="rounded-xl border border-white/15 px-4 py-2 text-xs">
+        <Link href="/account/privacy" className="chamfer border border-brass-400/20 px-4 py-2 text-xs">
           ניהול הפרטיות והנתונים שלי
         </Link>
       </header>
@@ -53,8 +53,8 @@ export default async function HistoryPage() {
         {items.map((row) => {
           const href = row.episode_number ? `/watch/${row.slug}?ep=${row.id}` : `/watch/${row.slug}`;
           return (
-            <li key={row.id} className="flex items-center gap-4 rounded-2xl border border-white/8 bg-white/[0.02] p-3">
-              <span className="h-16 w-11 shrink-0 overflow-hidden rounded-lg bg-ink-800">
+            <li key={row.id} className="flex items-center gap-4 chamfer border border-brass-400/15 bg-parchment-100/[0.02] p-3">
+              <span className="h-16 w-11 shrink-0 overflow-hidden chamfer-sm bg-ink-800">
                 {row.poster_url ? (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img src={row.poster_url} alt="" className="h-full w-full object-cover" loading="lazy" />
@@ -71,11 +71,11 @@ export default async function HistoryPage() {
                   {row.duration_sec ? <span>{formatDuration(row.duration_sec)}</span> : null}
                   {row.completed ? <span className="text-verdigris-400">הושלם ✓</span> : null}
                 </div>
-                <div className="mt-1.5 h-1 w-full max-w-md rounded-full bg-white/10">
+                <div className="mt-1.5 h-1 w-full max-w-md rounded-full bg-parchment-100/[0.07]">
                   <div className="h-full rounded-full bg-lemon-400" style={{ width: `${Math.min(100, Number(row.percent) * 100)}%` }} />
                 </div>
               </div>
-              <Link href={href} className="shrink-0 rounded-xl bg-lemon-400 px-3 py-2 text-xs font-bold text-ink-900">
+              <Link href={href} className="shrink-0 chamfer bg-lemon-400 px-3 py-2 text-xs font-bold text-ink-900">
                 המשך 
               </Link>
             </li>

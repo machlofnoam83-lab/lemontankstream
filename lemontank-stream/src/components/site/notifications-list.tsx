@@ -37,7 +37,7 @@ export function NotificationsList({ items: initial }: { items: Item[] }) {
   return (
     <div className="space-y-4">
       {unread > 0 ? (
-        <div className="flex items-center justify-between rounded-xl border border-lemon-400/25 bg-lemon-400/10 px-4 py-3">
+        <div className="flex items-center justify-between chamfer border border-lemon-400/25 bg-lemon-400/10 px-4 py-3">
           <span className="text-sm text-lemon-200">יש לך {unread} התראות שלא נקראו</span>
           <Button size="sm" variant="ghost" onClick={markAll}>סמן הכל כנקרא</Button>
         </div>
@@ -47,7 +47,7 @@ export function NotificationsList({ items: initial }: { items: Item[] }) {
         {items.map((n) => (
           <li
             key={n.id}
-            className={`rounded-2xl border p-4 transition ${n.read_at ? "border-white/8 bg-white/[0.02]" : "border-lemon-400/25 bg-lemon-400/[0.06]"}`}
+            className={`chamfer border p-4 transition ${n.read_at ? "border-brass-400/15 bg-parchment-100/[0.02]" : "border-lemon-400/25 bg-lemon-400/[0.06]"}`}
           >
             <div className="flex items-start gap-3">
               <Icon name={ICONS[n.kind] ?? "bell"} className="size-5 text-brass-300" />
@@ -62,7 +62,7 @@ export function NotificationsList({ items: initial }: { items: Item[] }) {
                     </Link>
                   ) : null}
                   {!n.read_at ? (
-                    <button onClick={() => markOne(n.id)} className="text-ink-400 hover:text-white">
+                    <button onClick={() => markOne(n.id)} className="text-ink-400 hover:text-parchment-100">
                       סמן כנקרא
                     </button>
                   ) : null}

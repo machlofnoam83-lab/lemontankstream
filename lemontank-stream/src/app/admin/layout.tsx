@@ -31,7 +31,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
           באפליקציה (Google Authenticator / Authy / 1Password) — זה לוקח פחות מדקה,
           ומרגע זה כל כניסה לניהול תדרוש גם קוד.
         </p>
-        <Link href="/account/security" className="rounded-xl bg-lemon-400 px-6 py-3 font-bold text-ink-950">
+        <Link href="/account/security" className="chamfer bg-lemon-400 px-6 py-3 font-bold text-ink-950">
           להפעלת אימות דו-שלבי
         </Link>
         <p className="text-[0.85rem] text-ink-500">
@@ -56,18 +56,18 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   const TONES = {
     warn: "bg-brass-500/15 text-brass-300 border-brass-500/30",
     danger: "bg-ember-500/15 text-ember-300 border-ember-500/30",
-    neutral: "bg-white/[0.07] text-ink-200 border-white/10",
+    neutral: "bg-parchment-100/[0.07] text-ink-200 border-brass-400/15",
   };
 
   return (
     <ToastProvider>
       <div className="min-h-dvh">
-        <header className="sticky top-0 z-40 border-b border-white/[0.07] bg-ink-950/85 backdrop-blur-2xl">
+        <header className="sticky top-0 z-40 border-b border-brass-400/15 bg-ink-950/85 backdrop-blur-md">
           {/* פס זוהר עליון — מסמן "מצב ניהול" */}
           <div className="h-px w-full bg-gradient-to-l from-transparent via-lemon-400/60 to-transparent" aria-hidden="true" />
           <div className="mx-auto flex max-w-[1600px] flex-wrap items-center gap-x-3 gap-y-2 px-4 py-3">
             <Link href="/admin" className="group flex items-center gap-2.5" aria-label="פאנל הניהול">
-              <span className="flex h-9 w-9 items-center justify-center rounded-xl border border-lemon-400/30 bg-lemon-400/10 text-lg shadow-[0_0_22px_-6px_rgba(201,154,74,0.7)]" aria-hidden="true">
+              <span className="flex h-9 w-9 items-center justify-center chamfer border border-lemon-400/30 bg-lemon-400/10 text-lg shadow-[0_0_22px_-6px_rgba(201,154,74,0.7)]" aria-hidden="true">
                 🍋
               </span>
               <span className="flex flex-col leading-none">
@@ -84,7 +84,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
                   {a.label}
                 </span>
               ))}
-              <span className="hidden items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 sm:inline-flex">
+              <span className="hidden items-center gap-2 rounded-full border border-brass-400/15 bg-parchment-100/[0.04] px-3 py-1 sm:inline-flex">
                 <span className="flex h-5 w-5 items-center justify-center rounded-full bg-gradient-to-b from-lemon-300 to-lemon-400 text-[0.8rem] font-black text-ink-950" aria-hidden="true">
                   {user.name.trim().charAt(0)}
                 </span>
@@ -94,7 +94,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
               </span>
               <Link
                 href="/"
-                className="rounded-xl border border-white/15 px-3 py-1.5 font-semibold text-ink-200 transition hover:border-white/30 hover:bg-white/[0.08] hover:text-white"
+                className="chamfer border border-brass-400/20 px-3 py-1.5 font-semibold text-ink-200 transition hover:border-brass-400/35 hover:bg-parchment-100/[0.08] hover:text-parchment-100"
               >
                 לאתר ←
               </Link>

@@ -31,7 +31,7 @@ export function BarChart({
           <div key={`${d.label}-${i}`} className="group flex h-full flex-1 flex-col items-center justify-end">
             <span className="mb-1 hidden text-[0.8rem] text-ink-300 group-hover:block">{valueLabel(d.value)}</span>
             <div
-              className={`w-full rounded-t-md ${colors[tone]} transition-all group-hover:opacity-80`}
+              className={`w-full chamfer ${colors[tone]} transition-all group-hover:opacity-80`}
               style={{ height: `${Math.max(d.value > 0 ? 4 : 0, (d.value / max) * 100)}%` }}
               title={`${d.label}: ${valueLabel(d.value)}`}
             />

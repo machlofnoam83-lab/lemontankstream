@@ -316,10 +316,10 @@ export function Player({
         <h2 className="text-xl font-black">התוכן הזה זמין למנויי פלוס</h2>
         <p className="max-w-md text-sm text-ink-300">{lockReason ?? "שדרגו לפלוס כדי לצפות בסרטים ובסדרות הפרימיום, באיכות 4K וללא פרסומות."}</p>
         <div className="flex flex-wrap justify-center gap-2">
-          <Link href="/plans" className="rounded-xl bg-gradient-to-l from-plus-500 to-plus-600 px-6 py-3 text-sm font-black text-white">
+          <Link href="/plans" className="chamfer bg-gradient-to-l from-plus-500 to-plus-600 px-6 py-3 text-sm font-black text-parchment-100">
             שדרג לפלוס — ₪19.90/חודש
           </Link>
-          <Link href={`/title/${slug}`} className="rounded-xl border border-white/20 bg-white/5 px-5 py-3 text-sm">
+          <Link href={`/title/${slug}`} className="chamfer border border-brass-400/25 bg-parchment-100/[0.04] px-5 py-3 text-sm">
             חזרה לפרטי הסרט
           </Link>
         </div>
@@ -340,7 +340,7 @@ export function Player({
         <p className="max-w-md text-sm text-ink-400">
           מנהל המערכת צריך להעלות את קובץ הווידאו (או להדביק קישור) בדף הניהול של הכותר. בינתיים אפשר להתעדכן — נוסיף התראה כשיהיה זמין.
         </p>
-        <Link href={`/title/${slug}`} className="rounded-xl border border-white/20 px-4 py-2 text-sm">
+        <Link href={`/title/${slug}`} className="chamfer border border-brass-400/25 px-4 py-2 text-sm">
           חזרה לפרטי הכותר
         </Link>
       </div>
@@ -363,7 +363,7 @@ export function Player({
     >
       {partyId && (
         <div className="pointer-events-none absolute inset-x-0 top-0 z-30 flex flex-wrap items-center gap-2 bg-gradient-to-b from-black/80 to-transparent px-3 py-2 text-[0.85rem]">
-          <span className="rounded-full bg-plus-500/90 px-3 py-1 font-bold text-white">
+          <span className="rounded-full bg-plus-500/90 px-3 py-1 font-bold text-parchment-100">
              צפייה משותפת
           </span>
           {partyHost ? (
@@ -371,7 +371,7 @@ export function Player({
           ) : (
             <span className="rounded-full bg-black/60 px-3 py-1 text-ink-200">
               {party.connected ? (
-                <>מסונכרן עם <b className="text-white">{party.hostName || "המארח"}</b>{party.driftSec > 2.5 ? " · מתיישר…" : " · בסנכרון"}</>
+                <>מסונכרן עם <b className="text-parchment-100">{party.hostName || "המארח"}</b>{party.driftSec > 2.5 ? " · מתיישר…" : " · בסנכרון"}</>
               ) : (
                 "מתחבר לחדר…"
               )}
@@ -385,7 +385,7 @@ export function Player({
               קוד הזמנה: <b className="font-mono text-lemon-300" dir="ltr">{partyCode}</b>
             </span>
           )}
-          {party.error && <span className="rounded-full bg-ember-500/80 px-3 py-1 text-white">{party.error}</span>}
+          {party.error && <span className="rounded-full bg-ember-500/80 px-3 py-1 text-parchment-100">{party.error}</span>}
         </div>
       )}
       <video
@@ -443,7 +443,7 @@ export function Player({
       {/* שכבת טעינה */}
       {!ready && !error ? (
         <div className="pointer-events-none absolute inset-0 flex items-center justify-center bg-black/40">
-          <div className="h-10 w-10 animate-spin rounded-full border-2 border-white/25 border-t-lemon-400" />
+          <div className="h-10 w-10 animate-spin rounded-full border-2 border-brass-400/30 border-t-lemon-400" />
         </div>
       ) : null}
 
@@ -451,7 +451,7 @@ export function Player({
         <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-black/85 p-6 text-center">
           <Icon name="film" className="size-8 text-brass-300" />
           <p className="max-w-md text-sm text-ink-200">{error}</p>
-          <button onClick={() => { setError(null); videoRef.current?.load(); }} className="rounded-xl bg-lemon-400 px-4 py-2 text-sm font-bold text-ink-900">
+          <button onClick={() => { setError(null); videoRef.current?.load(); }} className="chamfer bg-lemon-400 px-4 py-2 text-sm font-bold text-ink-900">
             נסה שוב
           </button>
         </div>
@@ -465,7 +465,7 @@ export function Player({
             if (v && introEnd) v.currentTime = introEnd;
             setShowIntroButton(false);
           }}
-          className="absolute bottom-24 left-4 rounded-lg bg-white/95 px-4 py-2 text-sm font-bold text-ink-900 shadow-lg hover:bg-white"
+          className="absolute bottom-24 left-4 chamfer-sm bg-parchment-100/[0.76] px-4 py-2 text-sm font-bold text-ink-900 shadow-[0_14px_34px_-24px_rgba(0,0,0,0.9)] hover:bg-white"
         >
           דלג על הפתיח ⏭
         </button>
@@ -473,12 +473,12 @@ export function Player({
 
       {/* חלונית הפרק הבא */}
       {showNextOverlay && nextEpisode && !inCredits ? (
-        <div className="absolute bottom-24 left-4 w-64 rounded-xl border border-white/15 bg-ink-900/95 p-3 shadow-2xl backdrop-blur">
+        <div className="absolute bottom-24 left-4 w-64 chamfer border border-brass-400/20 bg-ink-900/95 p-3 shadow-[0_24px_60px_-32px_rgba(0,0,0,0.95)] backdrop-blur">
           <div className="text-[0.85rem] text-ink-300">הבא בתור</div>
           <div className="mt-1 flex items-center gap-2">
             {nextEpisode.thumb ? (
               // eslint-disable-next-line @next/next/no-img-element
-              <img src={nextEpisode.thumb} alt="" className="h-10 w-16 rounded object-cover" />
+              <img src={nextEpisode.thumb} alt="" className="h-10 w-16 chamfer-sm object-cover" />
             ) : null}
             <div className="min-w-0 flex-1">
               <div className="truncate text-xs font-bold">{nextEpisode.label}</div>
@@ -486,11 +486,11 @@ export function Player({
             </div>
           </div>
           {nextEpisode.locked ? (
-            <Link href="/plans" className="mt-2 block rounded-lg bg-plus-500 px-3 py-1.5 text-center text-xs font-bold">
+            <Link href="/plans" className="mt-2 block chamfer-sm bg-plus-500 px-3 py-1.5 text-center text-xs font-bold">
               הפרק הבא זמין בפלוס 
             </Link>
           ) : (
-            <Link href={`/watch/${slug}?ep=${nextEpisode.id}`} className="mt-2 block rounded-lg bg-lemon-400 px-3 py-1.5 text-center text-xs font-bold text-ink-900">
+            <Link href={`/watch/${slug}?ep=${nextEpisode.id}`} className="mt-2 block chamfer-sm bg-lemon-400 px-3 py-1.5 text-center text-xs font-bold text-ink-900">
               נגן עכשיו
             </Link>
           )}
@@ -500,7 +500,7 @@ export function Player({
       {/* אזור בקרה */}
       <div className={`absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/95 via-black/70 to-transparent px-3 pb-2 pt-8 transition-opacity ${showControls ? "opacity-100" : "opacity-0"}`}>
         {/* פס התקדמות */}
-        <div className="group/seek relative mb-2 h-1.5 w-full cursor-pointer rounded-full bg-white/25" dir="ltr">
+        <div className="group/seek relative mb-2 h-1.5 w-full cursor-pointer rounded-full bg-parchment-100/[0.20]" dir="ltr">
           <input
             type="range"
             min={0}
@@ -521,33 +521,33 @@ export function Player({
             aria-valuenow={Math.floor(current)}
             aria-valuetext={`${formatDuration(current)} מתוך ${formatDuration(duration)}`}
           />
-          <div className="pointer-events-none absolute inset-y-0 left-0 rounded-full bg-white/40" style={{ width: `${bufferedPct}%` }} />
+          <div className="pointer-events-none absolute inset-y-0 left-0 rounded-full bg-parchment-100/[0.32]" style={{ width: `${bufferedPct}%` }} />
           <div className="pointer-events-none absolute inset-y-0 left-0 rounded-full bg-lemon-400" style={{ width: `${progressPct}%` }}>
             <span className="absolute -top-1 left-full h-3.5 w-3.5 -translate-x-1/2 rounded-full bg-lemon-400 opacity-0 transition-opacity group-hover/seek:opacity-100" />
           </div>
           {introStart != null && introEnd != null && duration ? (
             <div
-              className="pointer-events-none absolute inset-y-0 rounded-full bg-white/25"
+              className="pointer-events-none absolute inset-y-0 rounded-full bg-parchment-100/[0.20]"
               style={{ left: `${(introStart / duration) * 100}%`, width: `${((introEnd - introStart) / duration) * 100}%` }}
               title="פתיח"
             />
           ) : null}
         </div>
 
-        <div className="flex items-center gap-2 text-white" dir="ltr">
-          <button onClick={() => { const v = videoRef.current; if (v) v.paused ? void v.play() : v.pause(); }} aria-label={playing ? "השהה" : "נגן"} className="rounded-lg p-1.5 hover:bg-white/15">
+        <div className="flex items-center gap-2 text-parchment-100" dir="ltr">
+          <button onClick={() => { const v = videoRef.current; if (v) v.paused ? void v.play() : v.pause(); }} aria-label={playing ? "השהה" : "נגן"} className="chamfer-sm p-1.5 hover:bg-parchment-100/[0.12]">
             {playing ? <IconPause /> : <IconPlay />}
           </button>
 
-          <button onClick={() => { const v = videoRef.current; if (v) { v.currentTime = Math.max(0, v.currentTime - 10); } }} aria-label="חזור 10 שניות" className="rounded-lg p-1.5 hover:bg-white/15">
+          <button onClick={() => { const v = videoRef.current; if (v) { v.currentTime = Math.max(0, v.currentTime - 10); } }} aria-label="חזור 10 שניות" className="chamfer-sm p-1.5 hover:bg-parchment-100/[0.12]">
             <IconSkipBack />
           </button>
-          <button onClick={() => { const v = videoRef.current; if (v) { v.currentTime = Math.min(v.duration || 0, v.currentTime + 10); } }} aria-label="קדם 10 שניות" className="rounded-lg p-1.5 hover:bg-white/15">
+          <button onClick={() => { const v = videoRef.current; if (v) { v.currentTime = Math.min(v.duration || 0, v.currentTime + 10); } }} aria-label="קדם 10 שניות" className="chamfer-sm p-1.5 hover:bg-parchment-100/[0.12]">
             <IconSkipFwd />
           </button>
 
           <div className="group/vol flex items-center gap-1">
-            <button onClick={() => setMuted((m) => !m)} aria-label={muted ? "בטל השתקה" : "השתק"} className="rounded-lg p-1.5 hover:bg-white/15">
+            <button onClick={() => setMuted((m) => !m)} aria-label={muted ? "בטל השתקה" : "השתק"} className="chamfer-sm p-1.5 hover:bg-parchment-100/[0.12]">
               {muted || volume === 0 ? <IconMute /> : <IconVolume />}
             </button>
             <input
@@ -570,7 +570,7 @@ export function Player({
             {/* כתוביות */}
             {subtitles.length > 0 ? (
               <div className="relative">
-                <button onClick={() => setShowSettings((s) => (s === "subs" ? "none" : "subs"))} aria-label="כתוביות" className="rounded-lg p-1.5 hover:bg-white/15">
+                <button onClick={() => setShowSettings((s) => (s === "subs" ? "none" : "subs"))} aria-label="כתוביות" className="chamfer-sm p-1.5 hover:bg-parchment-100/[0.12]">
                   <IconCaptions />
                 </button>
                 {showSettings === "subs" ? (
@@ -588,7 +588,7 @@ export function Player({
 
             {/* איכות */}
             <div className="relative">
-              <button onClick={() => setShowSettings((s) => (s === "quality" ? "none" : "quality"))} aria-label="איכות" className="rounded-lg p-1.5 hover:bg-white/15">
+              <button onClick={() => setShowSettings((s) => (s === "quality" ? "none" : "quality"))} aria-label="איכות" className="chamfer-sm p-1.5 hover:bg-parchment-100/[0.12]">
                 <IconSettings />
               </button>
               {showSettings === "quality" ? (
@@ -605,7 +605,7 @@ export function Player({
 
             {/* מהירות */}
             <div className="relative">
-              <button onClick={() => setShowSettings((s) => (s === "speed" ? "none" : "speed"))} aria-label="מהירות נגינה" className="rounded-lg px-2 py-1 text-xs hover:bg-white/15">
+              <button onClick={() => setShowSettings((s) => (s === "speed" ? "none" : "speed"))} aria-label="מהירות נגינה" className="chamfer-sm px-2 py-1 text-xs hover:bg-parchment-100/[0.12]">
                 {rate}x
               </button>
               {showSettings === "speed" ? (
@@ -619,10 +619,10 @@ export function Player({
               ) : null}
             </div>
 
-            <button onClick={togglePip} aria-label="תמונה בתוך תמונה" className="rounded-lg p-1.5 hover:bg-white/15">
+            <button onClick={togglePip} aria-label="תמונה בתוך תמונה" className="chamfer-sm p-1.5 hover:bg-parchment-100/[0.12]">
               <IconPip />
             </button>
-            <button onClick={toggleFullscreen} aria-label={isFullscreen ? "צא ממסך מלא" : "מסך מלא"} className="rounded-lg p-1.5 hover:bg-white/15">
+            <button onClick={toggleFullscreen} aria-label={isFullscreen ? "צא ממסך מלא" : "מסך מלא"} className="chamfer-sm p-1.5 hover:bg-parchment-100/[0.12]">
               {isFullscreen ? <IconCompress /> : <IconExpand />}
             </button>
           </div>
@@ -635,8 +635,8 @@ export function Player({
               <Link
                 key={ep.id}
                 href={ep.locked ? "/plans" : `/watch/${slug}?ep=${ep.id}`}
-                className={`flex shrink-0 items-center gap-2 rounded-lg border px-2.5 py-1.5 text-xs ${
-                  ep.id === episodeId ? "border-lemon-400 bg-lemon-400/15 text-lemon-200" : "border-white/10 bg-black/40 text-ink-200 hover:bg-white/10"
+                className={`flex shrink-0 items-center gap-2 chamfer-sm border px-2.5 py-1.5 text-xs ${
+                  ep.id === episodeId ? "border-lemon-400 bg-lemon-400/15 text-lemon-200" : "border-brass-400/15 bg-black/40 text-ink-200 hover:bg-parchment-100/[0.07]"
                 }`}
               >
                 {ep.locked ? "" : ""} {ep.label}
@@ -653,7 +653,7 @@ export function Player({
 
 function Menu({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <div className="absolute bottom-full left-0 mb-2 w-40 overflow-hidden rounded-xl border border-white/15 bg-ink-900/97 py-1 shadow-2xl backdrop-blur">
+    <div className="absolute bottom-full left-0 mb-2 w-40 overflow-hidden chamfer border border-brass-400/20 bg-ink-900/97 py-1 shadow-[0_24px_60px_-32px_rgba(0,0,0,0.95)] backdrop-blur">
       <div className="px-3 py-1 text-[0.8rem] font-bold text-ink-400">{title}</div>
       {children}
     </div>
@@ -662,7 +662,7 @@ function Menu({ title, children }: { title: string; children: React.ReactNode })
 
 function MenuItem({ active, onClick, children }: { active?: boolean; onClick: () => void; children: React.ReactNode }) {
   return (
-    <button onClick={onClick} className={`block w-full px-3 py-1.5 text-right text-xs hover:bg-white/10 ${active ? "text-lemon-300" : "text-white"}`}>
+    <button onClick={onClick} className={`block w-full px-3 py-1.5 text-right text-xs hover:bg-parchment-100/[0.07] ${active ? "text-lemon-300" : "text-parchment-100"}`}>
       {active ? "✓ " : ""}
       {children}
     </button>

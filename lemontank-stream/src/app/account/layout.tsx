@@ -39,7 +39,7 @@ export default async function AccountLayout({ children }: { children: React.Reac
         <div className="mx-auto w-full max-w-7xl flex-1 px-4 py-6">
           <div className="grid gap-6 lg:grid-cols-[240px_1fr]">
             <aside className="space-y-4">
-              <div className="card-surface rounded-2xl p-4">
+              <div className="card-surface chamfer p-4">
                 <div className="flex items-center gap-3">
                   <span className="flex h-12 w-12 items-center justify-center rounded-full bg-lemon-400 text-xl font-black text-ink-900">
                     {(user.name || user.email).charAt(0)}
@@ -61,13 +61,13 @@ export default async function AccountLayout({ children }: { children: React.Reac
                 </div>
               </div>
 
-              <nav className="card-surface rounded-2xl p-2" aria-label="ניווט באזור האישי">
+              <nav className="card-surface chamfer p-2" aria-label="ניווט באזור האישי">
                 <ul className="space-y-1">
                   {NAV.map((item) => (
                     <li key={item.href}>
                       <Link
                         href={item.href}
-                        className="flex items-center gap-2 rounded-xl px-3 py-2.5 text-sm text-ink-200 transition hover:bg-white/5 hover:text-white"
+                        className="flex items-center gap-2 chamfer px-3 py-2.5 text-sm text-ink-200 transition hover:bg-parchment-100/[0.04] hover:text-parchment-100"
                       >
                         <span aria-hidden="true">{item.icon}</span>
                         {item.label}

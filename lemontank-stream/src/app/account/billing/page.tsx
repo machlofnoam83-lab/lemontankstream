@@ -70,10 +70,10 @@ export default async function BillingPage() {
             </div>
           </dl>
           <div className="mt-4 flex flex-wrap gap-2">
-            <Link href="/plans" className="rounded-xl bg-lemon-400 px-4 py-2 text-xs font-bold text-ink-900">
+            <Link href="/plans" className="chamfer bg-lemon-400 px-4 py-2 text-xs font-bold text-ink-900">
               {user.effective_plan === "plus" ? "ניהול המנוי" : "שדרג לפלוס "}
             </Link>
-            <Link href="/api/export?type=my-data" className="rounded-xl border border-white/15 px-4 py-2 text-xs">
+            <Link href="/api/export?type=my-data" className="chamfer border border-brass-400/20 px-4 py-2 text-xs">
               הורד את הנתונים שלי (JSON)
             </Link>
           </div>
@@ -81,7 +81,7 @@ export default async function BillingPage() {
       ) : (
         <Card className="p-5">
           <p className="text-sm text-ink-300">אין לך מנוי בתשלום — אתה במסלול החינם.</p>
-          <Link href="/plans" className="mt-3 inline-block rounded-xl bg-gradient-to-l from-plus-500 to-plus-600 px-4 py-2 text-xs font-bold text-white">
+          <Link href="/plans" className="mt-3 inline-block chamfer bg-gradient-to-l from-plus-500 to-plus-600 px-4 py-2 text-xs font-bold text-parchment-100">
             שדרג לפלוס — 7 ימי ניסיון חינם
           </Link>
         </Card>
@@ -103,7 +103,7 @@ export default async function BillingPage() {
                   <th className="px-3 py-2 text-right">סטטוס</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-white/5">
+              <tbody className="divide-y divide-brass-400/12">
                 {payments.map((p) => (
                   <tr key={p.id}>
                     <td className="px-3 py-2 font-mono text-xs" dir="ltr">{p.invoice_no ?? `#${p.id}`}</td>

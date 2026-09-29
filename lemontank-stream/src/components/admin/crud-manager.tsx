@@ -169,12 +169,12 @@ export function CrudManager({
       case "image":
         return value ? (
           // eslint-disable-next-line @next/next/no-img-element
-          <img src={String(value)} alt="" className="h-10 w-16 rounded-lg object-cover" />
+          <img src={String(value)} alt="" className="h-10 w-16 chamfer-sm object-cover" />
         ) : <span className="text-ink-500">—</span>;
       case "color":
         return (
           <span className="inline-flex items-center gap-2">
-            <span className="h-4 w-4 rounded-full border border-white/20" style={{ background: String(value ?? "#000") }} />
+            <span className="h-4 w-4 rounded-full border border-brass-400/25" style={{ background: String(value ?? "#000") }} />
             <span dir="ltr" className="font-mono text-[0.8rem]">{String(value ?? "")}</span>
           </span>
         );
@@ -199,7 +199,7 @@ export function CrudManager({
         <Button onClick={startCreate}>+ {entityLabel} חדש</Button>
       </div>
 
-      {warning ? <p className="mt-3 rounded-xl border border-brass-400/25 bg-brass-400/10 px-3 py-2 text-xs text-brass-200">{warning}</p> : null}
+      {warning ? <p className="mt-3 chamfer border border-brass-400/25 bg-brass-400/10 px-3 py-2 text-xs text-brass-200">{warning}</p> : null}
 
       <div className="mt-4">
         {filtered.length === 0 ? (
@@ -207,7 +207,7 @@ export function CrudManager({
         ) : (
           <DataTable head={[...columns.map((c) => c.label), "פעולות"]}>
             {filtered.map((row) => (
-              <tr key={row.id} className="hover:bg-white/[0.03]">
+              <tr key={row.id} className="hover:bg-parchment-100/[0.03]">
                 {columns.map((col) => (
                   <td key={col.key} className="px-3 py-2">{renderCell(col, row)}</td>
                 ))}
@@ -235,7 +235,7 @@ export function CrudManager({
           </>
         }
       >
-        {error ? <p className="mb-3 rounded-xl border border-ember-500/30 bg-ember-500/10 px-3 py-2 text-sm text-ember-200">{error}</p> : null}
+        {error ? <p className="mb-3 chamfer border border-ember-500/30 bg-ember-500/10 px-3 py-2 text-sm text-ember-200">{error}</p> : null}
 
         <div className="grid gap-3 md:grid-cols-2">
           {fields.map((f) => (
@@ -267,7 +267,7 @@ export function CrudManager({
                       type="color"
                       value={String(values[f.name] || "#f5b301")}
                       onChange={(e) => setValues((prev) => ({ ...prev, [f.name]: e.target.value }))}
-                      className="h-9 w-14 cursor-pointer rounded-lg border border-white/10 bg-transparent"
+                      className="h-9 w-14 cursor-pointer chamfer-sm border border-brass-400/15 bg-transparent"
                     />
                     <Input value={String(values[f.name] ?? "")} onChange={(e) => setValues((prev) => ({ ...prev, [f.name]: e.target.value }))} dir="ltr" className="flex-1" />
                   </div>

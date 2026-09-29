@@ -68,7 +68,7 @@ export function FlagsEditor({ initial }: { initial: Flag[] }) {
         <Input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="חיפוש פיצ'ר…" aria-label="חיפוש פיצ'ר" className="w-64" />
       </div>
 
-      <ul className="mt-4 divide-y divide-white/5">
+      <ul className="mt-4 divide-y divide-brass-400/12">
         {filtered.map((flag) => (
           <li key={flag.key} className="flex flex-wrap items-center justify-between gap-3 py-3">
             <div className="min-w-52 flex-1">
@@ -104,7 +104,7 @@ export function FlagsEditor({ initial }: { initial: Flag[] }) {
                 aria-label={`הפעל/כבה ${flag.key}`}
                 onClick={() => toggle(flag)}
                 disabled={busy === flag.key}
-                className={`relative h-6 w-11 shrink-0 rounded-full transition ${flag.enabled ? "bg-lemon-400" : "bg-white/15"}`}
+                className={`relative h-6 w-11 shrink-0 rounded-full transition ${flag.enabled ? "bg-lemon-400" : "bg-parchment-100/[0.12]"}`}
               >
                 <span className={`absolute top-0.5 h-5 w-5 rounded-full bg-white transition-all ${flag.enabled ? "start-0.5" : "start-5.5"}`} />
               </button>

@@ -124,7 +124,7 @@ export function ListsManager({ initial }: { initial: UserListRow[] }) {
                 required
                 minLength={2}
                 placeholder="למשל: לסופש עם החברה"
-                className="w-full rounded-xl border border-white/15 bg-black/40 px-3 py-2"
+                className="w-full chamfer border border-brass-400/20 bg-black/40 px-3 py-2"
               />
             </Field>
             <Field label="תיאור (אופציונלי)">
@@ -132,7 +132,7 @@ export function ListsManager({ initial }: { initial: UserListRow[] }) {
                 value={description}
                 onChange={(event) => setDescription(event.target.value)}
                 placeholder="מה משותף לכל הסרטים כאן?"
-                className="w-full rounded-xl border border-white/15 bg-black/40 px-3 py-2"
+                className="w-full chamfer border border-brass-400/20 bg-black/40 px-3 py-2"
               />
             </Field>
             <Switch
@@ -167,7 +167,7 @@ export function ListsManager({ initial }: { initial: UserListRow[] }) {
                 {list.is_public ? (
                   <span className="rounded-full bg-plus-500/20 px-2.5 py-1 text-[0.8rem] text-plus-300">משותפת </span>
                 ) : (
-                  <span className="rounded-full bg-white/10 px-2.5 py-1 text-[0.8rem] text-ink-300">פרטית</span>
+                  <span className="rounded-full bg-parchment-100/[0.07] px-2.5 py-1 text-[0.8rem] text-ink-300">פרטית</span>
                 )}
                 <span className="text-[0.85rem] text-ink-400">{list.item_count} כותרים</span>
               </div>
@@ -175,28 +175,28 @@ export function ListsManager({ initial }: { initial: UserListRow[] }) {
               {list.preview && <p className="mt-1 text-[0.85rem] text-ink-500">{list.preview}{list.item_count > 3 ? " …" : ""}</p>}
             </div>
             <div className="flex flex-wrap gap-2">
-              <button type="button" onClick={() => open(list)} className="rounded-xl bg-white/[0.07] px-3 py-2 text-[0.9rem] hover:bg-white/[0.12]">
+              <button type="button" onClick={() => open(list)} className="chamfer bg-parchment-100/[0.07] px-3 py-2 text-[0.9rem] hover:bg-parchment-100/[0.12]">
                 {openId === list.id ? "סגור" : "הצג כותרים"}
               </button>
-              <button type="button" onClick={() => togglePublic(list)} className="rounded-xl bg-white/[0.07] px-3 py-2 text-[0.9rem] hover:bg-white/[0.12]">
+              <button type="button" onClick={() => togglePublic(list)} className="chamfer bg-parchment-100/[0.07] px-3 py-2 text-[0.9rem] hover:bg-parchment-100/[0.12]">
                 {list.is_public ? "הפוך לפרטית" : "שתף"}
               </button>
               {list.is_public && list.share_code && (
-                <button type="button" onClick={() => copyShare(list)} className="rounded-xl bg-lemon-400 px-3 py-2 text-[0.9rem] font-bold text-ink-950">
+                <button type="button" onClick={() => copyShare(list)} className="chamfer bg-lemon-400 px-3 py-2 text-[0.9rem] font-bold text-ink-950">
                   {copied === list.id ? "✓ הועתק" : "העתק קישור"}
                 </button>
               )}
-              <Link href={`/movies`} className="rounded-xl bg-white/[0.07] px-3 py-2 text-[0.9rem] hover:bg-white/[0.12]">
+              <Link href={`/movies`} className="chamfer bg-parchment-100/[0.07] px-3 py-2 text-[0.9rem] hover:bg-parchment-100/[0.12]">
                 הוסף כותרים
               </Link>
-              <button type="button" onClick={() => remove(list)} className="rounded-xl px-3 py-2 text-[0.9rem] text-ember-300 hover:bg-ember-500/10">
+              <button type="button" onClick={() => remove(list)} className="chamfer px-3 py-2 text-[0.9rem] text-ember-300 hover:bg-ember-500/10">
                 מחק
               </button>
             </div>
           </div>
 
           {openId === list.id && (
-            <div className="mt-4 border-t border-white/10 pt-4">
+            <div className="mt-4 border-t border-brass-400/15 pt-4">
               {loadingItems ? (
                 <div className="flex items-center gap-2 text-ink-300"><Spinner /> טוען…</div>
               ) : items.length === 0 ? (
@@ -206,10 +206,10 @@ export function ListsManager({ initial }: { initial: UserListRow[] }) {
               ) : (
                 <ul className="grid gap-2 sm:grid-cols-2">
                   {items.map((item) => (
-                    <li key={item.item_id} className="flex items-center gap-3 rounded-xl bg-white/[0.05] p-2">
+                    <li key={item.item_id} className="flex items-center gap-3 chamfer bg-parchment-100/[0.05] p-2">
                       {item.poster_url ? (
                         // eslint-disable-next-line @next/next/no-img-element
-                        <img src={item.poster_url} alt="" className="h-14 w-10 rounded-lg object-cover" />
+                        <img src={item.poster_url} alt="" className="h-14 w-10 chamfer-sm object-cover" />
                       ) : (
                         <span className="flex h-14 w-10 items-center justify-center border border-brass-400/20 bg-obsidian-800 text-brass-300/70"><Icon name="film" className="size-4" /></span>
                       )}
@@ -225,7 +225,7 @@ export function ListsManager({ initial }: { initial: UserListRow[] }) {
                       <button
                         type="button"
                         onClick={() => removeItem(list.id, item.id)}
-                        className="rounded-lg px-2 py-1 text-[0.85rem] text-ember-300 hover:bg-ember-500/10"
+                        className="chamfer-sm px-2 py-1 text-[0.85rem] text-ember-300 hover:bg-ember-500/10"
                         aria-label={`הסר את ${item.name_he}`}
                       >
                         הסר

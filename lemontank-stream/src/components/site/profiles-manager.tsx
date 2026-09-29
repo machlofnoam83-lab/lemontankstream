@@ -115,7 +115,7 @@ export function ProfilesManager({ initialProfiles, maxProfiles, isPlus }: { init
         {profiles.map((p) => (
           <Card key={p.id} className="flex flex-col gap-3 p-4">
             <div className="flex items-center gap-3">
-              <span className="flex h-14 w-14 items-center justify-center rounded-2xl text-2xl" style={{ background: `${p.color}33`, color: p.color }}>
+              <span className="flex h-14 w-14 items-center justify-center chamfer text-2xl" style={{ background: `${p.color}33`, color: p.color }}>
                 {p.avatar_url || p.name.charAt(0)}
               </span>
               <div className="min-w-0">
@@ -124,9 +124,9 @@ export function ProfilesManager({ initialProfiles, maxProfiles, isPlus }: { init
                   {p.is_kid ? ` פרופיל ילדים · עד ${p.maturity_limit}` : `גיל מותר: ${p.maturity_limit}`}
                 </div>
                 <div className="mt-1 flex flex-wrap gap-1">
-                  {p.has_pin ? <span className="rounded bg-white/10 px-1.5 py-0.5 text-[0.8rem]"> PIN</span> : null}
-                  <span className="rounded bg-white/10 px-1.5 py-0.5 text-[0.8rem]">אודיו: {p.lang_audio}</span>
-                  <span className="rounded bg-white/10 px-1.5 py-0.5 text-[0.8rem]">כתוביות: {p.lang_subs}</span>
+                  {p.has_pin ? <span className="chamfer-sm bg-parchment-100/[0.07] px-1.5 py-0.5 text-[0.8rem]"> PIN</span> : null}
+                  <span className="chamfer-sm bg-parchment-100/[0.07] px-1.5 py-0.5 text-[0.8rem]">אודיו: {p.lang_audio}</span>
+                  <span className="chamfer-sm bg-parchment-100/[0.07] px-1.5 py-0.5 text-[0.8rem]">כתוביות: {p.lang_subs}</span>
                 </div>
               </div>
             </div>
@@ -179,7 +179,7 @@ export function ProfilesManager({ initialProfiles, maxProfiles, isPlus }: { init
                 key={a}
                 onClick={() => setAvatar(avatar === a ? "" : a)}
                 aria-pressed={avatar === a}
-                className={`h-9 w-9 rounded-xl text-lg transition ${avatar === a ? "bg-lemon-400/25 ring-1 ring-lemon-400" : "bg-white/5 hover:bg-white/10"}`}
+                className={`h-9 w-9 chamfer text-lg transition ${avatar === a ? "bg-lemon-400/25 ring-1 ring-lemon-400" : "bg-parchment-100/[0.04] hover:bg-parchment-100/[0.07]"}`}
               >
                 {a}
               </button>

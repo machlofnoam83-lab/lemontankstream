@@ -49,7 +49,7 @@ export default async function InsightsPage() {
             <a
               key={report}
               href={`/api/admin/insights?format=csv&report=${report}`}
-              className="rounded-xl bg-white/[0.07] px-3 py-2 hover:bg-white/[0.12]"
+              className="chamfer bg-parchment-100/[0.07] px-3 py-2 hover:bg-parchment-100/[0.12]"
             >
               ⬇ {label} (CSV)
             </a>
@@ -110,7 +110,7 @@ export default async function InsightsPage() {
               </thead>
               <tbody>
                 {revenue.byPlan.map((row) => (
-                  <tr key={row.plan_code} className="border-t border-white/10">
+                  <tr key={row.plan_code} className="border-t border-brass-400/15">
                     <td className="py-2 font-bold">{row.name_he}</td>
                     <td className="py-2">{money(Number(row.price))}</td>
                     <td className="py-2">{row.subscribers}</td>
@@ -130,7 +130,7 @@ export default async function InsightsPage() {
                 {revenue.monthly.slice(0, 6).map((row) => (
                   <li key={row.month} className="flex items-center gap-3">
                     <span className="w-20 text-[0.85rem] text-ink-400">{row.month}</span>
-                    <span className="h-3 flex-1 overflow-hidden rounded-full bg-white/10">
+                    <span className="h-3 flex-1 overflow-hidden rounded-full bg-parchment-100/[0.07]">
                       <span
                         className="block h-full rounded-full bg-lemon-400"
                         style={{ width: `${Math.max(3, (Number(row.revenue) / maxRevenue) * 100)}%` }}
@@ -190,7 +190,7 @@ export default async function InsightsPage() {
                     <span>{step.label}</span>
                     <span className="font-bold">{step.value}</span>
                   </div>
-                  <span className="mt-1 block h-2 overflow-hidden rounded-full bg-white/10">
+                  <span className="mt-1 block h-2 overflow-hidden rounded-full bg-parchment-100/[0.07]">
                     <span className="block h-full rounded-full bg-plus-400" style={{ width: `${(step.value / funnelTop) * 100}%` }} />
                   </span>
                 </li>
@@ -224,7 +224,7 @@ export default async function InsightsPage() {
             ) : (
               <ul className="mt-3 flex flex-wrap gap-2">
                 {engagement.topSearches.map((row) => (
-                  <li key={row.term} className="rounded-full bg-white/[0.07] px-3 py-1 text-[0.85rem]">
+                  <li key={row.term} className="rounded-full bg-parchment-100/[0.07] px-3 py-1 text-[0.85rem]">
                     {row.term} <span className="text-ink-500">· {row.hits}</span>
                   </li>
                 ))}
@@ -238,7 +238,7 @@ export default async function InsightsPage() {
               {engagement.peakHours.filter((row) => row.events > 0).map((row) => (
                 <div key={row.hour} className="flex items-center gap-2 text-[0.78rem]">
                   <span className="w-10 text-ink-500">{HOUR_LABEL(row.hour)}</span>
-                  <span className="h-2 flex-1 overflow-hidden rounded-full bg-white/10">
+                  <span className="h-2 flex-1 overflow-hidden rounded-full bg-parchment-100/[0.07]">
                     <span className="block h-full rounded-full bg-brass-400/80" style={{ width: `${(row.events / maxHour) * 100}%` }} />
                   </span>
                 </div>
@@ -281,14 +281,14 @@ export default async function InsightsPage() {
           {health.issues.length === 0 ? (
             <p className="mt-2 text-verdigris-300">הכל מלא — כל הכותרות עם מטא-דאטה מלא 🎉</p>
           ) : (
-            <ul className="mt-3 divide-y divide-white/10">
+            <ul className="mt-3 divide-y divide-brass-400/15">
               {health.issues.map((issue) => (
                 <li key={issue.key} className="flex flex-wrap items-center justify-between gap-2 py-3">
                   <div>
                     <div className="font-bold">{issue.label}</div>
                     <div className="text-[0.85rem] text-ink-400">{issue.hint}</div>
                   </div>
-                  <span className="rounded-full bg-white/[0.07] px-3 py-1 text-[0.9rem] font-bold">{issue.count}</span>
+                  <span className="rounded-full bg-parchment-100/[0.07] px-3 py-1 text-[0.9rem] font-bold">{issue.count}</span>
                 </li>
               ))}
             </ul>

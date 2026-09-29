@@ -29,14 +29,14 @@ export default async function AdminPlansPage() {
           </p>
         </div>
         <div className="flex gap-2 text-xs">
-          <span className="rounded-xl bg-white/[0.04] px-3 py-2">מנויי פלוס: <b>{formatNumber(Number(totalPlus))}</b></span>
-          <span className="rounded-xl bg-white/[0.04] px-3 py-2">הכנסה חודשית (MRR): <b>₪{mrr.toFixed(2)}</b></span>
+          <span className="chamfer bg-parchment-100/[0.04] px-3 py-2">מנויי פלוס: <b>{formatNumber(Number(totalPlus))}</b></span>
+          <span className="chamfer bg-parchment-100/[0.04] px-3 py-2">הכנסה חודשית (MRR): <b>₪{mrr.toFixed(2)}</b></span>
         </div>
       </header>
 
       <PlansEditor plans={plans} />
 
-      <section className="rounded-2xl border border-white/10 bg-white/[0.02] p-5 text-xs text-ink-400">
+      <section className="chamfer border border-brass-400/15 bg-parchment-100/[0.02] p-5 text-xs text-ink-400">
         <h2 className="mb-2 text-sm font-bold text-ink-100">איך נקבע מה חינם ומה פלוס?</h2>
         <ol className="list-inside list-decimal space-y-1">
           <li>בכל כותר (סרט/סדרה) ובכל פרק יש שדה <b className="text-ink-200">הרשאה</b>: חינם / פלוס / "בירושה".</li>

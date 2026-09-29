@@ -136,7 +136,7 @@ export function SecurityCenter({ canManage }: { canManage: boolean }) {
         </div>
 
         {canManage && (
-          <div className="mt-4 flex flex-wrap items-center gap-2 border-t border-white/8 pt-4">
+          <div className="mt-4 flex flex-wrap items-center gap-2 border-t border-brass-400/15 pt-4">
             <Button
               variant={enforce ? "ghost" : "primary"}
               size="sm"
@@ -162,7 +162,7 @@ export function SecurityCenter({ canManage }: { canManage: boolean }) {
           {POLICY_SWITCHES.map((item) => {
             const active = setting(item.key) === item.on;
             return (
-              <div key={item.key} className="rounded-xl border border-white/8 bg-white/[0.02] px-3.5 py-1">
+              <div key={item.key} className="chamfer border border-brass-400/15 bg-parchment-100/[0.02] px-3.5 py-1">
                 <Switch
                   label={item.title}
                   description={item.description}
@@ -174,11 +174,11 @@ export function SecurityCenter({ canManage }: { canManage: boolean }) {
             );
           })}
 
-          <div className="rounded-xl border border-white/8 bg-white/[0.02] p-3.5">
+          <div className="chamfer border border-brass-400/15 bg-parchment-100/[0.02] p-3.5">
             <span className="block text-[0.95rem] font-bold">מדיניות פרוקסי / VPN / ענן</span>
             <p className="mt-0.5 mb-2 text-[0.85rem] text-ink-400">TOR נחסם תמיד. כאן קובעים מה עושים עם שאר הפרוקסי</p>
             <select
-              className="w-full rounded-lg border border-white/12 bg-ink-900 px-2.5 py-1.5 text-xs"
+              className="w-full chamfer-sm border border-brass-400/19 bg-ink-900 px-2.5 py-1.5 text-xs"
               value={setting("proxy_policy")}
               disabled={!canManage || busy}
               onChange={(e) => act({ action: "set", key: "proxy_policy", value: e.target.value }, "מדיניות הפרוקסי עודכנה")}
@@ -190,11 +190,11 @@ export function SecurityCenter({ canManage }: { canManage: boolean }) {
             </select>
           </div>
 
-          <div className="rounded-xl border border-white/8 bg-white/[0.02] p-3.5">
+          <div className="chamfer border border-brass-400/15 bg-parchment-100/[0.02] p-3.5">
             <span className="block text-[0.95rem] font-bold">חסימת כלי יירוט (Burp / ZAP)</span>
             <p className="mt-0.5 mb-2 text-[0.85rem] text-ink-400">כותרת Proxy-Connection, חתימות Burp והתחזות דפדפן</p>
             <select
-              className="w-full rounded-lg border border-white/12 bg-ink-900 px-2.5 py-1.5 text-xs"
+              className="w-full chamfer-sm border border-brass-400/19 bg-ink-900 px-2.5 py-1.5 text-xs"
               value={setting("tool_block")}
               disabled={!canManage || busy}
               onChange={(e) => act({ action: "set", key: "tool_block", value: e.target.value }, "מדיניות הכלים עודכנה")}
@@ -220,10 +220,10 @@ export function SecurityCenter({ canManage }: { canManage: boolean }) {
           ) : (
             <ul className="space-y-2">
               {data.bans.map((ban) => (
-                <li key={ban.id} className="rounded-xl border border-white/8 bg-white/[0.02] p-3">
+                <li key={ban.id} className="chamfer border border-brass-400/15 bg-parchment-100/[0.02] p-3">
                   <div className="flex flex-wrap items-center justify-between gap-2">
                     <div className="flex items-center gap-2">
-                      <code dir="ltr" className="rounded-md bg-ink-900 px-2 py-0.5 text-[0.92rem] text-ember-300">{ban.ip}</code>
+                      <code dir="ltr" className="chamfer-sm bg-ink-900 px-2 py-0.5 text-[0.92rem] text-ember-300">{ban.ip}</code>
                       <Badge tone={ban.severity === "critical" ? "danger" : "warn"}>{CATEGORY_LABELS[ban.category] ?? ban.category}</Badge>
                       {ban.strikes > 1 && <span className="text-[0.85rem] text-brass-300">החמרה ×{ban.strikes}</span>}
                       {ban.permanent ? <Badge tone="danger">קבוע</Badge> : null}
@@ -248,7 +248,7 @@ export function SecurityCenter({ canManage }: { canManage: boolean }) {
           )}
 
           {canManage && (
-            <div className="mt-4 space-y-2 border-t border-white/8 pt-4">
+            <div className="mt-4 space-y-2 border-t border-brass-400/15 pt-4">
               <h3 className="text-[0.95rem] font-bold">חסימה ידנית</h3>
               <div className="flex flex-wrap gap-2">
                 <Input
@@ -341,7 +341,7 @@ export function SecurityCenter({ canManage }: { canManage: boolean }) {
             ) : (
               <ul className="max-h-[320px] space-y-1.5 overflow-y-auto pe-1 text-[0.85rem]">
                 {data.recentBlocks.map((e, i) => (
-                  <li key={`${e.created_at}-${i}`} className="rounded-lg bg-white/[0.03] px-2.5 py-1.5">
+                  <li key={`${e.created_at}-${i}`} className="chamfer-sm bg-parchment-100/[0.03] px-2.5 py-1.5">
                     <div className="flex items-center justify-between gap-2">
                       <span className={e.severity === "critical" ? "text-ember-300" : "text-brass-300"}>{e.kind}</span>
                       <span className="text-ink-500">{new Date(e.created_at).toLocaleTimeString("he-IL")}</span>
@@ -360,9 +360,9 @@ export function SecurityCenter({ canManage }: { canManage: boolean }) {
 }
 
 function Stat({ label, value, tone }: { label: string; value: number; tone: "neutral" | "warn" | "danger" }) {
-  const color = tone === "danger" ? "text-ember-300" : tone === "warn" ? "text-brass-300" : "text-white";
+  const color = tone === "danger" ? "text-ember-300" : tone === "warn" ? "text-brass-300" : "text-parchment-100";
   return (
-    <div className="rounded-xl border border-white/8 bg-white/[0.02] p-3">
+    <div className="chamfer border border-brass-400/15 bg-parchment-100/[0.02] p-3">
       <span className="block text-[0.85rem] text-ink-400">{label}</span>
       <b className={`text-xl ${color}`}>{value.toLocaleString("he-IL")}</b>
     </div>
