@@ -28,6 +28,7 @@ const SECTIONS: { title: string; items: { href: string; label: string; icon: str
     title: "משתמשים והכנסות",
     items: [
       { href: "/admin/users", label: "משתמשים", icon: "👥" },
+      { href: "/admin/demo-accounts", label: "חשבונות לבדיקה", icon: "🧪" },
       { href: "/admin/plans", label: "מסלולי מנוי", icon: "💳" },
       { href: "/admin/coupons", label: "קופונים", icon: "🏷️" },
       { href: "/admin/subscriptions", label: "מנויים ותשלומים", icon: "🧾" },
