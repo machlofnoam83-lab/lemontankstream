@@ -6,6 +6,7 @@ import { apiCall } from "@/lib/client/api";
 import { Button, Input } from "@/components/ui/primitives";
 import { useToast } from "@/components/ui/toast";
 import { formatDate } from "@/lib/format";
+import { Icon } from "@/components/ui/icons";
 
 /** כפתורי ההצטרפות/ביטול/חידוש מנוי — כולל מימוש קופון */
 export function UpgradePanel({
@@ -79,7 +80,8 @@ export function UpgradePanel({
               המנוי יסתיים ב-{formatDate(periodEnd)} — אפשר לחזור בו בכל רגע.
             </p>
             <Button variant="primary" className="w-full" onClick={() => call("resume")} loading={loading === "resume"}>
-              חדש את המנוי 
+              <Icon name="refresh" className="size-4" />
+              חדשו את המנוי
             </Button>
           </>
         ) : (
@@ -99,7 +101,8 @@ export function UpgradePanel({
     <div className="space-y-2">
       {trialDays > 0 ? (
         <Button variant="plus" className="w-full" size="lg" onClick={() => call("trial")} loading={loading === "trial"}>
-          התחל {trialDays} ימי ניסיון חינם
+          <Icon name="hourglass" className="size-4" />
+          התחילו {trialDays} ימי ניסיון חינם
         </Button>
       ) : null}
 
@@ -115,8 +118,12 @@ export function UpgradePanel({
           </Button>
         </div>
       ) : (
-        <button onClick={() => setShowCoupon(true)} className="w-full text-center text-xs text-ink-400 hover:text-lemon-300">
-          יש לך קוד קופון?
+        <button
+          onClick={() => setShowCoupon(true)}
+          className="mx-auto flex items-center gap-1.5 font-display text-sm text-parchment-300/70 transition hover:text-brass-200"
+        >
+          <Icon name="gift" className="size-4" />
+          יש לכם קוד קופון?
         </button>
       )}
     </div>

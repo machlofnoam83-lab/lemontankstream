@@ -4,6 +4,8 @@ import { all, get } from "@/lib/db";
 import { getCurrentUser } from "@/lib/session";
 import { formatPrice } from "@/lib/format";
 import { UpgradePanel } from "@/components/site/upgrade-panel";
+import { Icon } from "@/components/ui/icons";
+import { OrnamentRule } from "@/components/ui/ornaments";
 import { Badge } from "@/components/ui/primitives";
 
 export const metadata: Metadata = {
@@ -49,17 +51,23 @@ export default async function PlansPage() {
 
   return (
     <div className="space-y-8">
-      <header className="text-center">
-        <h1 className="text-3xl font-black tracking-tight md:text-5xl">
-          בחר את <span className="text-gradient">המסלול</span> שלך 
+      <header className="text-center animate-ink-in">
+        <p className="font-mono text-[0.7rem] uppercase tracking-[0.3em] text-brass-300/80">מנויים</p>
+        <h1 className="mt-2 font-display text-3xl font-bold tracking-tight text-parchment-50 md:text-5xl">
+          בחרו את <span className="text-brass-300">המסלול</span> שלכם
         </h1>
-        <p className="mx-auto mt-3 max-w-2xl text-sm leading-relaxed text-ink-300 md:text-base">
+        <p className="mx-auto mt-3 max-w-2xl text-base leading-relaxed text-parchment-200/80">
           מתחילים בחינם, משדרגים כשבא לכם. בלי התחייבות, ביטול בכל רגע בלחיצה.
         </p>
-        <div className="mt-5 flex flex-wrap items-center justify-center gap-2 text-[0.85rem] font-semibold text-ink-300">
-          {["7 ימי ניסיון חינם", "ביטול בכל רגע", "תשלום מאובטח", "ללא פרסומות בפלוס"].map((chip) => (
-            <span key={chip} className="rounded-full border border-white/10 bg-white/[0.04] px-3 py-1.5">
-              ✓ {chip}
+        <div className="mt-5 flex flex-wrap items-center justify-center gap-2">
+          {["7 ימי ניסיון חינם", "ביטול בכל רגע", "תשלום מאובטח", "ללא פרסומות בפלוס"].map((chip, index) => (
+            <span
+              key={chip}
+              style={{ animationDelay: `${index * 60}ms` }}
+              className="reveal-item inline-flex items-center gap-1.5 border border-brass-400/20 bg-brass-400/[0.05] px-3 py-1.5 font-mono text-[0.72rem] text-parchment-200/85"
+            >
+              <Icon name="check" className="size-3.5 text-verdigris-400" strokeWidth={3} />
+              {chip}
             </span>
           ))}
         </div>
@@ -74,17 +82,18 @@ export default async function PlansPage() {
           return (
             <section
               key={plan.code}
-              className={`relative flex flex-col overflow-hidden rounded-[24px] p-7 transition-transform duration-300 [transition-timing-function:var(--ease-cinema)] hover:-translate-y-1 ${
+              className={`chamfer reveal-item relative flex flex-col overflow-hidden p-7 lift hover:lift-hover ${
                 isPlus
-                  ? "border border-plus-500/40 bg-gradient-to-b from-plus-600/20 to-ink-900/70 shadow-[0_40px_90px_-50px_rgba(124,36,48,0.95)]"
+                  ? "border border-oxblood-500/45 bg-gradient-to-b from-oxblood-600/[0.22] to-obsidian-900/75 shadow-[0_40px_90px_-50px_rgba(124,36,48,0.95)]"
                   : "card-surface"
               }`}
               aria-label={`מסלול ${plan.name_he}`}
             >
               {isPlus ? (
                 <>
-                  <div className="pointer-events-none absolute -right-20 -top-24 h-56 w-56 rounded-full bg-plus-500/25 blur-3xl" aria-hidden="true" />
-                  <span className="absolute -top-0.5 right-7 rounded-b-xl bg-gradient-to-b from-plus-500 to-plus-600 px-3.5 py-1.5 text-[0.85rem] font-black text-white shadow-[0_10px_30px_-12px_rgba(124,36,48,1)]">
+                  <div className="pointer-events-none absolute -right-20 -top-24 size-56 rounded-full bg-oxblood-600/25 blur-3xl" aria-hidden="true" />
+                  <span className="absolute top-0 right-7 inline-flex items-center gap-1.5 border border-brass-300/50 border-t-0 bg-gradient-to-b from-oxblood-500 to-oxblood-600 px-3.5 py-1.5 font-mono text-[0.7rem] uppercase tracking-[0.18em] text-parchment-50 shadow-[0_10px_30px_-12px_rgba(124,36,48,1)]">
+                    <Icon name="crown" className="size-3.5" />
                     הפופולרי ביותר
                   </span>
                 </>
@@ -92,23 +101,23 @@ export default async function PlansPage() {
 
               <div className="flex items-start justify-between">
                 <div>
-                  <h2 className={`text-2xl font-black ${isPlus ? "text-plus-300" : "text-white"}`}>{isPlus ? " " : ""}{plan.name_he}</h2>
-                  {plan.tagline ? <p className="mt-1 text-sm text-ink-300">{plan.tagline}</p> : null}
+                  <h2 className={`font-display text-2xl font-bold ${isPlus ? "text-parchment-50" : "text-parchment-100"}`}>{plan.name_he}</h2>
+                  {plan.tagline ? <p className="mt-1 text-sm text-parchment-300/70">{plan.tagline}</p> : null}
                 </div>
                 {isCurrent ? <Badge tone="success">המסלול הנוכחי שלך</Badge> : null}
               </div>
 
               <div className="mt-6 flex items-end gap-2.5">
-                <span className={`text-5xl font-black tracking-tight ${isPlus ? "text-gradient" : "text-white"}`}>
+                <span className={`font-display text-5xl font-bold tracking-tight tabular-nums ${isPlus ? "text-brass-200" : "text-parchment-50"}`}>
                   {plan.price_ils === 0 ? "₪0" : formatPrice(plan.price_ils)}
                 </span>
-                <span className="pb-1.5 text-sm text-ink-400">/ חודש</span>
+                <span className="pb-1.5 text-sm text-parchment-300/70">/ חודש</span>
                 {plan.old_price_ils ? (
-                  <span className="pb-1.5 text-sm text-ink-500 line-through">{formatPrice(plan.old_price_ils)}</span>
+                  <span className="pb-1.5 text-sm text-parchment-300/45 line-through">{formatPrice(plan.old_price_ils)}</span>
                 ) : null}
               </div>
 
-              <ul className="mt-6 flex-1 space-y-2.5 text-sm text-ink-200">
+              <ul className="mt-6 flex-1 space-y-2.5 text-sm text-parchment-200/85">
                 {[
                   isPlus ? `עד ${plan.max_streams} מסכים במקביל` : "מסך אחד בכל פעם",
                   isPlus ? `${plan.max_profiles} פרופילים למשפחה` : "2 פרופילים",
@@ -122,18 +131,18 @@ export default async function PlansPage() {
                   return (
                     <li key={item.text} className="flex items-start gap-2.5">
                       <span
-                        className={`mt-0.5 flex h-4.5 w-4.5 shrink-0 items-center justify-center rounded-full text-[0.8rem] font-black ${
+                        className={`mt-0.5 flex size-4.5 shrink-0 items-center justify-center border ${
                           item.ok
                             ? isPlus
-                              ? "bg-plus-500/25 text-plus-300"
-                              : "bg-verdigris-500/20 text-verdigris-300"
-                            : "bg-white/[0.07] text-ink-400"
+                              ? "border-brass-400/45 bg-brass-400/10 text-brass-200"
+                              : "border-verdigris-400/45 bg-verdigris-500/12 text-verdigris-300"
+                            : "border-parchment-300/20 bg-obsidian-800/60 text-parchment-300/50"
                         }`}
                         aria-hidden="true"
                       >
-                        {item.ok ? "✓" : "✗"}
+                        <Icon name={item.ok ? "check" : "close"} className="size-3" strokeWidth={3} />
                       </span>
-                      <span className={item.ok ? "" : "text-ink-400"}>{item.text}</span>
+                      <span className={item.ok ? "" : "text-parchment-300/55"}>{item.text}</span>
                     </li>
                   );
                 })}
@@ -157,21 +166,21 @@ export default async function PlansPage() {
       </div>
 
       {/* השוואת תכונות */}
-      <section className="panel-ink overflow-hidden rounded-[22px]">
-        <h2 className="section-heading px-5 pt-5 !text-base">
+      <section className="panel-ink chamfer relative overflow-hidden">
+        <h2 className="section-heading px-5 pt-5 !text-base text-parchment-100">
           <span className="section-heading-bar" aria-hidden="true" />
           השוואה מפורטת
         </h2>
         <div className="mt-4 overflow-x-auto">
           <table className="w-full text-sm">
-            <thead className="bg-white/[0.04] text-[0.85rem] uppercase tracking-wide text-ink-300">
+            <thead className="bg-obsidian-900/70 font-mono text-[0.72rem] uppercase tracking-[0.16em] text-brass-300/80">
               <tr>
                 <th className="px-5 py-3 text-right font-bold">תכונה</th>
                 <th className="px-4 py-3 font-bold">חינם</th>
-                <th className="px-4 py-3 font-bold text-plus-400">פלוס </th>
+                <th className="px-4 py-3 font-bold text-brass-200">פלוס</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-white/[0.06] [&>tr:hover]:bg-white/[0.03]">
+            <tbody className="divide-y divide-brass-400/10 [&>tr:hover]:bg-brass-400/[0.04]">
               {[
                 ["תוכן חינם", "✓", "✓"],
                 ["תוכן פרימיום (פלוס)", "✗", "✓"],
@@ -184,11 +193,11 @@ export default async function PlansPage() {
                 ["תמיכה", "דוא״ל", "צ׳אט בעדיפות"],
               ].map(([feature, free, plus]) => (
                 <tr key={feature}>
-                  <td className="px-5 py-3.5 font-semibold text-ink-100">{feature}</td>
-                  <td className="px-4 py-3.5 text-center text-ink-300">
+                  <td className="px-5 py-3.5 font-display font-bold text-parchment-100">{feature}</td>
+                  <td className="px-4 py-3.5 text-center text-parchment-300/75">
                     <FeatureMark value={free} />
                   </td>
-                  <td className="px-4 py-3.5 text-center font-bold text-plus-300">
+                  <td className="px-4 py-3.5 text-center font-bold text-brass-200">
                     <FeatureMark value={plus} />
                   </td>
                 </tr>
@@ -205,8 +214,8 @@ export default async function PlansPage() {
           <ul className="divide-y divide-white/5 text-sm">
             {payments.map((p) => (
               <li key={p.id} className="flex items-center justify-between py-2.5">
-                <span className="text-ink-300">{new Date(p.created_at).toLocaleDateString("he-IL")}</span>
-                <span className="font-mono text-xs text-ink-400" dir="ltr">{p.invoice_no}</span>
+                <span className="text-parchment-300/75">{new Date(p.created_at).toLocaleDateString("he-IL")}</span>
+                <span className="font-mono text-xs text-parchment-300/60" dir="ltr">{p.invoice_no}</span>
                 <span className="font-bold">{formatPrice(p.amount, p.currency)}</span>
                 <Badge tone={p.status === "paid" ? "success" : "warn"}>{p.status === "paid" ? "שולם" : p.status}</Badge>
               </li>
@@ -229,7 +238,7 @@ export default async function PlansPage() {
           ].map(([q, a]) => (
             <div key={q}>
               <dt className="font-bold">{q}</dt>
-              <dd className="text-ink-300">{a}</dd>
+              <dd className="text-parchment-200/85">{a}</dd>
             </div>
           ))}
         </dl>
@@ -238,9 +247,9 @@ export default async function PlansPage() {
   );
 }
 
-/** סימון ✓ / ✗ בטבלת ההשוואה — עם טון צבע תואם */
+/** סימון ✓ / ✗ בטבלת ההשוואה — אייקונים חרותים במקום תווים */
 function FeatureMark({ value }: { value: string }) {
-  if (value === "✓") return <span className="text-verdigris-400">✓</span>;
-  if (value === "✗") return <span className="text-ink-500">✗</span>;
-  return <span>{value}</span>;
+  if (value === "✓") return <Icon name="check" className="mx-auto size-4 text-verdigris-400" strokeWidth={3} />;
+  if (value === "✗") return <Icon name="close" className="mx-auto size-4 text-parchment-300/35" strokeWidth={2} />;
+  return <span className="font-mono">{value}</span>;
 }

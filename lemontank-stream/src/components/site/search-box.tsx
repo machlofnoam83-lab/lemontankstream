@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { apiCall } from "@/lib/client/api";
+import { Icon } from "@/components/ui/icons";
 
 type Suggestion = { id: number; slug: string; name_he: string; kind: "movie" | "series"; year: number | null; poster_url: string | null; plan_access: string };
 
@@ -54,14 +55,11 @@ export function SearchBox({ compact = false, autoFocus = false }: { compact?: bo
 
   return (
     <div ref={boxRef} className="relative w-full">
-      <form onSubmit={submit} role="search" className="relative">
-        <svg
-          className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-ink-400"
-          width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true"
-        >
-          <circle cx="11" cy="11" r="7" />
-          <path d="m21 21-4.3-4.3" />
-        </svg>
+      <form onSubmit={submit} role="search" className="relative group/search">
+        <Icon
+          name="search"
+          className="pointer-events-none absolute right-3 top-1/2 size-4 -translate-y-1/2 text-brass-300/70 transition-colors group-focus-within/search:text-brass-200"
+        />
         <input
           type="search"
           value={q}
@@ -70,22 +68,30 @@ export function SearchBox({ compact = false, autoFocus = false }: { compact?: bo
           onFocus={() => items.length && setOpen(true)}
           placeholder={compact ? "חיפוש…" : "חפש סרט או סדרה…"}
           aria-label="חיפוש סרטים וסדרות"
-          className={`w-full rounded-full border border-white/15 bg-ink-900/90 py-2 pr-9 pl-3 text-sm placeholder:text-ink-400 focus:border-lemon-400/70 ${compact ? "md:w-52" : ""}`}
+          className={`field-ink !py-2 pr-9 pl-3 text-sm transition focus:field-ink-focus [&::placeholder]:text-parchment-300/45 ${
+            compact ? "md:w-52" : ""
+          }`}
         />
-        {loading ? <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[0.8rem] text-ink-400">…</span> : null}
+        {loading ? (
+          <span className="absolute left-3 top-1/2 flex -translate-y-1/2 gap-0.5" aria-hidden="true">
+            {[0, 1, 2].map((index) => (
+              <span key={index} className="size-1 rounded-full bg-brass-300 animate-lamp" style={{ animationDelay: `${index * 140}ms` }} />
+            ))}
+          </span>
+        ) : null}
       </form>
 
       {open && items.length > 0 ? (
-        <div className="absolute top-full z-50 mt-2 w-full min-w-[20rem] overflow-hidden rounded-xl border border-white/10 bg-ink-850/98 shadow-2xl backdrop-blur">
+        <div className="absolute top-full z-50 mt-2 w-full min-w-[20rem] overflow-hidden border border-brass-400/25 bg-obsidian-900/98 shadow-[0_30px_70px_-30px_rgba(0,0,0,1)] backdrop-blur-xl animate-ink-in chamfer">
           <ul className="max-h-[60vh] overflow-y-auto">
             {items.map((it) => (
               <li key={`${it.kind}-${it.id}`}>
                 <Link
                   href={`/title/${it.slug}`}
                   onClick={() => setOpen(false)}
-                  className="flex items-center gap-3 px-3 py-2 hover:bg-white/5"
+                  className="reveal-item flex items-center gap-3 px-3 py-2 transition hover:bg-brass-400/[0.07]"
                 >
-                  <span className="h-12 w-9 shrink-0 overflow-hidden rounded bg-ink-800 text-[0.75rem]">
+                  <span className="h-12 w-9 shrink-0 overflow-hidden border border-brass-400/20 bg-obsidian-800 text-[0.75rem]">
                     {it.poster_url ? (
                       // eslint-disable-next-line @next/next/no-img-element
                       <img src={it.poster_url} alt="" className="h-full w-full object-cover" loading="lazy" />
@@ -94,8 +100,8 @@ export function SearchBox({ compact = false, autoFocus = false }: { compact?: bo
                     )}
                   </span>
                   <span className="min-w-0 flex-1">
-                    <span className="block truncate text-sm font-medium">{it.name_he}</span>
-                    <span className="block text-[0.85rem] text-ink-400">
+                    <span className="block truncate font-display text-sm font-bold text-parchment-100">{it.name_he}</span>
+                    <span className="block text-[0.85rem] text-parchment-300/65">
                       {it.kind === "movie" ? "סרט" : "סדרה"} {it.year ? `· ${it.year}` : ""}
                     </span>
                   </span>
@@ -109,9 +115,10 @@ export function SearchBox({ compact = false, autoFocus = false }: { compact?: bo
               setOpen(false);
               router.push(`/search?q=${encodeURIComponent(q.trim())}`);
             }}
-            className="w-full border-t border-white/10 bg-white/[0.03] px-3 py-2 text-xs text-lemon-300 hover:bg-white/10"
+            className="flex w-full items-center justify-center gap-1.5 border-t border-brass-400/20 bg-obsidian-900/60 px-3 py-2 text-xs text-brass-200 transition hover:bg-brass-400/[0.08]"
           >
-            הצג את כל התוצאות עבור "{q}" ←
+            <Icon name="search" className="size-3.5" />
+            הצג את כל התוצאות עבור "{q}"
           </button>
         </div>
       ) : null}
