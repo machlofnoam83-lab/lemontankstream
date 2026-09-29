@@ -5,7 +5,8 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { TitleCard } from "./title-card";
 import { apiCall } from "@/lib/client/api";
-import { Button, EmptyState, Select, SkeletonRow } from "@/components/ui/primitives";
+import { Icon } from "@/components/ui/icons";
+import { OrnamentRule } from "@/components/ui/ornaments";
 import type { TitleCard as TitleCardType } from "@/lib/catalog";
 
 type Genre = { id: number; slug: string; name_he: string; icon: string | null };
@@ -16,13 +17,16 @@ const SORTS = [
   { value: "added", label: "נוספו לאחרונה" },
   { value: "popular", label: "הנצפים ביותר" },
   { value: "rating", label: "הדירוג הגבוה" },
-  { value: "az", label: "לפי א'–ת'" },
+  { value: "az", label: "לפי א׳–ת׳" },
   { value: "year", label: "לפי שנה" },
 ];
 
 /**
- * דפדפן קטלוג עם סינון, מיון ועמודים — לקוח בלבד, עם טעינה מהשרת
- * (השרת מסנן לפי הרשאת המנוי, כך שמשתמש חינם לא רואה קישורים לתוכן פלוס).
+ * דפדפן קטלוג — "שולחן החיפוש".
+ *
+ * סינון, מיון ועימוד מול השרת (שמסנן לפי הרשאת המנוי, כך שמשתמש חינם לא
+ * מקבל קישורים לתוכן פלוס). המסננים נראים כמו ידיות עץ ופליז, לא כמו טופס
+ * מודרני: ללא פינות עגולות, עם קו תחתון שמצטייר והדגשה בזהב.
  */
 export function CatalogBrowser({
   kind,
@@ -31,6 +35,7 @@ export function CatalogBrowser({
   title,
   defaultSort = "trending",
   catalogEmpty = false,
+  hideHeading = false,
 }: {
   kind?: "movie" | "series";
   initialPlan?: "free" | "plus";
@@ -39,6 +44,8 @@ export function CatalogBrowser({
   defaultSort?: string;
   /** הקטלוג ריק לגמרי (לא סינון שלא מצא כלום) — מציגים הסבר אחר */
   catalogEmpty?: boolean;
+  /** כשהעמוד כבר הציג כותרת משלו (למשל עמוד ז'אנר עם באנר) */
+  hideHeading?: boolean;
 }) {
   const searchParams = useSearchParams();
   const [genres, setGenres] = useState<Genre[]>([]);
@@ -92,119 +99,165 @@ export function CatalogBrowser({
     return Array.from({ length: 40 }, (_, i) => current + 1 - i);
   }, []);
 
+  const hasFilter = Boolean(plan || genre || year || q);
+
   return (
     <div className="space-y-6">
-      <header className="flex flex-wrap items-end justify-between gap-3 px-1">
-        <div>
-          <h1 className="section-heading !text-2xl md:!text-3xl">
-            <span className="section-heading-bar" aria-hidden="true" />
-            {title}
-          </h1>
-          <p className="mt-1.5 text-sm text-ink-400">
-            {total > 0 ? `${total} כותרים בקטלוג` : "סינון לפי ז'אנר, שנה ומסלול"}
-          </p>
-        </div>
+      {hideHeading ? null : (
+        <header className="flex flex-wrap items-end justify-between gap-3 px-1">
+          <div>
+            <h1 className="section-heading text-parchment-100 md:!text-3xl">
+              <span className="section-heading-bar" aria-hidden="true" />
+              {title}
+            </h1>
+            <p className="mt-1.5 text-sm text-parchment-300/70">
+              {total > 0 ? `${total} כותרים בקטלוג` : "סינון לפי ז'אנר, שנה ומסלול"}
+            </p>
+          </div>
 
-        {/* בורר מסלול בכפתורי גלולה — מהיר וברור */}
-        <div className="flex items-center gap-1.5" role="group" aria-label="סינון לפי מסלול">
-          {[
-            { value: "", label: "הכול" },
-            { value: "free", label: "חינם" },
-            { value: "plus", label: "⭐ פלוס" },
-          ].map((option) => {
-            const active = plan === option.value;
-            return (
-              <button
-                key={option.value || "all"}
-                type="button"
-                aria-pressed={active}
-                onClick={() => setPlan(option.value)}
-                className={`rounded-full border px-3.5 py-1.5 text-xs font-bold transition-all duration-300 ${
-                  active
-                    ? option.value === "plus"
-                      ? "border-plus-400/50 bg-plus-500/20 text-plus-300 shadow-[0_0_18px_-6px_rgba(139,92,246,0.9)]"
-                      : "border-lemon-400/50 bg-lemon-400/15 text-lemon-200 shadow-[0_0_18px_-6px_rgba(247,194,43,0.9)]"
-                    : "border-white/12 text-ink-300 hover:border-white/25 hover:text-white"
-                }`}
-              >
-                {option.label}
-              </button>
-            );
-          })}
-        </div>
-      </header>
+          <div className="flex items-center gap-1.5" role="group" aria-label="סינון לפי מסלול">
+            {[
+              { value: "", label: "הכול", icon: null },
+              { value: "free", label: "חינם", icon: "check" as const },
+              { value: "plus", label: "פלוס", icon: "crown" as const },
+            ].map((option) => {
+              const active = plan === option.value;
+              return (
+                <button
+                  key={option.value || "all"}
+                  type="button"
+                  aria-pressed={active}
+                  onClick={() => setPlan(option.value)}
+                  className={`inline-flex items-center gap-1.5 border px-3.5 py-1.5 font-display text-sm transition-all duration-300 ${
+                    active
+                      ? option.value === "plus"
+                        ? "border-oxblood-500/70 bg-oxblood-500/20 text-parchment-50"
+                        : option.value === "free"
+                          ? "border-verdigris-400/60 bg-verdigris-400/15 text-verdigris-300"
+                          : "border-brass-300/60 bg-brass-400/12 text-brass-200"
+                      : "border-brass-400/18 text-parchment-300/75 hover:border-brass-400/45 hover:text-parchment-100"
+                  }`}
+                >
+                  {option.icon ? <Icon name={option.icon} className="size-3.5" /> : null}
+                  {option.label}
+                </button>
+              );
+            })}
+          </div>
+        </header>
+      )}
 
       {/* סרגל סינון */}
-      <div className="card-surface flex flex-wrap items-center gap-2 rounded-2xl p-3">
-        <Select value={genre} onChange={(e) => setGenre(e.target.value)} aria-label="סינון לפי ז'אנר" className="w-auto min-w-40">
-          <option value="">כל הז'אנרים</option>
-          {genres.map((g) => (
-            <option key={g.id} value={g.slug}>
-              {g.icon ? `${g.icon} ` : ""}
-              {g.name_he}
-            </option>
-          ))}
-        </Select>
+      <div className="card-surface chamfer flex flex-wrap items-center gap-2.5 p-3.5">
+        <label className="flex items-center gap-2">
+          <Icon name="tag" className="size-4 text-brass-300/80" />
+          <span className="sr-only">סינון לפי ז'אנר</span>
+          <select
+            value={genre}
+            onChange={(event) => setGenre(event.target.value)}
+            aria-label="סינון לפי ז'אנר"
+            className="field-ink w-auto min-w-40 !py-2 text-sm"
+          >
+            <option value="">כל הז'אנרים</option>
+            {genres.map((option) => (
+              <option key={option.id} value={option.slug}>
+                {option.name_he}
+              </option>
+            ))}
+          </select>
+        </label>
 
-        <Select value={sort} onChange={(e) => setSort(e.target.value)} aria-label="מיון" className="w-auto">
-          {SORTS.map((s) => (
-            <option key={s.value} value={s.value}>
-              {s.label}
-            </option>
-          ))}
-        </Select>
+        <label className="flex items-center gap-2">
+          <Icon name="list" className="size-4 text-brass-300/80" />
+          <span className="sr-only">מיון</span>
+          <select
+            value={sort}
+            onChange={(event) => setSort(event.target.value)}
+            aria-label="מיון"
+            className="field-ink w-auto !py-2 text-sm"
+          >
+            {SORTS.map((option) => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))}
+          </select>
+        </label>
 
-        <Select value={year} onChange={(e) => setYear(e.target.value)} aria-label="סינון לפי שנה" className="w-auto">
-          <option value="">כל השנים</option>
-          {years.map((y) => (
-            <option key={y} value={y}>
-              {y}
-            </option>
-          ))}
-        </Select>
+        <label className="flex items-center gap-2">
+          <Icon name="calendar" className="size-4 text-brass-300/80" />
+          <span className="sr-only">סינון לפי שנה</span>
+          <select
+            value={year}
+            onChange={(event) => setYear(event.target.value)}
+            aria-label="סינון לפי שנה"
+            className="field-ink w-auto !py-2 text-sm"
+          >
+            <option value="">כל השנים</option>
+            {years.map((value) => (
+              <option key={value} value={value}>
+                {value}
+              </option>
+            ))}
+          </select>
+        </label>
 
-        <input
-          type="search"
-          value={q}
-          onChange={(e) => setQ(e.target.value)}
-          placeholder="חיפוש בתוך התוצאות…"
-          aria-label="חיפוש בתוך התוצאות"
-          className="min-w-44 flex-1 rounded-xl border border-white/10 bg-ink-900/80 px-3 py-2 text-sm"
-        />
+        <span className="relative flex min-w-44 flex-1 items-center">
+          <Icon name="search" className="pointer-events-none absolute right-3 size-4 text-brass-300/70" />
+          <input
+            type="search"
+            value={q}
+            onChange={(event) => setQ(event.target.value)}
+            placeholder="חיפוש בתוך התוצאות…"
+            aria-label="חיפוש בתוך התוצאות"
+            className="field-ink !py-2 pr-10 text-sm transition focus:field-ink-focus"
+          />
+        </span>
 
-        {(plan || genre || year || q) && (
-          <Button variant="subtle" size="sm" onClick={() => { setPlan(""); setGenre(""); setYear(""); setQ(""); }}>
-            נקה סינון ✕
-          </Button>
-        )}
+        {hasFilter ? (
+          <button
+            type="button"
+            onClick={() => {
+              setPlan("");
+              setGenre("");
+              setYear("");
+              setQ("");
+            }}
+            className="inline-flex items-center gap-1.5 border border-brass-400/25 px-3 py-2 text-sm text-parchment-300/85 chamfer transition hover:border-ember-400/50 hover:text-ember-200 animate-ink-in"
+          >
+            <Icon name="close" className="size-4" />
+            נקה סינון
+          </button>
+        ) : null}
       </div>
 
       {loading && items.length === 0 ? (
-        <div className="space-y-4">
-          <SkeletonRow />
-          <SkeletonRow />
-        </div>
+        <ShelfSkeleton />
       ) : items.length === 0 ? (
         catalogEmpty ? (
-          <EmptyState
-            title="הקטלוג שלנו בהקמה 🍿"
+          <EmptyNote
+            icon="lantern"
+            title="הארכיון עוד מתמלא"
             description="עוד לא הועלו כותרים. פתחו חשבון חינם ותהיו הראשונים לדעת כשהתוכן עולה."
-            icon="🎬"
-            action={<Link href="/register" className="rounded-xl bg-lemon-400 px-4 py-2 text-sm font-bold text-ink-900">פתחו חשבון חינם</Link>}
+            cta={{ href: "/register", label: "פתחו חשבון חינם" }}
           />
         ) : (
-          <EmptyState
+          <EmptyNote
+            icon="search"
             title="לא נמצאו כותרים"
-            description="נסה לשנות את הסינון או לחפש משהו אחר."
-            icon="🔍"
-            action={<Link href="/" className="rounded-xl bg-lemon-400 px-4 py-2 text-sm font-bold text-ink-900">חזרה לעמוד הבית</Link>}
+            description="נסו לשנות את הסינון או לחפש משהו אחר."
+            cta={{ href: "/", label: "חזרה לעמוד הבית" }}
           />
         )
       ) : (
         <>
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
-            {items.map((item) => (
-              <div key={`${item.kind}-${item.id}`} className="flex justify-center">
+          <div className="grid grid-cols-2 gap-3.5 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
+            {items.map((item, index) => (
+              <div
+                key={`${item.kind}-${item.id}`}
+                className="reveal-item flex justify-center"
+                style={{ animationDelay: `${Math.min(index * 40, 520)}ms` }}
+              >
                 <TitleCard item={item} size="md" />
               </div>
             ))}
@@ -212,13 +265,66 @@ export function CatalogBrowser({
 
           {items.length < total ? (
             <div className="flex justify-center">
-              <Button variant="ghost" loading={loading} onClick={() => void load(offset + limit)}>
+              <button
+                type="button"
+                onClick={() => void load(offset + limit)}
+                disabled={loading}
+                className="inline-flex items-center gap-2 border border-brass-400/30 px-6 py-3 font-display text-sm text-parchment-100 chamfer transition hover:border-brass-300/70 hover:bg-brass-400/[0.07] disabled:opacity-50"
+              >
+                <Icon name="download" className="size-4" />
                 טען עוד ({total - items.length} נותרו)
-              </Button>
+              </button>
             </div>
           ) : null}
         </>
       )}
+    </div>
+  );
+}
+
+/** שלד טעינה — מדפים ריקים שמנצנצים בעדינות */
+function ShelfSkeleton() {
+  return (
+    <div className="space-y-4" aria-hidden="true">
+      {[0, 1].map((row) => (
+        <div key={row} className="flex gap-3.5 overflow-hidden">
+          {Array.from({ length: 6 }).map((_, index) => (
+            <span
+              key={index}
+              className="skeleton h-64 w-44 shrink-0 chamfer"
+              style={{ animationDelay: `${index * 90}ms` }}
+            />
+          ))}
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function EmptyNote({
+  icon,
+  title,
+  description,
+  cta,
+}: {
+  icon: "lantern" | "search";
+  title: string;
+  description: string;
+  cta: { href: string; label: string };
+}) {
+  return (
+    <div className="card-surface chamfer relative mx-auto max-w-xl p-8 text-center animate-ink-in">
+      <span aria-hidden="true" className="pointer-events-none absolute inset-[6px] border border-brass-400/10" />
+      <span className="mx-auto flex size-14 items-center justify-center border border-brass-400/30 bg-brass-400/[0.06] text-brass-300 chamfer" aria-hidden="true">
+        <Icon name={icon} className="size-6" />
+      </span>
+      <h2 className="mt-4 font-display text-xl font-bold text-parchment-50">{title}</h2>
+      <p className="mx-auto mt-2 max-w-sm text-sm leading-relaxed text-parchment-200/75">{description}</p>
+      <OrnamentRule className="my-5" />
+      <Link href={cta.href} className="btn-primary sheen text-sm">
+        <Icon name="arrow-left" className="size-4" />
+        {cta.label}
+      </Link>
     </div>
   );
 }

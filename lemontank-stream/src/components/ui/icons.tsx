@@ -22,7 +22,8 @@ type IconName =
   | "list" | "heart" | "users" | "sparkles" | "wand" | "lock" | "unlock"
   | "door" | "skull" | "dragon" | "sword" | "chalice" | "knot" | "feather"
   | "mail" | "copy" | "refresh" | "trash" | "edit" | "chart" | "wifi" | "monitor"
-  | "wallet" | "gift" | "info" | "warn" | "shield-check";
+  | "wallet" | "gift" | "info" | "warn" | "shield-check" | "wrench" | "scissors"
+  | "anchor" | "hourglass" | "seal";
 
 const PATHS: Record<IconName, React.ReactNode> = {
   play: <path d="M7 4.5v15l12-7.5z" />,
@@ -87,6 +88,11 @@ const PATHS: Record<IconName, React.ReactNode> = {
   gift: <><rect x="4" y="9" width="16" height="10.5" rx="1" /><path d="M4 13h16M12 9v10.5" /><path d="M12 9c-2.5 0-4-1-4-2.6C8 5.2 9 4.5 10 4.8c1.4.4 2 2 2 4.2zM12 9c2.5 0 4-1 4-2.6 0-1.2-1-1.9-2-1.6-1.4.4-2 2-2 4.2z" /></>,
   info: <><circle cx="12" cy="12" r="8" /><path d="M12 11v5" /><circle cx="12" cy="8.4" r="0.9" /></>,
   warn: <><path d="M12 4.5l8 14H4z" /><path d="M12 10v4.5" /><circle cx="12" cy="16.6" r="0.9" /></>,
+  wrench: <><path d="M15.5 4.5a4.5 4.5 0 0 0-4 6.6L4.8 17.8a1.7 1.7 0 0 0 2.4 2.4l6.7-6.7a4.5 4.5 0 0 0 6.6-4.9l-2.6 2.6-2.4-.6-.6-2.4z" /></>,
+  scissors: <><circle cx="6.5" cy="6.5" r="2.3" /><circle cx="6.5" cy="17.5" r="2.3" /><path d="M8.6 7.7L19 17M19 7L8.6 16.3" /></>,
+  anchor: <><path d="M12 5.5v13" /><circle cx="12" cy="4.2" r="1.6" /><path d="M6 11h12" /><path d="M5 14.5c1.4 3 3.9 4.6 7 4.6s5.6-1.6 7-4.6" /></>,
+  hourglass: <><path d="M7 3.5h10" /><path d="M7 20.5h10" /><path d="M8 3.5c0 4 4 5 4 8.5 0-3.5 4-4.5 4-8.5" /><path d="M8 20.5c0-4 4-5 4-8.5 0 3.5 4 4.5 4 8.5" /></>,
+  seal: <><circle cx="12" cy="9" r="5" /><path d="M9 13.5L7.5 20.5l4.5-2.2 4.5 2.2L15 13.5" /></>,
 };
 
 export function Icon({

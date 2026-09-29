@@ -5,6 +5,8 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { SearchBox } from "./search-box";
 import { UserMenu } from "./user-menu";
+import { Icon } from "@/components/ui/icons";
+import { LogoMark, Wordmark } from "@/components/ui/logo";
 import type { SessionUser } from "@/lib/session";
 
 const NAV = [
@@ -13,7 +15,7 @@ const NAV = [
   { href: "/series", label: "סדרות" },
   { href: "/new", label: "חדש" },
   { href: "/popular", label: "פופולרי" },
-  { href: "/genres", label: "ז'אנרים" },
+  { href: "/genres", label: "ז׳אנרים" },
   { href: "/live", label: "שידור חי" },
   { href: "/account/party", label: "צפייה משותפת" },
   { href: "/requests", label: "בקשו כותר" },
@@ -23,8 +25,11 @@ const isActive = (pathname: string, href: string) =>
   href === "/" ? pathname === "/" : pathname === href || pathname.startsWith(`${href}/`);
 
 /**
- * כותרת האתר — שקופה מעל התוכן, מתחזקת לזכוכית בגלילה.
- * הניווט מציג מצב פעיל עם קו לימוני זוהר, ובמובייל נגלל אופקית.
+ * כותרת האתר — "לוח השיש בכניסה".
+ *
+ * בתחילת העמוד היא צפה מעל התמונה בשקיפות מדורגת; בגלילה היא מתעבה למשטח
+ * אובסידיאן עם קו פליז תחתון שנמשך (אנימציה, לא קפיצה). הניווט מציג מצב פעיל
+ * בקו פליז זוהר עדין — לא "כפתור מודגש".
  */
 export function HeaderShell({
   user,
@@ -49,24 +54,21 @@ export function HeaderShell({
 
   return (
     <header
-      className={`sticky top-0 z-40 transition-all duration-500 [transition-timing-function:var(--ease-cinema)] ${
+      className={`sticky top-0 z-40 transition-all duration-700 [transition-timing-function:var(--ease-ink)] ${
         scrolled
-          ? "border-b border-white/[0.07] bg-ink-950/80 shadow-[0_18px_50px_-30px_rgba(0,0,0,1)] backdrop-blur-2xl"
-          : "border-b border-transparent bg-gradient-to-b from-ink-950/90 via-ink-950/40 to-transparent"
+          ? "bg-obsidian-950/92 shadow-[0_18px_50px_-30px_rgba(0,0,0,1)] backdrop-blur-xl"
+          : "bg-gradient-to-b from-obsidian-950/95 via-obsidian-950/55 to-transparent"
       }`}
     >
+      {/* קו פליז עליון — "קו האור" של הארכיון */}
+      <div className="h-px w-full bg-gradient-to-l from-transparent via-brass-500/45 to-transparent" aria-hidden="true" />
+
       <div className="mx-auto flex max-w-[1500px] items-center gap-3 px-4 py-3">
-        {/* לוגו */}
         <Link href="/" className="group flex shrink-0 items-center gap-2.5" aria-label="LemonTank Stream — דף הבית">
-          <span
-            className="flex h-9 w-9 items-center justify-center rounded-xl border border-lemon-400/30 bg-lemon-400/10 text-lg shadow-[0_0_22px_-6px_rgba(247,194,43,0.7)] transition-transform duration-300 group-hover:scale-105"
-            aria-hidden="true"
-          >
-            🍋
+          <span className="transition-transform duration-500 [transition-timing-function:var(--ease-ink)] group-hover:-translate-y-0.5 group-hover:rotate-[-3deg]">
+            <LogoMark className="size-9" />
           </span>
-          <span className="hidden text-lg font-black tracking-tight sm:block">
-            Lemon<span className="text-gradient">Tank</span>
-          </span>
+          <Wordmark className="hidden sm:flex" />
         </Link>
 
         {/* ניווט ראשי */}
@@ -78,16 +80,16 @@ export function HeaderShell({
                 key={item.href}
                 href={item.href}
                 aria-current={active ? "page" : undefined}
-                className={`relative rounded-xl px-3 py-2 text-sm transition-colors duration-200 ${
-                  active ? "font-bold text-white" : "text-ink-300 hover:bg-white/[0.06] hover:text-white"
+                className={`relative px-3 py-2 font-display text-[0.98rem] transition-colors duration-300 ${
+                  active ? "font-bold text-parchment-50" : "text-parchment-300/75 hover:text-parchment-100"
                 }`}
               >
                 {item.label}
                 <span
-                  className={`absolute inset-x-2.5 -bottom-0.5 h-[2px] rounded-full bg-gradient-to-l from-lemon-300 to-lemon-500 transition-opacity duration-300 ${
-                    active ? "opacity-100 shadow-[0_0_12px_1px_rgba(247,194,43,0.8)]" : "opacity-0"
-                  }`}
                   aria-hidden="true"
+                  className={`absolute inset-x-2.5 -bottom-[3px] h-px origin-center bg-gradient-to-l from-transparent via-brass-300 to-transparent transition-transform duration-500 [transition-timing-function:var(--ease-ink)] ${
+                    active ? "scale-x-100 shadow-[0_0_10px_0_rgba(224,188,120,0.75)]" : "scale-x-0"
+                  }`}
                 />
               </Link>
             );
@@ -104,50 +106,52 @@ export function HeaderShell({
               {user.effective_plan !== "plus" ? (
                 <Link
                   href="/plans"
-                  className="hidden rounded-full bg-gradient-to-l from-plus-500 to-plus-600 px-3.5 py-1.5 text-xs font-bold text-white shadow-[0_8px_24px_-10px_rgba(139,92,246,1)] transition hover:brightness-110 sm:block"
+                  className="hidden items-center gap-1.5 border border-brass-400/40 bg-brass-400/[0.08] px-3 py-1.5 text-xs font-bold text-brass-200 chamfer transition hover:border-brass-300/70 hover:bg-brass-400/15 sm:inline-flex"
                 >
-                  ⭐ שדרג לפלוס
+                  <Icon name="crown" className="size-3.5" />
+                  שדרג לפלוס
                 </Link>
               ) : null}
               {isStaffUser ? (
                 <Link
                   href="/admin"
-                  className="hidden rounded-xl border border-lemon-400/40 bg-lemon-400/5 px-3 py-1.5 text-xs font-bold text-lemon-300 transition hover:bg-lemon-400/15 sm:block"
+                  className="hidden items-center gap-1.5 border border-oxblood-500/45 bg-oxblood-500/10 px-3 py-1.5 text-xs font-bold text-parchment-100 chamfer transition hover:bg-oxblood-500/20 sm:inline-flex"
                 >
+                  <Icon name="wrench" className="size-3.5" />
                   ניהול
                 </Link>
               ) : null}
-              {profile && (
+              {profile ? (
                 <Link
                   href="/profiles"
                   title="החלפת פרופיל"
-                  className="hidden items-center gap-2 rounded-full border border-white/12 bg-white/[0.05] py-1 pl-3 pr-1 text-[0.85rem] transition hover:bg-white/[0.1] sm:flex"
+                  className="hidden items-center gap-2 border border-brass-400/20 bg-obsidian-900/60 py-1 pl-3 pr-1 text-sm text-parchment-200 chamfer transition hover:border-brass-300/50 sm:flex"
                 >
-                  <span className="truncate max-w-[7rem]">{profile.name}</span>
-                  {profile.is_kid ? (
-                    <span className="rounded-full bg-free-500/20 px-2 py-0.5 text-[0.72rem] text-free-400">ילדים</span>
-                  ) : null}
-                  <span className="flex h-7 w-7 items-center justify-center overflow-hidden rounded-full bg-lemon-400 text-ink-950">
+                  <span className="max-w-[7rem] truncate">{profile.name}</span>
+                  {profile.is_kid ? <span className="badge-free">ילדים</span> : null}
+                  <span className="flex size-7 items-center justify-center overflow-hidden border border-brass-400/30 bg-brass-400 text-obsidian-950">
                     {profile.avatar_url ? (
                       // eslint-disable-next-line @next/next/no-img-element
-                      <img src={profile.avatar_url} alt="" className="h-7 w-7 object-cover" />
+                      <img src={profile.avatar_url} alt="" className="size-7 object-cover" />
                     ) : (
-                      <span className="text-[0.8rem] font-black">{profile.name.slice(0, 1)}</span>
+                      <span className="font-display text-sm font-bold">{profile.name.slice(0, 1)}</span>
                     )}
                   </span>
                 </Link>
-              )}
+              ) : null}
               <UserMenu user={user} notifications={notifications} />
             </>
           ) : (
             <>
-              <Link href="/login" className="rounded-xl px-3 py-2 text-sm text-ink-200 transition hover:bg-white/[0.06] hover:text-white">
+              <Link
+                href="/login"
+                className="inline-flex items-center gap-1.5 border border-brass-400/25 px-3 py-2 font-display text-sm text-parchment-200 chamfer transition hover:border-brass-300/60 hover:text-parchment-50"
+              >
+                <Icon name="door" className="size-4" />
                 התחברות
               </Link>
-              <Link
-                href="/register"
-                className="rounded-xl bg-gradient-to-b from-lemon-300 to-lemon-400 px-4 py-2 text-sm font-extrabold text-ink-950 shadow-[0_10px_30px_-12px_rgba(247,194,43,0.8)] transition hover:brightness-105"
-              >
+              <Link href="/register" className="btn-primary sheen text-sm">
+                <Icon name="key" className="size-4" />
                 הרשמה חינם
               </Link>
             </>
@@ -156,7 +160,7 @@ export function HeaderShell({
       </div>
 
       {/* ניווט מובייל */}
-      <nav className="no-scrollbar flex gap-1.5 overflow-x-auto border-t border-white/[0.05] px-3 py-2 lg:hidden" aria-label="ניווט מובייל">
+      <nav className="no-scrollbar flex gap-1.5 overflow-x-auto border-t border-brass-400/10 px-3 py-2 lg:hidden" aria-label="ניווט מובייל">
         {NAV.map((item) => {
           const active = isActive(pathname, item.href);
           return (
@@ -164,10 +168,10 @@ export function HeaderShell({
               key={item.href}
               href={item.href}
               aria-current={active ? "page" : undefined}
-              className={`whitespace-nowrap rounded-full px-3.5 py-1.5 text-xs transition ${
+              className={`whitespace-nowrap border px-3.5 py-1.5 font-display text-sm transition ${
                 active
-                  ? "bg-lemon-400/15 font-bold text-lemon-200 ring-1 ring-lemon-400/30"
-                  : "text-ink-300 hover:bg-white/[0.06]"
+                  ? "border-brass-300/50 bg-brass-400/10 text-brass-100"
+                  : "border-transparent text-parchment-300/75 hover:border-brass-400/20 hover:text-parchment-100"
               }`}
             >
               {item.label}
@@ -175,7 +179,10 @@ export function HeaderShell({
           );
         })}
         {user ? (
-          <Link href="/my-list" className="whitespace-nowrap rounded-full px-3.5 py-1.5 text-xs text-ink-300 hover:bg-white/[0.06]">
+          <Link
+            href="/my-list"
+            className="whitespace-nowrap border border-transparent px-3.5 py-1.5 font-display text-sm text-parchment-300/75 transition hover:border-brass-400/20 hover:text-parchment-100"
+          >
             הרשימה שלי
           </Link>
         ) : null}

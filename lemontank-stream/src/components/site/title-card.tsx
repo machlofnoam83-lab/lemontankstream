@@ -24,8 +24,14 @@ const RATIOS = {
 };
 
 /**
- * כרטיס כותר קולנועי — פוסטר שמתרומם בריחוף, זכוכית מעל התמונה,
- * תג מסלול (חינם/פלוס), דירוג, ופס התקדמות לצפייה.
+ * כרטיס כותר — "לוחית בארכיון".
+ *
+ * מה שהשתנה מהגרסה הקודמת, ולמה:
+ *   • פינות חרוטות ומסגרת כפולה במקום פינות עגולות — הכל נראה מגולף.
+ *   • אין זכוכית מטושטשת ואין תגים צבעוניים: תווית פלוס היא חותם, חינם הוא
+ *     ברונזה ירוקה, והדירוג בפונט ממוספר ולא בכוכב זוהר.
+ *   • שם הכותר ב-serif מתחת לתמונה, עם קו פליז שנמשך בריחוף.
+ *   • דירוג (rank) הוא ספרה גדולה ב-serif בצד — כמו מפתח קטלוג, לא "badge".
  */
 export function TitleCard({ item, size = "md", showProgress = false, rank }: Props) {
   const percent = Math.max(0, Math.min(100, (item.percent ?? 0) * 100));
@@ -34,7 +40,7 @@ export function TitleCard({ item, size = "md", showProgress = false, rank }: Pro
   return (
     <Link
       href={`/title/${item.slug}`}
-      className={`group relative block shrink-0 ${SIZES[size]} ${RATIOS[size]} poster-shell hover:poster-shell-hover`}
+      className={`group relative block shrink-0 chamfer ${SIZES[size]} ${RATIOS[size]} poster-shell hover:poster-shell-hover`}
       aria-label={`${item.name_he}${item.year ? ` (${item.year})` : ""} — ${item.plan_access === "plus" ? "פלוס" : "חינם"}`}
     >
       {poster ? (
@@ -43,72 +49,77 @@ export function TitleCard({ item, size = "md", showProgress = false, rank }: Pro
           src={poster}
           alt={`פוסטר ${item.name_he}`}
           loading="lazy"
-          className="h-full w-full object-cover transition-transform duration-[900ms] [transition-timing-function:var(--ease-cinema)] group-hover:scale-[1.07]"
+          decoding="async"
+          className="size-full object-cover [filter:saturate(0.94)_contrast(1.04)] transition-transform duration-[1100ms] [transition-timing-function:var(--ease-cinema)] group-hover:scale-[1.06]"
         />
       ) : (
-        <div className="poster-fallback h-full w-full" style={{ ["--poster-color" as string]: item.color }}>
+        <span className="poster-fallback size-full" style={{ ["--poster-color" as string]: item.color }}>
           <span className="text-balance text-sm">{item.name_he}</span>
-        </div>
+        </span>
       )}
 
-      {/* דהייה תחתונה לקריאות */}
-      <div className="absolute inset-x-0 bottom-0 h-3/4 bg-gradient-to-t from-black/95 via-black/45 to-transparent" />
+      {/* דהייה תחתונה — הטקסט יושב על חושך */}
+      <span className="pointer-events-none absolute inset-x-0 bottom-0 h-3/4 bg-gradient-to-t from-obsidian-950 via-obsidian-950/55 to-transparent" />
+      {/* מסגרת פנימית דקה */}
+      <span className="pointer-events-none absolute inset-0 ring-1 ring-inset ring-brass-200/12" />
 
-      {/* תגיות עליונות */}
-      <div className="absolute right-2.5 top-2.5 flex flex-col items-end gap-1.5">
-        {item.plan_access === "plus" ? <span className="badge-plus">⭐ פלוס</span> : <span className="badge-free">חינם</span>}
+      {/* תוויות עליונות */}
+      <span className="absolute right-2.5 top-2.5 flex flex-col items-end gap-1.5">
+        {item.plan_access === "plus" ? <span className="badge-plus">פלוס</span> : <span className="badge-free">חינם</span>}
         {item.is_original ? (
-          <span className="rounded-full border border-lemon-400/40 bg-black/70 px-2 py-0.5 text-[0.8rem] font-black text-lemon-300 backdrop-blur">
-            מקורי LT
+          <span className="border border-brass-400/45 bg-obsidian-950/80 px-1.5 py-0.5 font-mono text-[0.7rem] uppercase tracking-[0.16em] text-brass-200 backdrop-blur">
+            מקורי
           </span>
         ) : null}
-      </div>
+      </span>
 
-      {/* דירוג */}
       {item.rating_imdb ? (
-        <span className="chip-meta absolute left-2.5 top-2.5 text-lemon-300">★ {item.rating_imdb.toFixed(1)}</span>
+        <span className="chip-meta absolute left-2.5 top-2.5 font-mono text-brass-200 tabular-nums">
+          {item.rating_imdb.toFixed(1)}
+        </span>
       ) : null}
 
       {rank ? (
         <span
-          className="absolute -right-2 bottom-8 select-none text-6xl font-black leading-none text-white/25 drop-shadow-[0_4px_18px_rgba(0,0,0,0.9)]"
           aria-hidden="true"
+          className="absolute -right-2 bottom-6 select-none font-display text-6xl font-bold leading-none text-brass-200/35 drop-shadow-[0_4px_18px_rgba(0,0,0,0.95)]"
         >
           {rank}
         </span>
       ) : null}
 
-      {/* פרטי כותר */}
-      <div className="absolute inset-x-0 bottom-0 p-3">
-        <h3 className="line-clamp-2 text-[0.98rem] font-black leading-snug text-white drop-shadow">{item.name_he}</h3>
-        <div className="mt-1.5 flex flex-wrap items-center gap-x-1.5 gap-y-1 text-[0.82rem] font-semibold text-ink-200">
-          {item.year ? <span>{item.year}</span> : null}
-          {item.kind === "series" && item.seasons_count > 0 ? <span className="text-ink-400">· {item.seasons_count} עונות</span> : null}
-          {item.kind === "movie" && item.runtime_min ? <span className="text-ink-400">· {item.runtime_min} דק'</span> : null}
-          {item.views_count > 999 ? <span className="ms-auto text-ink-400">{formatCompact(item.views_count)} צפיות</span> : null}
-        </div>
-      </div>
+      {/* פרטי הכותר */}
+      <span className="absolute inset-x-0 bottom-0 block p-3">
+        <span className="block font-display text-[1.02rem] font-bold leading-snug text-parchment-50 drop-shadow-[0_2px_8px_rgba(0,0,0,0.9)]">
+          {item.name_he}
+        </span>
+        {/* קו פליז שנמשך בריחוף */}
+        <span className="mt-1 block h-px w-6 bg-brass-400/60 transition-all duration-500 [transition-timing-function:var(--ease-ink)] group-hover:w-full group-hover:bg-brass-300" />
+        <span className="mt-1.5 flex flex-wrap items-center gap-x-1.5 gap-y-1 font-mono text-[0.76rem] text-parchment-300/80">
+          {item.year ? <span className="tabular-nums">{item.year}</span> : null}
+          {item.kind === "series" && item.seasons_count > 0 ? <span>· {item.seasons_count} עונות</span> : null}
+          {item.kind === "movie" && item.runtime_min ? <span>· {item.runtime_min} דק׳</span> : null}
+          {item.views_count > 999 ? <span className="ms-auto tabular-nums">{formatCompact(item.views_count)} צפיות</span> : null}
+        </span>
+      </span>
 
-      {/* שכבת ריחוף */}
-      <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-t from-black/85 via-black/35 to-transparent opacity-0 backdrop-blur-[1px] transition-opacity duration-300 group-hover:opacity-100">
-        <span
-          className="flex h-12 w-12 translate-y-2 items-center justify-center rounded-full bg-gradient-to-b from-lemon-300 to-lemon-400 text-ink-950 shadow-[0_10px_30px_-8px_rgba(247,194,43,0.9)] transition-transform duration-300 [transition-timing-function:var(--ease-cinema)] group-hover:translate-y-0"
-          aria-hidden="true"
-        >
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" className="flip-rtl">
-            <path d="M8 5v14l11-7z" />
+      {/* שכבת ריחוף — "חותם הצפייה" */}
+      <span className="absolute inset-0 flex items-center justify-center bg-gradient-to-t from-obsidian-950/90 via-obsidian-950/40 to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100">
+        <span className="flex size-12 translate-y-2 items-center justify-center border border-brass-300/70 bg-obsidian-950/70 text-brass-200 chamfer shadow-[0_0_26px_-6px_rgba(201,154,74,0.85)] transition-transform duration-500 [transition-timing-function:var(--ease-ink)] group-hover:translate-y-0">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <svg viewBox="0 0 24 24" fill="currentColor" className="size-4 flip-rtl" aria-hidden="true">
+            <path d="M7 4.5v15l12-7.5z" />
           </svg>
         </span>
-      </div>
+      </span>
 
-      {/* פס התקדמות */}
       {showProgress && percent > 0 ? (
-        <div className="absolute inset-x-0 bottom-0 h-[3px] bg-white/15">
-          <div
-            className="h-full bg-gradient-to-l from-lemon-300 to-lemon-500 shadow-[0_0_10px_1px_rgba(247,194,43,0.7)]"
+        <span className="absolute inset-x-0 bottom-0 block h-[3px] bg-parchment-200/15">
+          <span
+            className="block h-full bg-gradient-to-l from-brass-200 to-brass-500 shadow-[0_0_10px_1px_rgba(201,154,74,0.65)]"
             style={{ width: `${percent}%` }}
           />
-        </div>
+        </span>
       ) : null}
     </Link>
   );

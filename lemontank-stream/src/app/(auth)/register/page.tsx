@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { RegisterForm } from "@/components/auth/register-form";
+import { Icon } from "@/components/ui/icons";
 import { get } from "@/lib/db";
 
 export const metadata: Metadata = { title: "הרשמה חינם", description: "פתח חשבון חינם ב-LemonTank Stream — סרטים וסדרות בעברית" };
@@ -25,12 +26,21 @@ export default async function RegisterPage({ searchParams }: { searchParams: Pro
   );
 
   return (
-    <div className="card-surface rounded-2xl p-6 md:p-8">
-      <h1 className="text-2xl font-black">פתח חשבון 🍋</h1>
-      <p className="mt-1 text-sm text-ink-400">
-        הרשמה בחינם, בלי כרטיס אשראי. אפשר לשדרג לפלוס בכל שלב ולהתחיל ב-7 ימי ניסיון.
-      </p>
-      <RegisterForm plans={plans} initialPlan={params.plan === "plus" ? "plus" : "free"} referral={params.ref ?? null} />
+    <div className="card-surface chamfer relative animate-ink-in p-6 md:p-8">
+      <span aria-hidden="true" className="pointer-events-none absolute inset-[6px] border border-brass-400/10 chamfer" />
+
+      <div className="relative">
+        <p className="font-mono text-[0.7rem] uppercase tracking-[0.3em] text-brass-300/80">הרשמה</p>
+        <h1 className="mt-2 flex items-center gap-2 font-display text-2xl font-bold text-parchment-50 md:text-3xl">
+          <Icon name="quill" className="size-6 text-brass-300" />
+          פתיחת חשבון
+        </h1>
+        <p className="mt-1.5 text-sm text-parchment-200/75">
+          בחינם, בלי כרטיס אשראי. אפשר לשדרג לפלוס בכל שלב ולהתחיל ב־7 ימי ניסיון.
+        </p>
+
+        <RegisterForm plans={plans} initialPlan={params.plan === "plus" ? "plus" : "free"} referral={params.ref ?? null} />
+      </div>
     </div>
   );
 }

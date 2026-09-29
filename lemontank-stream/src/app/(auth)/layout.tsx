@@ -1,49 +1,93 @@
 import Link from "next/link";
 import { ToastProvider } from "@/components/ui/toast";
+import { Icon } from "@/components/ui/icons";
+import { LogoMark, Wordmark } from "@/components/ui/logo";
+import { DustMotes } from "@/components/ui/ornaments";
+import { artFile } from "@/lib/art";
 
-/** פריסת מסכי ההתחברות/הרשמה — ממורכזת, עם רקע קולנועי ממותג */
+/**
+ * פריסת מסכי הכניסה — "הדלת בארכיון".
+ *
+ * במסכים רחבים: טור אמנות משמאל (הציור שנוצר במיוחד, אם קיים) וטור הטופס
+ * מימין; במסכים צרים נשאר רק הטופס. אין הילות ניאון ואין גרדיאנטים סגולים —
+ * אבן, פליז ואור נר.
+ */
 export default function AuthLayout({ children }: { children: React.ReactNode }) {
+  const door = artFile("auth-door.jpg");
+
   return (
     <ToastProvider>
-      <div className="relative flex min-h-dvh flex-col items-center justify-center px-4 py-12">
-        {/* רקע קולנועי */}
+      <div className="relative min-h-dvh">
+        {/* רקע: אבן חשוכה עם אור נר בפינה */}
         <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">
-          <div className="absolute -top-40 right-1/4 h-[26rem] w-[26rem] rounded-full bg-lemon-400/12 blur-[110px]" />
-          <div className="absolute -bottom-48 left-1/4 h-[26rem] w-[26rem] rounded-full bg-plus-500/12 blur-[110px]" />
-          <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-l from-transparent via-lemon-400/30 to-transparent" />
+          <span className="absolute inset-0 bg-[radial-gradient(90%_70%_at_78%_18%,rgba(201,154,74,0.16),transparent_62%),radial-gradient(70%_60%_at_12%_88%,rgba(124,36,48,0.12),transparent_60%)]" />
+          <span className="absolute inset-x-0 top-0 h-px bg-gradient-to-l from-transparent via-brass-500/40 to-transparent" />
+          <DustMotes count={16} />
         </div>
 
-        <Link href="/" className="group relative mb-9 flex items-center gap-3" aria-label="LemonTank Stream — דף הבית">
-          <span
-            className="flex h-12 w-12 items-center justify-center rounded-2xl border border-lemon-400/30 bg-lemon-400/10 text-2xl shadow-[0_0_30px_-8px_rgba(247,194,43,0.85)] transition-transform duration-300 group-hover:scale-105"
-            aria-hidden="true"
-          >
-            🍋
-          </span>
-          <span className="text-2xl font-black tracking-tight">
-            Lemon<span className="text-gradient">Tank</span>
-            <span className="mt-1 block text-[0.85rem] font-bold uppercase tracking-[0.22em] text-ink-400">Stream</span>
-          </span>
-        </Link>
+        <div className="relative mx-auto grid min-h-dvh max-w-[1400px] items-center gap-10 px-4 py-10 lg:grid-cols-[1.05fr_minmax(24rem,30rem)] lg:py-14">
+          {/* טור האמנות — נעלם במסכים צרים */}
+          <div className="hidden lg:block">
+            <div className="framed chamfer relative h-[min(72vh,40rem)] overflow-hidden bg-obsidian-950">
+              {door ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={door} alt="" className="absolute inset-0 size-full object-cover animate-drift" />
+              ) : (
+                <span className="absolute inset-0 bg-[radial-gradient(120%_90%_at_50%_10%,rgba(201,154,74,0.22),transparent_70%),linear-gradient(170deg,#1a1712,#0a0806)]" />
+              )}
+              <span className="pointer-events-none absolute inset-0 bg-gradient-to-t from-obsidian-950 via-obsidian-950/35 to-transparent" />
+              <span className="pointer-events-none absolute inset-0 ring-1 ring-inset ring-brass-400/15" />
 
-        <main id="main" className="relative w-full max-w-md">
-          {children}
-        </main>
+              <div className="absolute inset-x-0 bottom-0 space-y-3 p-8">
+                <p className="font-mono text-[0.7rem] uppercase tracking-[0.3em] text-brass-300/80">LemonTank · Archive</p>
+                <h2 className="font-display text-3xl font-bold leading-tight text-parchment-50">
+                  כל סרט וכל סדרה,
+                  <br />
+                  במקום אחד שקט.
+                </h2>
+                <p className="max-w-md text-sm leading-relaxed text-parchment-200/80">
+                  חשבון אחד, פרופילים לכל בני הבית, ומסלול חינם מלכתחילה. בלי פרסומות קופצות,
+                  בלי הפתעות בחשבון.
+                </p>
+                <ul className="flex flex-wrap gap-x-5 gap-y-2 pt-1 text-sm text-parchment-200/85">
+                  {[
+                    { icon: "shield-check" as const, label: "סיסמאות ב-scrypt" },
+                    { icon: "key" as const, label: "אימות דו-שלבי" },
+                    { icon: "users" as const, label: "עד 5 פרופילים בפלוס" },
+                  ].map((item) => (
+                    <li key={item.label} className="flex items-center gap-1.5">
+                      <Icon name={item.icon} className="size-4 text-brass-300" />
+                      {item.label}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+          </div>
 
-        <p className="relative mt-9 text-center text-xs leading-relaxed text-ink-400">
-          בהתחברות אתה מאשר את{" "}
-          <Link href="/legal/terms" className="text-lemon-300 hover:underline">
-            תנאי השימוש
-          </Link>{" "}
-          ו
-          <Link href="/legal/privacy" className="text-lemon-300 hover:underline">
-            מדיניות הפרטיות
-          </Link>
-        </p>
+          {/* טור הטופס */}
+          <div className="mx-auto w-full max-w-md lg:mx-0">
+            <Link href="/" className="group mb-7 flex items-center gap-3" aria-label="LemonTank Stream — דף הבית">
+              <span className="transition-transform duration-500 [transition-timing-function:var(--ease-ink)] group-hover:-translate-y-0.5">
+                <LogoMark className="size-11" />
+              </span>
+              <Wordmark />
+            </Link>
 
-        <p className="relative mt-3 flex items-center gap-1.5 text-[0.85rem] text-ink-500">
-          <span aria-hidden="true">🔒</span> חיבור מוצפן · סיסמאות נשמרות ב-scrypt · אימות דו-שלבי זמין
-        </p>
+            <main id="main">{children}</main>
+
+            <p className="mt-7 text-center text-xs leading-relaxed text-parchment-300/60">
+              בהתחברות אתה מאשר את{" "}
+              <Link href="/legal/terms" className="text-brass-300 underline decoration-dotted underline-offset-4 hover:text-brass-200">
+                תנאי השימוש
+              </Link>{" "}
+              ו
+              <Link href="/legal/privacy" className="text-brass-300 underline decoration-dotted underline-offset-4 hover:text-brass-200">
+                מדיניות הפרטיות
+              </Link>
+            </p>
+          </div>
+        </div>
       </div>
     </ToastProvider>
   );

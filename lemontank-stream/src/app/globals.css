@@ -583,3 +583,126 @@ body > * { position: relative; z-index: 1; }
   body::before, body::after { display: none; }
   .no-print { display: none !important; }
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   תנועה — כל אלמנט קטן זז. הכל מדמה חומר: דיו, להבה, שעווה, קו שמצטייר.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/** תאימות לאחור: אותו מהלך דיו גם בשם הקודם */
+@utility animate-fade-up { animation: lt-ink-in 0.7s var(--ease-ink) both; }
+
+/** נדנוד עדין לשגיאה — לא קפיצה אלסטית, אלא כתם שנמרח */
+@keyframes lt-shake {
+  0%, 100% { transform: translateX(0); }
+  18% { transform: translateX(-5px); }
+  38% { transform: translateX(4px); }
+  58% { transform: translateX(-2px); }
+  78% { transform: translateX(1px); }
+}
+@utility animate-shake { animation: lt-shake 0.5s var(--ease-ink) both; }
+
+/** שלוש נקודות שמהבהבות כמו להבה — למצב טעינה */
+@keyframes lt-lamp {
+  0%, 100% { opacity: 0.25; transform: translateY(0); }
+  50%      { opacity: 1;    transform: translateY(-2px); }
+}
+@utility animate-lamp { animation: lt-lamp 1.1s ease-in-out infinite; }
+
+/** חותם שמתהדק: קנה מידה קטן + הילה */
+@keyframes lt-seal {
+  0%   { transform: scale(0.86); opacity: 0; }
+  60%  { transform: scale(1.03); opacity: 1; }
+  100% { transform: scale(1);    opacity: 1; }
+}
+@utility animate-seal { animation: lt-seal 0.45s var(--ease-ink) both; }
+
+/** קו שמצטייר — לקו תחתון של שדה קלט במיקוד */
+@keyframes lt-draw-x {
+  from { transform: scaleX(0); }
+  to   { transform: scaleX(1); }
+}
+@utility animate-draw-x { animation: lt-draw-x 0.45s var(--ease-ink) both; transform-origin: right; }
+
+/** שדה קלט חרות: קו פליז שמצטייר במיקוד, בלי מסגרת גנרית */
+@utility field-ink {
+  position: relative;
+  width: 100%;
+  background: rgb(10 8 6 / 0.7);
+  border: 1px solid rgb(201 154 74 / 0.22);
+  clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
+  padding: 0.72rem 0.9rem;
+  color: var(--color-parchment-100);
+  transition: border-color 0.3s var(--ease-ink), background 0.3s var(--ease-ink), box-shadow 0.4s var(--ease-ink);
+}
+@utility field-ink-focus {
+  border-color: rgb(224 188 120 / 0.7);
+  background: rgb(18 16 12 / 0.9);
+  box-shadow: 0 0 0 1px rgb(224 188 120 / 0.18), 0 12px 34px -22px rgb(201 154 74 / 0.9);
+}
+@utility field-label {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-family: var(--font-display);
+  font-size: 0.9rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: rgb(205 184 145 / 0.92);
+  margin-bottom: 0.35rem;
+}
+@utility field-error {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  border: 1px solid rgb(124 36 48 / 0.6);
+  background: rgb(124 36 48 / 0.16);
+  color: var(--color-parchment-100);
+  clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
+  padding: 0.7rem 0.9rem;
+  font-size: 0.9rem;
+}
+
+/** תאי קוד אימות (2FA) — כל תא נראה כמו חריץ בקיר */
+@utility code-cell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  aspect-ratio: 1 / 1.15;
+  background: rgb(10 8 6 / 0.75);
+  border: 1px solid rgb(201 154 74 / 0.25);
+  clip-path: polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px);
+  font-family: var(--font-display);
+  font-size: 1.7rem;
+  font-weight: 700;
+  color: var(--color-parchment-50);
+  transition: border-color 0.25s var(--ease-ink), transform 0.25s var(--ease-ink), box-shadow 0.3s var(--ease-ink);
+}
+@utility code-cell-active {
+  border-color: rgb(224 188 120 / 0.85);
+  transform: translateY(-2px);
+  box-shadow: 0 10px 26px -16px rgb(201 154 74 / 1);
+}
+
+/** "פתיחת הדלת" בכניסה מוצלחת: אור שמתרחב מהמרכז */
+@keyframes lt-door {
+  0%   { opacity: 0; transform: scaleY(0.2); }
+  45%  { opacity: 0.9; }
+  100% { opacity: 0; transform: scaleY(1.6); }
+}
+@utility animate-door { animation: lt-door 1.1s var(--ease-cinema) both; transform-origin: center; }
+
+/** מסגרת זוהרת עדינה סביב פעולה ראשית */
+@keyframes lt-ring {
+  0%, 100% { box-shadow: 0 0 0 0 rgb(201 154 74 / 0.35); }
+  50%      { box-shadow: 0 0 0 6px rgb(201 154 74 / 0); }
+}
+@utility animate-ring-pulse { animation: lt-ring 2.6s ease-out infinite; }
+
+/** כרטיס שמתרומם מהשולחן */
+@utility lift {
+  transition: transform 0.5s var(--ease-ink), box-shadow 0.5s var(--ease-ink), border-color 0.4s var(--ease-ink);
+}
+@utility lift-hover {
+  transform: translateY(-4px);
+}
