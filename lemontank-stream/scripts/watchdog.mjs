@@ -127,6 +127,25 @@ if (!fs.existsSync(SERVER)) {
   process.exit(1);
 }
 
+// בדיקה מוקדמת: בלי בנייה (.next) השרת ייפול מיד בכל הפעלה.
+// עדיף לומר את זה פעם אחת, במפורש, מלהפעיל אותו שוב ושוב לשווא.
+if (!fs.existsSync(path.join(ROOT, ".next", "BUILD_ID"))) {
+  say("✗", R, "אין בנייה (.next חסר) — קודם בונים, ואז מריצים.");
+  console.log(`
+${B}מה עושים — אחת מהשתיים:${OFF}
+
+  1. הכנה מלאה (מתקין, מייצר סודות, יוצר מסד ובונה):
+         ${B}npm run setup${OFF}
+
+  2. רק בנייה (אם כבר התקנת בעבר):
+         ${B}npm run build${OFF}
+
+  בלי בנייה, אפשר להריץ במצב פיתוח (איטי יותר, מתאים רק לבדיקה):
+         ${B}npm run dev${OFF}
+`);
+  process.exit(1);
+}
+
 console.log("");
 console.log(`${B}🍋 שומר הסף של LemonTank${OFF} — מפעיל את האתר, ומחזיר אותו לחיים לבד`);
 console.log("");
@@ -136,6 +155,12 @@ let port = null;
 let consecutiveFailures = 0;
 let restarts = 0;
 let stopping = false;
+let fastExits = 0;
+let startedAt = 0;
+
+/** יציאה בתוך 8 שניות = השרת לא הספיק לעלות — כנראה תקלה קבועה (קונפיגורציה) */
+const FAST_EXIT_MS = 8_000;
+const FAST_EXIT_LIMIT = 3;
 
 function startServer(chosenPort) {
   child = spawn(process.execPath, [SERVER], {
@@ -146,11 +171,39 @@ function startServer(chosenPort) {
   });
 
   log(`הפעלה מחדש #${restarts} על פורט ${chosenPort} (pid ${child.pid})`);
+  startedAt = Date.now();
   child.on("exit", (code, signal) => {
     if (stopping) return;
     const why = signal ? `אות ${signal}` : `קוד ${code}`;
+    const lived = Date.now() - startedAt;
+
+    if (lived < FAST_EXIT_MS) {
+      fastExits += 1;
+      if (fastExits >= FAST_EXIT_LIMIT) {
+        stopping = true;
+        clearInterval(beat);
+        say("✗", R, "השרת נפל שלוש פעמים ברצף מיד עם העלייה — זו תקלה קבועה, לא נפילה זמנית.");
+        console.log(`
+${B}מה עושים:${OFF}
+
+  1. הרץ דוח מלא, ושלח לי אותו:
+         ${B}npm run doctor -- --report${OFF}
+     (נוצר קובץ lemontank-report.txt)
+
+  2. או פתח את השרת ידנית כדי לראות את השגיאה בעיניים:
+         ${B}npm run start${OFF}
+
+  כל מה שקרה עד כאן נשמר ב: data/watchdog.log
+`);
+        log(`נעצר אחרי ${fastExits} יציאות מהירות — כנראה תקלה קבועה`);
+        process.exit(1);
+      }
+    } else {
+      fastExits = 0;
+    }
+
     say("⟳", Y, `השרת נעצר (${why}) — מפעיל אותו מחדש...`);
-    log(`השרת נעצר: ${why}`);
+    log(`השרת נעצר: ${why} (חי ${Math.round(lived / 1000)}s)`);
     scheduleRestart();
   });
 }
@@ -166,6 +219,7 @@ function scheduleRestart() {
       // מישהו כבר הקים תהליך אחר — לא מכפילים
       port = state.port;
       consecutiveFailures = 0;
+      fastExits = 0;
       say("✔", G, `האתר חזר לאוויר על http://localhost:${port}`);
       log(`האתר חזר על פורט ${port} (תהליך קיים)`);
       return;

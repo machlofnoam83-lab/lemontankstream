@@ -16,6 +16,7 @@
     "security": "node scripts/security.mjs",
     "security:status": "node scripts/security.mjs status",
     "setup": "node scripts/local-setup.mjs",
+    "update": "node scripts/update.mjs",
     "setup:check": "node scripts/local-setup.mjs --check",
     "recover": "node scripts/recover.mjs",
     "db:migrate": "node scripts/apply-migrations.mjs",
