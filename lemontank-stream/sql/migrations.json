@@ -1,0 +1,74 @@
+{
+  "version": 1,
+  "migrations": [
+    {
+      "name": "2026-09-fortress-session-posture",
+      "sql": [
+        "ALTER TABLE sessions ADD COLUMN ua_hash TEXT",
+        "ALTER TABLE sessions ADD COLUMN ip_prefix TEXT",
+        "ALTER TABLE sessions ADD COLUMN last_ip TEXT",
+        "ALTER TABLE sessions ADD COLUMN absolute_expires_at TEXT",
+        "ALTER TABLE sessions ADD COLUMN stepup_until TEXT",
+        "ALTER TABLE sessions ADD COLUMN risk_score INTEGER NOT NULL DEFAULT 0"
+      ]
+    },
+    {
+      "name": "2026-09-fortress-audit-chain",
+      "sql": [
+        "ALTER TABLE audit_log ADD COLUMN seq INTEGER",
+        "ALTER TABLE audit_log ADD COLUMN prev_hash TEXT",
+        "ALTER TABLE audit_log ADD COLUMN entry_hash TEXT",
+        "CREATE INDEX IF NOT EXISTS idx_audit_seq ON audit_log(seq)"
+      ]
+    },
+    {
+      "name": "2026-09-fortress-login-geo",
+      "sql": [
+        "ALTER TABLE sessions ADD COLUMN origin_country TEXT",
+        "ALTER TABLE sessions ADD COLUMN mfa_used INTEGER NOT NULL DEFAULT 0"
+      ]
+    },
+    {
+      "name": "2026-09-fortress-breach-cache",
+      "sql": [
+        "CREATE TABLE IF NOT EXISTS breach_checks (\n        prefix TEXT PRIMARY KEY,\n        payload TEXT NOT NULL,\n        checked_at TEXT NOT NULL\n      )",
+        "CREATE INDEX IF NOT EXISTS idx_breach_checked ON breach_checks(checked_at)",
+        "INSERT OR IGNORE INTO security_settings(key, value) VALUES('breach_check', 'enforce')"
+      ]
+    },
+    {
+      "name": "2026-09-fortress-login-attempts-user",
+      "sql": [
+        "ALTER TABLE login_attempts ADD COLUMN user_id INTEGER",
+        "CREATE INDEX IF NOT EXISTS idx_login_attempts_user ON login_attempts(user_id, created_at)"
+      ]
+    },
+    {
+      "name": "2026-09-payments-giftcards",
+      "sql": [
+        "CREATE TABLE IF NOT EXISTS gift_cards (\n        id          INTEGER PRIMARY KEY AUTOINCREMENT,\n        code_hash   TEXT NOT NULL UNIQUE,\n        code_prefix TEXT NOT NULL,\n        code_enc    TEXT,\n        kind        TEXT NOT NULL DEFAULT 'issued',\n        plan_code   TEXT NOT NULL DEFAULT 'plus',\n        months      INTEGER NOT NULL DEFAULT 1,\n        value_ils   REAL NOT NULL DEFAULT 0,\n        max_uses    INTEGER NOT NULL DEFAULT 1,\n        used_count  INTEGER NOT NULL DEFAULT 0,\n        status      TEXT NOT NULL DEFAULT 'active',\n        note        TEXT,\n        created_by  INTEGER REFERENCES users(id) ON DELETE SET NULL,\n        expires_at  TEXT,\n        created_at  TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ','now'))\n      )",
+        "CREATE INDEX IF NOT EXISTS idx_giftcards_status ON gift_cards(status, created_at)",
+        "CREATE TABLE IF NOT EXISTS redemption_requests (\n        id            INTEGER PRIMARY KEY AUTOINCREMENT,\n        user_id       INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,\n        code_hash     TEXT NOT NULL,\n        code_prefix   TEXT NOT NULL,\n        code_enc      TEXT,\n        kind          TEXT NOT NULL DEFAULT 'external',\n        status        TEXT NOT NULL DEFAULT 'pending',\n        plan_code     TEXT,\n        months        INTEGER,\n        value_ils     REAL,\n        contact       TEXT,\n        evidence      TEXT,\n        decided_by    INTEGER REFERENCES users(id) ON DELETE SET NULL,\n        decided_at    TEXT,\n        decision_note TEXT,\n        created_at    TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ','now'))\n      ) STRICT",
+        "CREATE INDEX IF NOT EXISTS idx_redemptions_user ON redemption_requests(user_id, created_at)",
+        "CREATE INDEX IF NOT EXISTS idx_redemptions_status ON redemption_requests(status, created_at)",
+        "CREATE TABLE IF NOT EXISTS outbound_alerts (\n        id         INTEGER PRIMARY KEY AUTOINCREMENT,\n        channel    TEXT NOT NULL,\n        kind       TEXT NOT NULL,\n        title      TEXT NOT NULL,\n        body       TEXT,\n        status     TEXT NOT NULL DEFAULT 'queued',\n        attempts   INTEGER NOT NULL DEFAULT 0,\n        error      TEXT,\n        created_at TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ','now')),\n        sent_at    TEXT\n      ) STRICT",
+        "CREATE INDEX IF NOT EXISTS idx_outbound_status ON outbound_alerts(status, created_at)"
+      ]
+    },
+    {
+      "name": "2026-09-audit-ledger-immutable",
+      "sql": [
+        "CREATE TABLE audit_log_new (\n        id            INTEGER PRIMARY KEY AUTOINCREMENT,\n        actor_id      INTEGER,\n        actor_email   TEXT,\n        action        TEXT    NOT NULL,\n        entity        TEXT,\n        entity_id     TEXT,\n        severity      TEXT    NOT NULL DEFAULT 'info',\n        before_json   TEXT,\n        after_json    TEXT,\n        ip            TEXT,\n        user_agent    TEXT,\n        request_id    TEXT,\n        created_at    TEXT    NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ','now')),\n        seq           INTEGER,\n        prev_hash     TEXT,\n        entry_hash    TEXT\n      ) STRICT",
+        "INSERT INTO audit_log_new(id, actor_id, actor_email, action, entity, entity_id, severity, before_json, after_json, ip, user_agent, request_id, created_at, seq, prev_hash, entry_hash) SELECT id, actor_id, actor_email, action, entity, entity_id, severity, before_json, after_json, ip, user_agent, request_id, created_at, seq, prev_hash, entry_hash FROM audit_log",
+        "DROP TABLE audit_log",
+        "ALTER TABLE audit_log_new RENAME TO audit_log",
+        "CREATE INDEX IF NOT EXISTS idx_audit_created ON audit_log(created_at DESC)",
+        "CREATE INDEX IF NOT EXISTS idx_audit_actor ON audit_log(actor_id, created_at DESC)",
+        "CREATE INDEX IF NOT EXISTS idx_audit_action ON audit_log(action, created_at DESC)",
+        "CREATE UNIQUE INDEX IF NOT EXISTS idx_audit_seq_unique ON audit_log(seq)",
+        "CREATE TABLE IF NOT EXISTS audit_anchor (\n        id         INTEGER PRIMARY KEY CHECK (id = 1),\n        seq        INTEGER NOT NULL,\n        entry_hash TEXT    NOT NULL,\n        updated_at TEXT    NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ','now'))\n      ) STRICT",
+        "INSERT INTO audit_anchor(id, seq, entry_hash, updated_at)\n         SELECT 1, seq, entry_hash, strftime('%Y-%m-%dT%H:%M:%fZ','now')\n         FROM audit_log WHERE seq IS NOT NULL AND entry_hash IS NOT NULL\n         ORDER BY seq DESC LIMIT 1\n       ON CONFLICT(id) DO UPDATE SET seq = excluded.seq, entry_hash = excluded.entry_hash, updated_at = excluded.updated_at"
+      ]
+    }
+  ]
+}

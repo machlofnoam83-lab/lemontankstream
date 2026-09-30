@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900" role="img" aria-label="הסליל">
+  <defs>
+    <linearGradient id="bg" x1="1" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#070d24"/>
+      <stop offset="60%" stop-color="#050508"/>
+      <stop offset="100%" stop-color="#000"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="26%" cy="42%" r="62%">
+      <stop offset="0%" stop-color="#7aa2ff" stop-opacity="0.42"/>
+      <stop offset="100%" stop-color="#7aa2ff" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="beam" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#7aa2ff" stop-opacity="0.8"/>
+      <stop offset="100%" stop-color="#cddcff" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="side" x1="1" y1="0" x2="0" y2="0">
+      <stop offset="0%" stop-color="#050508"/>
+      <stop offset="52%" stop-color="#050508" stop-opacity="0.85"/>
+      <stop offset="100%" stop-color="#050508" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="1600" height="900" fill="url(#bg)"/>
+  <circle cx="430" cy="380" r="440" fill="url(#glow)"/>
+  <rect x="-867.12" y="-500" width="36.906" height="2000" fill="url(#beam)" opacity="0.15" transform="rotate(-17 800 450)"/>
+  <rect x="-641.84" y="-500" width="34.192" height="2000" fill="url(#beam)" opacity="0.14" transform="rotate(-17 800 450)"/>
+  <rect x="-372.96000000000004" y="-500" width="56.548" height="2000" fill="url(#beam)" opacity="0.21" transform="rotate(-17 800 450)"/>
+  <rect x="-173.28" y="-500" width="39.114000000000004" height="2000" fill="url(#beam)" opacity="0.15" transform="rotate(-17 800 450)"/>
+  <rect x="69.12" y="-500" width="46.244" height="2000" fill="url(#beam)" opacity="0.18" transform="rotate(-17 800 450)"/>
+  <rect x="262.24" y="-500" width="25.038" height="2000" fill="url(#beam)" opacity="0.10" transform="rotate(-17 800 450)"/>
+  <rect x="483.04" y="-500" width="19.748" height="2000" fill="url(#beam)" opacity="0.09" transform="rotate(-17 800 450)"/>
+  <rect x="730.72" y="-500" width="29.914" height="2000" fill="url(#beam)" opacity="0.12" transform="rotate(-17 800 450)"/>
+  <rect x="985.12" y="-500" width="43.944" height="2000" fill="url(#beam)" opacity="0.17" transform="rotate(-17 800 450)"/>
+  <rect width="1600" height="900" fill="#000" opacity="0.18"/>
+
+  <rect x="0" y="0" width="1600" height="900" fill="url(#side)"/>
+  <g font-family="Heebo, Assistant, Rubik, Arial, sans-serif" direction="rtl" text-anchor="middle">
+    <text x="1168" y="364" font-size="24" font-weight="800" fill="#7aa2ff" letter-spacing="3">LEMONTANK ORIGINAL</text>
+    <text x="1168" y="430" font-size="92" font-weight="900" fill="#fff" letter-spacing="-3">הסליל</text>
+  </g>
+  <rect x="0" y="0" width="1600" height="900" fill="none" stroke="#ffffff" stroke-opacity="0.06"/>
+</svg>

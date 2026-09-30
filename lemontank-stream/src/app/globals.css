@@ -1,0 +1,708 @@
+@import "tailwindcss";
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LemonTank — "ארכיון האור" · מערכת עיצוב
+   ═══════════════════════════════════════════════════════════════════════════
+   השפה: כתב-יד עתיק שנשמר בספרייה חשוכה. שמן על בד, פליז מושחר, קלף מיושן,
+   אור נרות. לא "אתר SaaS כהה" — אלא חפץ.
+
+   שלוש החלטות שמבדילות מכל תבנית גנרית:
+     1. אין סגול-כחול ואין גרדיאנטים ניאון. הזהב הוא פליז שרוף, לא לימון זוהר.
+     2. אין פינות עגולות אחידות — חיתוך פינות (octagon), מסגרות כפולות,
+        קווים דקים. הכל נראה חרות ביד ולא מודבק.
+     3. כל אנימציה מדמה חומר: דיו שנספג, ניצוץ גחלים, אבק מרחף, שעווה נמסה.
+        אין bounce אלסטי ואין spring מודרני.
+
+   נגישות נשמרת במלואה: ניגודיות AA, focus גלוי, prefers-reduced-motion.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+@theme {
+  /* ── קלף: הטקסט והמשטחים הבהירים ─────────────────────────────────────── */
+  --color-parchment-50: #f7f0e0;
+  --color-parchment-100: #efe4cd;
+  --color-parchment-200: #e2d2b2;
+  --color-parchment-300: #cdb891;
+  --color-parchment-400: #b39d74;
+
+  /* ── אובסידיאן: הרקעים, מהעמוק לבָהיר ─────────────────────────────────── */
+  --color-obsidian-950: #0a0806;
+  --color-obsidian-900: #12100c;
+  --color-obsidian-850: #1a1712;
+  --color-obsidian-800: #221d17;
+  --color-obsidian-700: #2e2820;
+  --color-obsidian-600: #3d352a;
+
+  /* ── פליז / זהב שרוף: צבע המותג ──────────────────────────────────────── */
+  --color-brass-200: #f0d9a8;
+  --color-brass-300: #e0bc78;
+  --color-brass-400: #c99a4a;
+  --color-brass-500: #a97b32;
+  --color-brass-600: #865e24;
+  --color-brass-700: #5f4218;
+
+  /* ── גחלים / אוקסבלוד: הדגשות דרמטיות ────────────────────────────────── */
+  --color-ember-400: #d9663a;
+  --color-ember-500: #b34a24;
+  --color-oxblood-500: #7c2430;
+  --color-oxblood-600: #5c1a24;
+
+  /* ── ירקרק-ברונזה: "חינם" (במקום ירוק ניאון) ─────────────────────────── */
+  --color-verdigris-300: #9dc7b4;
+  --color-verdigris-400: #6f9d8a;
+  --color-verdigris-500: #4d7463;
+
+  /* ── שמות קודמים נשמרים כדי שכל הרכיבים הקיימים יירשו את המראה החדש ──── */
+  --color-ink-950: #0a0806;
+  --color-ink-900: #12100c;
+  --color-ink-850: #1a1712;
+  --color-ink-800: #221d17;
+  --color-ink-700: #2e2820;
+  --color-ink-600: #3d352a;
+  --color-ink-500: #6b5f4d;
+  --color-ink-400: #93856e;
+  --color-ink-300: #b6a88e;
+  --color-ink-200: #d6c8ae;
+  --color-ink-100: #ece1ca;
+
+  --color-lemon-50: #f7f0e0;
+  --color-lemon-100: #efe4cd;
+  --color-lemon-200: #e8d3a6;
+  --color-lemon-300: #e0bc78;
+  --color-lemon-400: #c99a4a;
+  --color-lemon-500: #a97b32;
+  --color-lemon-600: #865e24;
+  --color-lemon-700: #5f4218;
+
+  --color-plus-200: #e6cfc0;
+  --color-plus-300: #d9b49b;
+  --color-plus-400: #c08a63;
+  --color-plus-500: #a5643f;
+  --color-plus-600: #7c4526;
+
+  --color-free-400: #6f9d8a;
+  --color-free-500: #4d7463;
+
+  /* ── טיפוגרפיה ─────────────────────────────────────────────────────────
+     בלי תלות באינטרנט (אין egress בבנייה): הגדרה שמתבססת על serif מערכתיים
+     שקיימים בווינדוס ובמאק, עם נפילה בטוחה. כותרות ב-serif = תחושת ספר. */
+  --font-display: "FrankRuehl", "Frank Ruhl Libre", "David Libre", "David",
+    "Noto Serif Hebrew", "Times New Roman", "Georgia", serif;
+  --font-sans: "Segoe UI", "Heebo", "Assistant", "Noto Sans Hebrew", "Arial Hebrew",
+    system-ui, -apple-system, sans-serif;
+  --font-mono: "Cascadia Mono", "Consolas", "SF Mono", ui-monospace, monospace;
+
+  --radius-card: 4px;
+  --radius-pill: 999px;
+
+  /* ── צללים: אור נרות, לא ניאון ────────────────────────────────────────── */
+  --shadow-glow: 0 10px 34px -16px rgb(201 154 74 / 0.55);
+  --shadow-poster: 0 26px 60px -22px rgb(0 0 0 / 0.9), 0 1px 0 0 rgb(224 188 120 / 0.08) inset;
+  --shadow-panel: 0 1px 0 0 rgb(224 188 120 / 0.06) inset, 0 30px 80px -44px rgb(0 0 0 / 0.95);
+
+  --ease-cinema: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-ink: cubic-bezier(0.16, 0.84, 0.28, 1);
+}
+
+/* ── סקאלת גדלים קריאה ─────────────────────────────────────────────────── */
+@theme {
+  --text-xs: 0.875rem;
+  --text-xs--line-height: 1.45;
+  --text-sm: 1rem;
+  --text-sm--line-height: 1.5;
+  --text-base: 1.0625rem;
+  --text-base--line-height: 1.65;
+  --text-lg: 1.1875rem;
+  --text-lg--line-height: 1.5;
+  --text-xl: 1.3125rem;
+  --text-xl--line-height: 1.45;
+  --text-2xl: 1.5625rem;
+  --text-2xl--line-height: 1.35;
+  --text-3xl: 1.9375rem;
+  --text-3xl--line-height: 1.25;
+  --text-4xl: 2.375rem;
+  --text-4xl--line-height: 1.2;
+  --text-5xl: 3.125rem;
+  --text-5xl--line-height: 1.1;
+  --text-6xl: 3.875rem;
+  --text-6xl--line-height: 1.05;
+  --text-7xl: 4.625rem;
+  --text-7xl--line-height: 1;
+}
+
+/* ═══════════════════════════════ בסיס ═══════════════════════════════════ */
+
+* { -webkit-tap-highlight-color: transparent; }
+
+html {
+  color-scheme: dark;
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+}
+
+/**
+ * הרקע: שלוש שכבות שמרכיבות "חדר עם נר".
+ *   · גחלים חמות מלמטה (מקור האור)
+ *   · הילה קרה מלמעלה (חלון)
+ *   · כתם פליז בפינה אחת — אסימטריה מכוונת, כדי שלא ייראה כמו תבנית
+ */
+body {
+  background-color: var(--color-obsidian-950);
+  background-image:
+    radial-gradient(1200px 700px at 78% 108%, rgb(217 102 58 / 0.13), transparent 62%),
+    radial-gradient(900px 560px at 12% -8%, rgb(201 154 74 / 0.09), transparent 60%),
+    radial-gradient(1500px 900px at 50% 130%, rgb(124 36 48 / 0.07), transparent 65%);
+  background-attachment: fixed;
+  color: var(--color-ink-100);
+  font-family: var(--font-sans);
+  min-height: 100dvh;
+  overflow-x: hidden;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  font-feature-settings: "kern" 1, "liga" 1;
+}
+
+/* ── כותרות: serif, עם "דיו שנספג" ── */
+h1, h2, h3, h4, .font-display {
+  font-family: var(--font-display);
+  letter-spacing: 0.005em;
+  text-wrap: balance;
+  font-weight: 700;
+}
+h1 { letter-spacing: -0.01em; }
+
+/* ── שכבת גריין: נייר, לא מסך ── */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.055;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='p'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.72' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='220' height='220' filter='url(%23p)'/%3E%3C/svg%3E");
+}
+
+/* ── וינייטה: קצוות כהים כמו צילום ישן ── */
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background: radial-gradient(120% 90% at 50% 40%, transparent 52%, rgb(0 0 0 / 0.55) 100%);
+}
+
+/* תוכן מעל שכבות הרקע */
+body > * { position: relative; z-index: 1; }
+
+/* ── פס גלילה: פליז ── */
+::-webkit-scrollbar { width: 11px; height: 11px; }
+::-webkit-scrollbar-track { background: rgb(0 0 0 / 0.35); }
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, var(--color-brass-500), var(--color-brass-700));
+  border-radius: 0;
+  border: 3px solid transparent;
+  background-clip: content-box;
+}
+::-webkit-scrollbar-thumb:hover { background: var(--color-brass-400); background-clip: content-box; }
+
+::selection { background: var(--color-brass-400); color: #12100c; }
+
+:focus-visible {
+  outline: 2px solid var(--color-brass-300);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+/* ═══════════════════════ עיטורים (SVG מוטמע, בלי קבצים) ═══════════════════ */
+
+/** מסגרת כפולה דקה — כמו מסגרת של תחריט עתיק */
+@utility framed {
+  position: relative;
+  border: 1px solid rgb(201 154 74 / 0.28);
+  box-shadow:
+    0 0 0 1px rgb(0 0 0 / 0.6),
+    0 0 0 6px rgb(18 16 12 / 0.85),
+    0 0 0 7px rgb(201 154 74 / 0.14);
+}
+
+/** פינות חרוטות — מוטיב חוזר במקום rounded-* */
+@utility chamfer {
+  clip-path: polygon(12px 0, 100% 0, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0 100%, 0 12px);
+}
+@utility chamfer-sm {
+  clip-path: polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px);
+}
+@utility chamfer-all {
+  clip-path: polygon(10px 0, calc(100% - 10px) 0, 100% 10px, 100% calc(100% - 10px), calc(100% - 10px) 100%, 10px 100%, 0 calc(100% - 10px), 0 10px);
+}
+
+/* ═══════════════════════════ רכיבים ════════════════════════════════════ */
+
+/** משטח ראשי: קלף כהה עם טקסטורת בד */
+@utility card-surface {
+  background:
+    linear-gradient(180deg, rgb(34 29 23 / 0.92), rgb(18 16 12 / 0.86));
+  border: 1px solid rgb(201 154 74 / 0.16);
+  box-shadow:
+    0 1px 0 0 rgb(224 188 120 / 0.05) inset,
+    0 18px 50px -30px rgb(0 0 0 / 0.9);
+  backdrop-filter: blur(2px);
+}
+
+/** פאנל כהה וכבד — ניהול, טבלאות */
+@utility panel-ink {
+  background: linear-gradient(180deg, rgb(26 23 18 / 0.96), rgb(10 8 6 / 0.94));
+  border: 1px solid rgb(201 154 74 / 0.14);
+  box-shadow: 0 1px 0 0 rgb(224 188 120 / 0.05) inset;
+}
+
+/** לחצן ראשי: פליז מוברש עם הבהוב שמן */
+@utility btn-primary {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  clip-path: polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px);
+  background: linear-gradient(180deg, var(--color-brass-300), var(--color-brass-500) 62%, var(--color-brass-600));
+  color: #17130d;
+  font-weight: 800;
+  letter-spacing: 0.01em;
+  padding: 0.7rem 1.35rem;
+  border: none;
+  transition: transform 0.18s var(--ease-ink), box-shadow 0.25s ease, filter 0.2s ease;
+  box-shadow: var(--shadow-glow), 0 1px 0 0 rgb(255 255 255 / 0.35) inset;
+}
+@utility btn-primary-hover {
+  transform: translateY(-1px);
+  filter: brightness(1.08) saturate(1.05);
+}
+@utility btn-primary-press {
+  transform: translateY(1px) scale(0.995);
+}
+
+/** לחצן משני: זכוכית חלולה עם מסגרת דקה */
+@utility btn-ghost {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  clip-path: polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px);
+  background: rgb(247 240 224 / 0.04);
+  color: var(--color-parchment-100);
+  padding: 0.7rem 1.35rem;
+  border: 1px solid rgb(224 188 120 / 0.3);
+  transition: background 0.2s ease, border-color 0.2s ease, transform 0.18s var(--ease-ink);
+}
+@utility btn-ghost-hover {
+  background: rgb(224 188 120 / 0.12);
+  border-color: rgb(224 188 120 / 0.55);
+}
+
+/** תג "פלוס" — שעווה אדומה חתומה */
+@utility badge-plus {
+  background: linear-gradient(150deg, var(--color-oxblood-500), var(--color-oxblood-600));
+  color: var(--color-parchment-50);
+  border: 1px solid rgb(224 188 120 / 0.4);
+  clip-path: polygon(6px 0, 100% 0, 100% calc(100% - 6px), calc(100% - 6px) 100%, 0 100%, 0 6px);
+  font-size: 0.82rem;
+  font-weight: 800;
+  padding: 0.18rem 0.6rem;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+}
+
+/** תג "חינם" — ברונזה ירוקה, לא ניאון */
+@utility badge-free {
+  background: rgb(77 116 99 / 0.25);
+  color: var(--color-verdigris-300);
+  border: 1px solid rgb(111 157 138 / 0.5);
+  clip-path: polygon(6px 0, 100% 0, 100% calc(100% - 6px), calc(100% - 6px) 100%, 0 100%, 0 6px);
+  font-size: 0.82rem;
+  font-weight: 800;
+  padding: 0.18rem 0.6rem;
+  white-space: nowrap;
+}
+
+/** תג מטא על כרטיסים */
+@utility chip-meta {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.28rem;
+  border: 1px solid rgb(224 188 120 / 0.28);
+  background: rgb(10 8 6 / 0.72);
+  backdrop-filter: blur(4px);
+  padding: 0.12rem 0.5rem;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--color-parchment-100);
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+/** פוסטר בלי תמונה — ציור מופשט במקום ריבוע ריק */
+@utility poster-fallback {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background:
+    radial-gradient(120% 90% at 50% 0%, color-mix(in srgb, var(--poster-color, #c99a4a) 34%, transparent) 0%, transparent 72%),
+    linear-gradient(165deg, color-mix(in srgb, var(--poster-color, #c99a4a) 26%, #12100c) 0%, #0a0806 92%);
+  color: rgb(247 240 224 / 0.92);
+  text-align: center;
+  padding: 1rem;
+  font-family: var(--font-display);
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+/** מסגרת פוסטר: כבדה, עם מסגרת פנימית דקה */
+@utility poster-shell {
+  position: relative;
+  overflow: hidden;
+  border-radius: 2px;
+  background: var(--color-obsidian-850);
+  border: 1px solid rgb(201 154 74 / 0.2);
+  box-shadow: 0 14px 36px -22px rgb(0 0 0 / 0.95);
+  transition: transform 0.45s var(--ease-cinema), box-shadow 0.45s var(--ease-cinema), border-color 0.3s ease;
+}
+@utility poster-shell-hover {
+  transform: translateY(-5px);
+  border-color: rgb(224 188 120 / 0.55);
+  box-shadow: var(--shadow-poster);
+}
+
+/** הצצת אור על פני הכרטיס בריחוף */
+@utility sheen {
+  position: relative;
+  overflow: hidden;
+}
+@utility sheen-layer {
+  position: absolute;
+  inset: -40% -120%;
+  background: linear-gradient(78deg, transparent 38%, rgb(247 240 224 / 0.14) 48%, transparent 58%);
+  transform: translateX(-70%);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+/** פס גלילה אופקי נטול סקרולבר */
+@utility row-scroll {
+  display: flex;
+  gap: 1.1rem;
+  overflow-x: auto;
+  scroll-snap-type: x proximity;
+  scrollbar-width: none;
+  padding: 0.5rem 0.15rem 1.15rem;
+}
+@utility row-scroll-item { scroll-snap-align: start; flex: 0 0 auto; }
+
+/** כותרת סקשן: קו פליז דק + כותרת serif */
+@utility section-heading {
+  display: flex;
+  align-items: baseline;
+  gap: 0.7rem;
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+@utility section-heading-bar {
+  content: "";
+  display: inline-block;
+  width: 2px;
+  height: 1.05em;
+  background: linear-gradient(180deg, var(--color-brass-300), transparent);
+  box-shadow: 0 0 12px 0 rgb(201 154 74 / 0.6);
+}
+
+/** קו הפרדה מעוטר — מוטיב חוזר בין סקשנים */
+@utility rule-ornate {
+  height: 12px;
+  background-image:
+    radial-gradient(circle at 50% 50%, var(--color-brass-400) 0 1.6px, transparent 1.7px),
+    linear-gradient(90deg, transparent, rgb(201 154 74 / 0.5) 18%, rgb(201 154 74 / 0.5) 82%, transparent);
+  background-size: 100% 12px, 100% 1px;
+  background-position: center, center;
+  background-repeat: no-repeat;
+}
+
+/* ══════════════════════ אנימציות — כולן "חומר" ═════════════════════════ */
+
+/** דיו שנספג: כניסה עם טשטוש, לא קפיצה */
+@keyframes lt-ink-in {
+  from { opacity: 0; transform: translateY(14px); filter: blur(6px); }
+  to { opacity: 1; transform: translateY(0); filter: blur(0); }
+}
+@utility animate-ink-in { animation: lt-ink-in 0.7s var(--ease-ink) both; }
+
+/** אותה תנועה אבל מהצד (ל-RTL: מהשמאל) */
+@keyframes lt-ink-in-side {
+  from { opacity: 0; transform: translateX(-22px); filter: blur(5px); }
+  to { opacity: 1; transform: translateX(0); filter: blur(0); }
+}
+@utility animate-ink-in-side { animation: lt-ink-in-side 0.75s var(--ease-ink) both; }
+
+/** גחלים: הבהוב לא סדור של אור נר */
+@keyframes lt-flicker {
+  0%, 100% { opacity: 0.92; filter: brightness(1); }
+  42% { opacity: 0.72; filter: brightness(0.92); }
+  46% { opacity: 1; filter: brightness(1.14); }
+  58% { opacity: 0.8; filter: brightness(0.96); }
+  70% { opacity: 1; filter: brightness(1.06); }
+}
+@utility animate-flicker { animation: lt-flicker 5.5s ease-in-out infinite; }
+
+/** תנועת מצלמה איטית על תמונת במה */
+@keyframes lt-ken-burns {
+  from { transform: scale(1.05) translate3d(0, 0, 0); }
+  to { transform: scale(1.14) translate3d(-1.2%, -1.4%, 0); }
+}
+@utility animate-ken-burns { animation: lt-ken-burns 26s ease-in-out infinite alternate; }
+
+/** טבעת פעימה עדינה */
+@keyframes lt-pulse-ring {
+  0% { box-shadow: 0 0 0 0 rgb(201 154 74 / 0.45); }
+  70% { box-shadow: 0 0 0 14px rgb(201 154 74 / 0); }
+  100% { box-shadow: 0 0 0 0 rgb(201 154 74 / 0); }
+}
+@utility animate-ring { animation: lt-pulse-ring 2.6s infinite; }
+
+/** אבק מרחף — נצנוצים זעירים שעולים */
+@keyframes lt-dust {
+  0% { transform: translateY(0) translateX(0); opacity: 0; }
+  12% { opacity: 0.7; }
+  100% { transform: translateY(-120px) translateX(14px); opacity: 0; }
+}
+@utility animate-dust { animation: lt-dust 9s linear infinite; }
+
+/** סחיפה איטית של עלה/בד */
+@keyframes lt-drift {
+  0% { transform: translate3d(0, 0, 0) rotate(0deg); }
+  50% { transform: translate3d(-8px, -10px, 0) rotate(-1.4deg); }
+  100% { transform: translate3d(0, 0, 0) rotate(0deg); }
+}
+@utility animate-drift { animation: lt-drift 11s ease-in-out infinite; }
+
+/** שלד טעינה */
+@keyframes lt-shimmer { 100% { transform: translateX(-100%); } }
+@utility skeleton {
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(180deg, var(--color-obsidian-800), var(--color-obsidian-850));
+  border: 1px solid rgb(201 154 74 / 0.1);
+}
+@utility skeleton-shine {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent, rgb(224 188 120 / 0.09), transparent);
+  animation: lt-shimmer 1.9s infinite;
+}
+
+@keyframes lt-fade-in { from { opacity: 0; } to { opacity: 1; } }
+@utility animate-fade-in { animation: lt-fade-in 0.6s ease both; }
+
+/** קו שנמשך — להפרדות ולסרגלים */
+@keyframes lt-draw {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
+}
+@utility animate-draw { animation: lt-draw 1s var(--ease-ink) both; transform-origin: right center; }
+
+/** כניסה מדורגת לשורות (delay דרך inline style) */
+@utility reveal-item {
+  opacity: 0;
+  animation: lt-ink-in 0.72s var(--ease-ink) forwards;
+}
+
+/* ── נגן וידאו ── */
+@utility player-wrap {
+  position: relative;
+  width: 100%;
+  background: #050403;
+  border: 1px solid rgb(201 154 74 / 0.22);
+  overflow: hidden;
+  aspect-ratio: 16 / 9;
+  box-shadow: 0 40px 100px -50px rgb(0 0 0 / 1), 0 0 0 1px rgb(224 188 120 / 0.06);
+}
+
+/* ── טבלאות ניהול ── */
+@utility admin-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 1rem;
+  font-variant-numeric: tabular-nums;
+}
+
+@utility text-gradient {
+  background: linear-gradient(160deg, var(--color-parchment-100), var(--color-brass-300) 55%, var(--color-brass-500));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+@utility no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+@utility no-scrollbar-hide { display: none; }
+
+@utility ring-glow {
+  box-shadow: 0 0 0 1px rgb(201 154 74 / 0.5), 0 0 22px -8px rgb(201 154 74 / 0.6);
+}
+
+/* חותם שעווה — לפיצ'רים "נדירים" */
+@utility wax-seal {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.1rem;
+  height: 2.1rem;
+  border-radius: 999px;
+  background: radial-gradient(circle at 34% 30%, #9b2f3c, var(--color-oxblood-600) 70%);
+  box-shadow: 0 0 0 1px rgb(224 188 120 / 0.25) inset, 0 6px 14px -8px rgb(0 0 0 / 0.9);
+  color: var(--color-parchment-50);
+  font-family: var(--font-display);
+  font-weight: 700;
+}
+
+[dir="rtl"] .flip-rtl { transform: scaleX(-1); }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+@media print {
+  body { background: #fff; color: #000; }
+  body::before, body::after { display: none; }
+  .no-print { display: none !important; }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   תנועה — כל אלמנט קטן זז. הכל מדמה חומר: דיו, להבה, שעווה, קו שמצטייר.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/** תאימות לאחור: אותו מהלך דיו גם בשם הקודם */
+@utility animate-fade-up { animation: lt-ink-in 0.7s var(--ease-ink) both; }
+
+/** נדנוד עדין לשגיאה — לא קפיצה אלסטית, אלא כתם שנמרח */
+@keyframes lt-shake {
+  0%, 100% { transform: translateX(0); }
+  18% { transform: translateX(-5px); }
+  38% { transform: translateX(4px); }
+  58% { transform: translateX(-2px); }
+  78% { transform: translateX(1px); }
+}
+@utility animate-shake { animation: lt-shake 0.5s var(--ease-ink) both; }
+
+/** שלוש נקודות שמהבהבות כמו להבה — למצב טעינה */
+@keyframes lt-lamp {
+  0%, 100% { opacity: 0.25; transform: translateY(0); }
+  50%      { opacity: 1;    transform: translateY(-2px); }
+}
+@utility animate-lamp { animation: lt-lamp 1.1s ease-in-out infinite; }
+
+/** חותם שמתהדק: קנה מידה קטן + הילה */
+@keyframes lt-seal {
+  0%   { transform: scale(0.86); opacity: 0; }
+  60%  { transform: scale(1.03); opacity: 1; }
+  100% { transform: scale(1);    opacity: 1; }
+}
+@utility animate-seal { animation: lt-seal 0.45s var(--ease-ink) both; }
+
+/** קו שמצטייר — לקו תחתון של שדה קלט במיקוד */
+@keyframes lt-draw-x {
+  from { transform: scaleX(0); }
+  to   { transform: scaleX(1); }
+}
+@utility animate-draw-x { animation: lt-draw-x 0.45s var(--ease-ink) both; transform-origin: right; }
+
+/** שדה קלט חרות: קו פליז שמצטייר במיקוד, בלי מסגרת גנרית */
+@utility field-ink {
+  position: relative;
+  width: 100%;
+  background: rgb(10 8 6 / 0.7);
+  border: 1px solid rgb(201 154 74 / 0.22);
+  clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
+  padding: 0.72rem 0.9rem;
+  color: var(--color-parchment-100);
+  transition: border-color 0.3s var(--ease-ink), background 0.3s var(--ease-ink), box-shadow 0.4s var(--ease-ink);
+}
+@utility field-ink-focus {
+  border-color: rgb(224 188 120 / 0.7);
+  background: rgb(18 16 12 / 0.9);
+  box-shadow: 0 0 0 1px rgb(224 188 120 / 0.18), 0 12px 34px -22px rgb(201 154 74 / 0.9);
+}
+@utility field-label {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-family: var(--font-display);
+  font-size: 0.9rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: rgb(205 184 145 / 0.92);
+  margin-bottom: 0.35rem;
+}
+@utility field-error {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  border: 1px solid rgb(124 36 48 / 0.6);
+  background: rgb(124 36 48 / 0.16);
+  color: var(--color-parchment-100);
+  clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
+  padding: 0.7rem 0.9rem;
+  font-size: 0.9rem;
+}
+
+/** תאי קוד אימות (2FA) — כל תא נראה כמו חריץ בקיר */
+@utility code-cell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  aspect-ratio: 1 / 1.15;
+  background: rgb(10 8 6 / 0.75);
+  border: 1px solid rgb(201 154 74 / 0.25);
+  clip-path: polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px);
+  font-family: var(--font-display);
+  font-size: 1.7rem;
+  font-weight: 700;
+  color: var(--color-parchment-50);
+  transition: border-color 0.25s var(--ease-ink), transform 0.25s var(--ease-ink), box-shadow 0.3s var(--ease-ink);
+}
+@utility code-cell-active {
+  border-color: rgb(224 188 120 / 0.85);
+  transform: translateY(-2px);
+  box-shadow: 0 10px 26px -16px rgb(201 154 74 / 1);
+}
+
+/** "פתיחת הדלת" בכניסה מוצלחת: אור שמתרחב מהמרכז */
+@keyframes lt-door {
+  0%   { opacity: 0; transform: scaleY(0.2); }
+  45%  { opacity: 0.9; }
+  100% { opacity: 0; transform: scaleY(1.6); }
+}
+@utility animate-door { animation: lt-door 1.1s var(--ease-cinema) both; transform-origin: center; }
+
+/** מסגרת זוהרת עדינה סביב פעולה ראשית */
+@keyframes lt-ring {
+  0%, 100% { box-shadow: 0 0 0 0 rgb(201 154 74 / 0.35); }
+  50%      { box-shadow: 0 0 0 6px rgb(201 154 74 / 0); }
+}
+@utility animate-ring-pulse { animation: lt-ring 2.6s ease-out infinite; }
+
+/** כרטיס שמתרומם מהשולחן */
+@utility lift {
+  transition: transform 0.5s var(--ease-ink), box-shadow 0.5s var(--ease-ink), border-color 0.4s var(--ease-ink);
+}
+@utility lift-hover {
+  transform: translateY(-4px);
+}

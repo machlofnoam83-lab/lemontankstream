@@ -1,0 +1,45 @@
+{
+  "name": "lemontank-stream",
+  "version": "1.0.0",
+  "private": true,
+  "description": "LemonTank Stream - Hebrew movie & series streaming platform (Free / Plus)",
+  "scripts": {
+    "dev": "node server.mjs --dev",
+    "build": "next build",
+    "start": "node server.mjs",
+    "watchdog": "node scripts/watchdog.mjs",
+    "watchdog:status": "node scripts/watchdog.mjs --once",
+    "autostart": "node scripts/install-autostart.mjs",
+    "typecheck": "tsc --noEmit",
+    "test": "node scripts/apply-migrations.mjs --quiet && node scripts/test-prep.mjs && node --test tests/*.test.mjs",
+    "start:next": "next start -H 0.0.0.0 -p 3000",
+    "security": "node scripts/security.mjs",
+    "security:status": "node scripts/security.mjs status",
+    "setup": "node scripts/local-setup.mjs",
+    "update": "node scripts/update.mjs",
+    "setup:check": "node scripts/local-setup.mjs --check",
+    "recover": "node scripts/recover.mjs",
+    "db:migrate": "node scripts/apply-migrations.mjs",
+    "db:status": "node scripts/apply-migrations.mjs --status",
+    "port": "node scripts/pick-port.mjs",
+    "status": "node scripts/status.mjs",
+    "doctor": "node scripts/doctor.mjs"
+  },
+  "dependencies": {
+    "next": "^15.5.26",
+    "react": "19.1.0",
+    "react-dom": "19.1.0",
+    "zod": "^3.24.1"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4.1.13",
+    "@types/node": "^22.10.5",
+    "@types/react": "^19.0.7",
+    "@types/react-dom": "^19.0.3",
+    "tailwindcss": "^4.1.13",
+    "typescript": "^5.7.3"
+  },
+  "engines": {
+    "node": ">=22.13.0 <23.0.0 || >=23.4.0"
+  }
+}

@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="600" height="900" viewBox="0 0 600 900" role="img" aria-label="המשפחה שלי">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0.7" y2="1">
+      <stop offset="0%" stop-color="#2a0b06"/>
+      <stop offset="55%" stop-color="#050508"/>
+      <stop offset="100%" stop-color="#000000"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="50%" cy="42%" r="55%">
+      <stop offset="0%" stop-color="#ff5a3c" stop-opacity="0.55"/>
+      <stop offset="100%" stop-color="#ff5a3c" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="beam" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#ff5a3c" stop-opacity="0.9"/>
+      <stop offset="100%" stop-color="#ffb199" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="fade" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="45%" stop-color="#000" stop-opacity="0"/>
+      <stop offset="100%" stop-color="#000" stop-opacity="0.92"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="600" height="900" fill="url(#bg)"/>
+  <g>
+      <circle cx="312" cy="334" r="108" fill="#ff5a3c" opacity="0.38"/>
+      <path d="M-40 573 Q 160 432 340 566 T 640 568 L 640 900 L -40 900 Z" fill="#2a0b06" opacity="0.92"/>
+  </g>
+  <rect width="600" height="900" fill="url(#fade)"/>
+
+  <!-- תג עליון -->
+  <g font-family="Heebo, Assistant, Arial, sans-serif" direction="rtl">
+    <rect x="448" y="34" width="118" height="34" rx="17" fill="#ff5a3c" opacity="0.92"/>
+    <text x="507" y="57" text-anchor="middle" font-size="17" font-weight="800" fill="#0a0a10">סרט</text>
+    <text x="34" y="58" font-size="16" font-weight="700" fill="#ffb199" opacity="0.9" direction="ltr" text-anchor="start">LEMONTANK</text>
+  </g>
+
+  <!-- כותרת -->
+  <g font-family="Heebo, Assistant, Rubik, Arial, sans-serif">
+    <text x="300" y="700" text-anchor="middle" direction="rtl" font-size="64" font-weight="900" fill="#ffffff" letter-spacing="-1.5">המשפחה שלי</text>
+  </g>
+
+  <!-- מטא -->
+  <g font-family="Heebo, Assistant, Arial, sans-serif" direction="rtl">
+    <line x1="150" y1="738" x2="450" y2="738" stroke="#ff5a3c" stroke-width="2" opacity="0.65"/>
+    <text x="300" y="768" text-anchor="middle" font-size="23" font-weight="700" fill="#ffb199" opacity="0.95">2004 · 115 דק׳ · ★ 8.0</text>
+    <text x="300" y="800" text-anchor="middle" font-size="17" font-weight="600" fill="#ffffff" opacity="0.62" direction="ltr">The Incredibles</text>
+  </g>
+
+  <rect x="0.5" y="0.5" width="599" height="899" fill="none" stroke="#ffffff" stroke-opacity="0.09"/>
+</svg>

@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900" role="img" aria-label="צייד השדים: רכבת האינסוף">
+  <defs>
+    <linearGradient id="bg" x1="1" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#2a0b06"/>
+      <stop offset="60%" stop-color="#050508"/>
+      <stop offset="100%" stop-color="#000"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="26%" cy="42%" r="62%">
+      <stop offset="0%" stop-color="#ff5a3c" stop-opacity="0.42"/>
+      <stop offset="100%" stop-color="#ff5a3c" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="beam" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#ff5a3c" stop-opacity="0.8"/>
+      <stop offset="100%" stop-color="#ffb199" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="side" x1="1" y1="0" x2="0" y2="0">
+      <stop offset="0%" stop-color="#050508"/>
+      <stop offset="52%" stop-color="#050508" stop-opacity="0.85"/>
+      <stop offset="100%" stop-color="#050508" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="1600" height="900" fill="url(#bg)"/>
+  <circle cx="430" cy="380" r="440" fill="url(#glow)"/>
+  <rect x="-837.44" y="-500" width="53.972" height="2000" fill="url(#beam)" opacity="0.21" transform="rotate(-17 800 450)"/>
+  <rect x="-594.4" y="-500" width="61.47" height="2000" fill="url(#beam)" opacity="0.23" transform="rotate(-17 800 450)"/>
+  <rect x="-361.12" y="-500" width="63.356" height="2000" fill="url(#beam)" opacity="0.24" transform="rotate(-17 800 450)"/>
+  <rect x="-170.32" y="-500" width="40.816" height="2000" fill="url(#beam)" opacity="0.16" transform="rotate(-17 800 450)"/>
+  <rect x="89.92" y="-500" width="58.204" height="2000" fill="url(#beam)" opacity="0.22" transform="rotate(-17 800 450)"/>
+  <rect x="267.44" y="-500" width="28.028" height="2000" fill="url(#beam)" opacity="0.11" transform="rotate(-17 800 450)"/>
+  <rect x="484.32" y="-500" width="20.484" height="2000" fill="url(#beam)" opacity="0.09" transform="rotate(-17 800 450)"/>
+  <rect x="731.04" y="-500" width="30.098" height="2000" fill="url(#beam)" opacity="0.12" transform="rotate(-17 800 450)"/>
+  <rect x="945.2" y="-500" width="20.990000000000002" height="2000" fill="url(#beam)" opacity="0.09" transform="rotate(-17 800 450)"/>
+  <rect width="1600" height="900" fill="#000" opacity="0.18"/>
+
+  <rect x="0" y="0" width="1600" height="900" fill="url(#side)"/>
+  <g font-family="Heebo, Assistant, Rubik, Arial, sans-serif" direction="rtl" text-anchor="middle">
+    <text x="1168" y="364" font-size="24" font-weight="800" fill="#ff5a3c" letter-spacing="3">LEMONTANK ORIGINAL</text>
+    <text x="1168" y="430" font-size="92" font-weight="900" fill="#fff" letter-spacing="-3">צייד השדים: רכבת האינסוף</text>
+  </g>
+  <rect x="0" y="0" width="1600" height="900" fill="none" stroke="#ffffff" stroke-opacity="0.06"/>
+</svg>

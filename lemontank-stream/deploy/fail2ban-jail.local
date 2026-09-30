@@ -1,0 +1,8 @@
+[lemontank]
+enabled  = true
+filter   = lemontank
+logpath  = /opt/lemontank/logs/security.log
+maxretry = 3
+findtime = 600
+bantime  = 86400
+action   = ufw[name=lemontank]

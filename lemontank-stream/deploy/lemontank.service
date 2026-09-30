@@ -1,0 +1,44 @@
+# ═══════════════════════════════════════════════════════════════════════════
+#  שירות systemd — מריץ את שער האבטחה (server.mjs) עם Next.js בפנים
+#  התקנה:  cp deploy/lemontank.service /etc/systemd/system/
+#           systemctl daemon-reload && systemctl enable --now lemontank
+# ═══════════════════════════════════════════════════════════════════════════
+
+[Unit]
+Description=LemonTank Stream (שער אבטחה + Next.js)
+After=network.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=lemontank
+Group=lemontank
+WorkingDirectory=/opt/lemontank
+Environment=NODE_ENV=production
+Environment=PORT=3000
+Environment=HOST=127.0.0.1
+ExecStart=/usr/bin/node server.mjs
+Restart=always
+RestartSec=3
+
+# ── הקשחת השירות (systemd hardening) ──────────────────────────────────────
+NoNewPrivileges=true
+PrivateTmp=true
+PrivateDevices=true
+ProtectSystem=strict
+ProtectHome=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+RestrictSUIDSGID=true
+RestrictRealtime=true
+LockPersonality=true
+MemoryDenyWriteExecute=false
+ReadWritePaths=/opt/lemontank/data /opt/lemontank/storage /opt/lemontank/logs
+# מגבלות משאבים — מונע תליה של השרת בתקיפת נפח
+LimitNOFILE=65535
+MemoryMax=4G
+TasksMax=512
+
+[Install]
+WantedBy=multi-user.target
